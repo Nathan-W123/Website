@@ -578,7 +578,7 @@ export function ProjectWorld() {
               {activeProject.details.map((detail) => <li key={detail}><i style={{ backgroundColor: activeProject.accent }} />{detail}</li>)}
             </ul>
             <div className="world-dialog-actions">
-              <Button render={<a href={activeProject.href} target="_blank" rel="noreferrer" />} className="world-dialog-primary"><FolderGit2 /> Explore project <ExternalLink /></Button>
+              <Button nativeButton={false} render={<a href={activeProject.href} target="_blank" rel="noreferrer" />} className="world-dialog-primary"><FolderGit2 /> Explore project <ExternalLink /></Button>
               <Button variant="ghost" onClick={() => setProjectOpen(false)}>Return to world</Button>
             </div>
           </div>
