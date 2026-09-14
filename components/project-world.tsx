@@ -11,298 +11,301 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const WORLD = { width: 2200, height: 1500 };
-const PLAYER_SPEED = 235;
+const WORLD = { width: 1536, height: 1024 };
+const START = { x: 720, y: 946 };
+const PLAYER_SPEED = 150;
+const INTERACTION_RADIUS = 58;
 
 type Point = { x: number; y: number };
+type Rect = { x: number; y: number; w: number; h: number };
 type Direction = 'up' | 'down' | 'left' | 'right';
-type Landmark =
-  | 'observatory'
-  | 'chess'
-  | 'arena'
-  | 'terminal'
-  | 'kiosk'
-  | 'radio'
-  | 'tunnel'
-  | 'molecule'
-  | 'greenhouse'
-  | 'quantum'
-  | 'portal';
 
 type Project = {
   id: string;
   number: string;
-  name: string;
-  kind: string;
+  location: string;
+  projectName: string;
+  category: string;
   href: string;
   summary: string;
   details: string[];
-  biome: string;
-  x: number;
-  y: number;
-  landmark: Landmark;
-  sigil: string;
+  area: string;
   accent: string;
+  landmark: Point;
+  approach: Point;
+  building: Rect;
 };
 
 const PROJECTS: Project[] = [
   {
-    id: 'black-hole', number: '01', name: 'Black Hole Sim', kind: 'ASTROPHYSICS / PYTHON',
-    href: 'https://github.com/Nathan-W123/Black-Hole-Sim',
-    summary: 'A physically validated general-relativistic simulator for timelike and null geodesics around a Schwarzschild black hole.',
-    details: ['Backward ray tracing from an arbitrary camera', 'Novikov–Thorne accretion disk with Doppler shifts', 'Lensed starfields, photon rings, and secondary images'],
-    biome: 'Astral Wilds', x: 1100, y: 310, landmark: 'observatory', sigil: '◉', accent: '#8df0d1',
+    id: 'black-hole', number: '01', location: 'Starfall Observatory', projectName: 'Black Hole Sim', category: 'ASTROPHYSICS · PYTHON',
+    href: 'https://github.com/Nathan-W123/Black-Hole-Sim', area: 'Starfall Highlands', accent: '#f1c66d',
+    summary: 'A general-relativistic simulator for tracing light and matter around a Schwarzschild black hole.',
+    details: ['Backward ray tracing from an arbitrary camera', 'Relativistic accretion-disk color and Doppler shifts', 'Photon rings, lensed starfields, and secondary images'],
+    landmark: { x: 307, y: 104 }, approach: { x: 307, y: 196 }, building: { x: 224, y: 28, w: 166, h: 134 },
   },
   {
-    id: 'gambit', number: '02', name: 'Gambit', kind: 'MACHINE LEARNING / PYTHON',
-    href: 'https://github.com/Nathan-W123/Gambit',
-    summary: 'A neural network trained on human games to play bullet chess through the official Lichess Bot API.',
-    details: ['Policy + value residual convolutional network', 'Alpha-beta search tuned for bullet time controls', 'ONNX inference path and legal-move masking'],
-    biome: 'Strategy Gardens', x: 450, y: 360, landmark: 'chess', sigil: '♞', accent: '#f0c977',
+    id: 'gambit', number: '02', location: "Knight's Rest", projectName: 'Gambit', category: 'MACHINE LEARNING · PYTHON',
+    href: 'https://github.com/Nathan-W123/Gambit', area: 'Alderwatch', accent: '#8cb4e5',
+    summary: 'A chess-playing neural network trained on human games and built to compete through the official Lichess Bot API.',
+    details: ['Policy-and-value residual convolutional network', 'Alpha-beta search tuned for bullet time controls', 'ONNX inference and legal-move masking'],
+    landmark: { x: 659, y: 155 }, approach: { x: 659, y: 242 }, building: { x: 532, y: 72, w: 250, h: 157 },
   },
   {
-    id: 'siege', number: '03', name: 'Siege', kind: 'REINFORCEMENT LEARNING / PYTHON',
-    href: 'https://github.com/Nathan-W123/Siege',
+    id: 'siege', number: '03', location: 'The Proving Grounds', projectName: 'Siege', category: 'REINFORCEMENT LEARNING · PYTHON',
+    href: 'https://github.com/Nathan-W123/Siege', area: 'Alderwatch', accent: '#d7784b',
     summary: 'An educational reinforcement-learning project that learns strategy inside a custom battle simulator.',
     details: ['Config-driven simulator and scripted opponents', 'Masked policy with league self-play', 'Training reports and a live WebGL network viewer'],
-    biome: 'Strategy Gardens', x: 280, y: 680, landmark: 'arena', sigil: '⬢', accent: '#ffb96f',
+    landmark: { x: 489, y: 328 }, approach: { x: 489, y: 406 }, building: { x: 420, y: 277, w: 138, h: 110 },
   },
   {
-    id: 'kumi', number: '04', name: 'Kumi', kind: 'AGENT SYSTEMS / TYPESCRIPT',
-    href: 'https://github.com/Nathan-W123/Kumi',
-    summary: 'An agent-neutral coordination layer that schedules, isolates, validates, and integrates parallel software work.',
-    details: ['Isolated worktrees and conflict-aware scheduling', 'Human and multi-agent task coordination', 'Validation, approvals, audit history, and atomic promotion'],
-    biome: 'Terminal Grove', x: 1750, y: 340, landmark: 'terminal', sigil: 'K', accent: '#6debb0',
+    id: 'kumi', number: '04', location: "Weaver's Guild", projectName: 'Kumi', category: 'AGENT SYSTEMS · TYPESCRIPT',
+    href: 'https://github.com/Nathan-W123/Kumi', area: 'Alderwatch', accent: '#d4a84e',
+    summary: 'An agent-neutral coordination layer for scheduling, isolating, validating, and integrating parallel software work.',
+    details: ['Isolated worktrees and conflict-aware scheduling', 'Human and multi-agent task coordination', 'Approvals, audit history, and atomic promotion'],
+    landmark: { x: 730, y: 357 }, approach: { x: 730, y: 430 }, building: { x: 656, y: 286, w: 150, h: 120 },
   },
   {
-    id: 'kumi-site', number: '05', name: 'Kumi Website', kind: 'WEB / HTML',
-    href: 'https://github.com/Nathan-W123/Kumi-Website',
-    summary: 'The public face of Kumi: a fast, framework-free multi-page marketing site with clean URL routing.',
+    id: 'kumi-site', number: '05', location: 'The Printworks', projectName: 'Kumi Website', category: 'WEB · HTML',
+    href: 'https://github.com/Nathan-W123/Kumi-Website', area: 'Alderwatch', accent: '#e08250',
+    summary: 'The public face of Kumi: a fast, framework-free multi-page site with clean routing and accessible motion.',
     details: ['Nine hand-authored pages and one shared stylesheet', 'Path-prefix-safe links for embedded previews', 'Accessibility and reduced-motion regression tests'],
-    biome: 'Terminal Grove', x: 1930, y: 620, landmark: 'kiosk', sigil: '⌁', accent: '#8bd8c2',
+    landmark: { x: 928, y: 376 }, approach: { x: 928, y: 441 }, building: { x: 854, y: 320, w: 154, h: 103 },
   },
   {
-    id: 'voice-agents', number: '06', name: 'Voice Agents', kind: 'VOICE AI / TYPESCRIPT',
-    href: 'https://github.com/Nathan-W123/YCHackVoiceAgents',
-    summary: 'A TypeScript voice-agent experiment created for a YC hackathon.',
-    details: ['Realtime conversational interface', 'Hackathon-scale product experiment', 'Built around expressive voice interaction'],
-    biome: 'Terminal Grove', x: 1560, y: 670, landmark: 'radio', sigil: '⌁', accent: '#74d8ef',
+    id: 'voice-agents', number: '06', location: 'Signal House', projectName: 'Voice Agents', category: 'VOICE AI · TYPESCRIPT',
+    href: 'https://github.com/Nathan-W123/YCHackVoiceAgents', area: 'Alderwatch', accent: '#c99357',
+    summary: 'A TypeScript voice-agent experiment built for a YC hackathon around expressive real-time conversation.',
+    details: ['Realtime conversational interface', 'Hackathon-scale product experiment', 'An exploration of expressive voice interaction'],
+    landmark: { x: 1095, y: 239 }, approach: { x: 1095, y: 314 }, building: { x: 1050, y: 187, w: 93, h: 108 },
   },
   {
-    id: 'aero', number: '07', name: 'Aero', kind: 'FLUID DYNAMICS / PYTHON',
-    href: 'https://github.com/Nathan-W123/Aero',
+    id: 'aero', number: '07', location: 'Gale Works', projectName: 'Aero', category: 'FLUID DYNAMICS · PYTHON',
+    href: 'https://github.com/Nathan-W123/Aero', area: 'Gale Coast', accent: '#65bccc',
     summary: 'A from-scratch 2D and 3D lattice-Boltzmann wind-tunnel simulator for external and internal flows.',
-    details: ['D2Q9 and D3Q19 solvers with multiple collision models', 'Analytic geometry and STL voxelization workflows', 'Force, lift, drag, scalar, and thermal observables'],
-    biome: 'Wind Coast', x: 390, y: 1160, landmark: 'tunnel', sigil: '≋', accent: '#85dce9',
+    details: ['D2Q9 and D3Q19 solvers with multiple collision models', 'Analytic geometry and STL voxelization workflows', 'Lift, drag, scalar, thermal, and force observables'],
+    landmark: { x: 1370, y: 169 }, approach: { x: 1362, y: 263 }, building: { x: 1292, y: 87, w: 172, h: 150 },
   },
   {
-    id: 'quantize', number: '08', name: 'Quantize', kind: 'MOLECULAR SCIENCE / PYTHON',
-    href: 'https://github.com/Nathan-W123/Quantize',
+    id: 'quantize', number: '08', location: 'Atom Garden', projectName: 'Quantize', category: 'MOLECULAR SCIENCE · PYTHON',
+    href: 'https://github.com/Nathan-W123/Quantize', area: 'Lumenwood', accent: '#a786ff',
     summary: 'Hybrid molecular-geometry inversion from rotational spectroscopy and quantum chemistry.',
     details: ['SVD separates spectroscopy-sensitive and null directions', 'Quantum gradients stabilize underspecified structures', 'Multi-isotopologue fitting with correction provenance'],
-    biome: 'Matter Marsh', x: 880, y: 1190, landmark: 'molecule', sigil: '⌬', accent: '#c7ea85',
+    landmark: { x: 205, y: 554 }, approach: { x: 205, y: 627 }, building: { x: 133, y: 506, w: 148, h: 105 },
   },
   {
-    id: 'formulate', number: '09', name: 'Formulate', kind: 'MATERIALS DESIGN / PYTHON',
-    href: 'https://github.com/Nathan-W123/Formulate',
+    id: 'formulate', number: '09', location: 'Glassroot Conservatory', projectName: 'Formulate', category: 'MATERIALS DESIGN · PYTHON',
+    href: 'https://github.com/Nathan-W123/Formulate', area: 'Glassroot Fields', accent: '#7ecf92',
     summary: 'A behavior-driven inverse materials engine that maps desired properties to ranked molecules and formulations.',
     details: ['Unit-safe target specifications and uncertainty', 'Search, expert prediction, and Pareto ranking', 'Selective quantum and molecular-dynamics validation'],
-    biome: 'Matter Marsh', x: 1320, y: 1170, landmark: 'greenhouse', sigil: '✣', accent: '#d9df72',
+    landmark: { x: 617, y: 593 }, approach: { x: 617, y: 674 }, building: { x: 526, y: 508, w: 184, h: 137 },
   },
   {
-    id: 'hf-scf', number: '10', name: 'HF–SCF Engine', kind: 'QUANTUM CHEMISTRY / PYTHON',
-    href: 'https://github.com/Nathan-W123/HF-SCF-Engine',
+    id: 'hf-scf', number: '10', location: 'Violet Spire', projectName: 'HF–SCF Engine', category: 'QUANTUM CHEMISTRY · PYTHON',
+    href: 'https://github.com/Nathan-W123/HF-SCF-Engine', area: 'Violet Reach', accent: '#a878e8',
     summary: 'A Hartree–Fock self-consistent field engine with an interactive browser-facing demo.',
-    details: ['Quantum-chemistry computation from first principles', 'Self-consistent field iteration', 'Interactive project demo available on the web'],
-    biome: 'Matter Marsh', x: 1810, y: 1130, landmark: 'quantum', sigil: 'Ψ', accent: '#d7a6f4',
+    details: ['Quantum-chemistry computation from first principles', 'Self-consistent field iteration', 'An interactive project demo for the browser'],
+    landmark: { x: 1044, y: 560 }, approach: { x: 1044, y: 676 }, building: { x: 992, y: 467, w: 109, h: 183 },
   },
   {
-    id: 'website', number: '11', name: 'Nathan’s World', kind: 'INTERACTIVE WEB / TYPESCRIPT',
-    href: 'https://github.com/Nathan-W123/Website',
-    summary: 'The world you are standing in: a playable portfolio where every project becomes a place to discover.',
-    details: ['Top-down canvas exploration with keyboard and touch controls', 'Biome-based project storytelling', 'A living world designed to grow with new work'],
-    biome: 'Crossroads', x: 1100, y: 800, landmark: 'portal', sigil: 'NW', accent: '#f2cf69',
+    id: 'website', number: '11', location: "Traveler's Archive", projectName: 'Nathan’s World', category: 'INTERACTIVE WEB · TYPESCRIPT',
+    href: 'https://github.com/Nathan-W123/Website', area: 'Glassroot Fields', accent: '#f3c75e',
+    summary: 'The world you are standing in: a playable portfolio where every project becomes a place worth discovering.',
+    details: ['Top-down exploration with keyboard and touch controls', 'Place-based project storytelling', 'A growing world for future work and experiments'],
+    landmark: { x: 720, y: 829 }, approach: { x: 720, y: 914 }, building: { x: 588, y: 744, w: 271, h: 145 },
   },
 ];
 
+const WORLD_BLOCKERS: Rect[] = [
+  { x: 0, y: 421, w: 424, h: 88 },
+  { x: 499, y: 428, w: 710, h: 84 },
+  { x: 1269, y: 418, w: 267, h: 112 },
+  ...PROJECTS.map((project) => project.building),
+];
+
+const directionRow: Record<Direction, number> = { down: 0, left: 1, right: 2, up: 3 };
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
-const hash = (x: number, y: number) => {
-  const value = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
-  return value - Math.floor(value);
-};
+const overlaps = (a: Rect, b: Rect) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
-const biomeAt = (point: Point) => {
-  if (point.y < 770 && point.x < 750) return 'Strategy Gardens';
-  if (point.y < 780 && point.x > 1450) return 'Terminal Grove';
-  if (point.y > 890 && point.x < 650) return 'Wind Coast';
-  if (point.y > 900 && point.x >= 650) return 'Matter Marsh';
-  if (point.y < 620) return 'Astral Wilds';
-  return 'Crossroads';
-};
-
-function rectsOverlap(a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) {
-  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+function areaAt(point: Point) {
+  if (point.y < 240 && point.x < 455) return 'Starfall Highlands';
+  if (point.x > 1190 && point.y < 530) return 'Gale Coast';
+  if (point.y > 480 && point.x < 470) return 'Lumenwood';
+  if (point.y > 470 && point.x > 900) return 'Violet Reach';
+  if (point.y > 470) return 'Glassroot Fields';
+  return 'Alderwatch';
 }
 
-function drawLabel(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = '#e8f4cf') {
-  ctx.save();
-  ctx.font = '700 12px "Courier New", monospace';
-  ctx.textAlign = 'center';
-  const width = ctx.measureText(text).width;
-  ctx.fillStyle = 'rgba(7, 13, 18, .82)';
-  ctx.fillRect(Math.round(x - width / 2 - 7), Math.round(y - 12), Math.round(width + 14), 19);
-  ctx.fillStyle = color;
-  ctx.fillText(text, Math.round(x), Math.round(y + 1));
-  ctx.restore();
+function clearsBlockers(point: Point) {
+  const feet = { x: point.x - 6, y: point.y - 11, w: 12, h: 14 };
+  return !WORLD_BLOCKERS.some((blocker) => overlaps(feet, blocker));
 }
 
-function terrainColor(x: number, y: number, detail: number) {
-  if (y < 770 && x < 750) return detail > 0.72 ? '#55462e' : '#493c2b';
-  if (y < 780 && x > 1450) return detail > 0.72 ? '#183f39' : '#123530';
-  if (y > 890 && x < 650) return detail > 0.72 ? '#315660' : '#294b55';
-  if (y > 900 && x >= 650) return detail > 0.72 ? '#3f4f36' : '#35442f';
-  if (y < 620) return detail > 0.72 ? '#315354' : '#294747';
-  return detail > 0.72 ? '#365447' : '#2e493e';
+const WATER_GLINTS: Point[] = [
+  { x: 17, y: 477 }, { x: 74, y: 454 }, { x: 353, y: 460 }, { x: 390, y: 486 },
+  { x: 546, y: 462 }, { x: 642, y: 479 }, { x: 780, y: 472 }, { x: 876, y: 486 },
+  { x: 1124, y: 470 }, { x: 1288, y: 454 }, { x: 1420, y: 505 }, { x: 1490, y: 352 },
+  { x: 1452, y: 66 }, { x: 1510, y: 188 }, { x: 1360, y: 330 }, { x: 1510, y: 690 },
+  { x: 1435, y: 930 }, { x: 1235, y: 1005 }, { x: 960, y: 1008 }, { x: 314, y: 1003 },
+];
+
+const GLOW_POINTS = [
+  { x: 205, y: 541, color: '#77dfff', phase: 0 }, { x: 158, y: 684, color: '#876dff', phase: .7 },
+  { x: 296, y: 675, color: '#8c72ff', phase: 1.3 }, { x: 1044, y: 510, color: '#ba77ff', phase: .4 },
+  { x: 1008, y: 604, color: '#996cff', phase: 1.1 }, { x: 1080, y: 621, color: '#c48bff', phase: 1.8 },
+  { x: 307, y: 112, color: '#ffd471', phase: .2 }, { x: 617, y: 580, color: '#a6f0a7', phase: 1.5 },
+];
+
+const STEAM_SOURCES = [
+  { x: 746, y: 300, phase: 0 }, { x: 925, y: 331, phase: .35 },
+  { x: 700, y: 759, phase: .7 }, { x: 1095, y: 217, phase: .15 },
+];
+
+const TREE_SWAY = [
+  { x: 433, y: 258, color: '#245e3d' }, { x: 833, y: 197, color: '#2e7347' },
+  { x: 1153, y: 282, color: '#28613d' }, { x: 342, y: 650, color: '#144a39' },
+  { x: 475, y: 711, color: '#1b533a' }, { x: 887, y: 688, color: '#245b39' },
+  { x: 1182, y: 705, color: '#286443' }, { x: 1362, y: 646, color: '#2b6845' },
+];
+
+function drawWindmill(context: CanvasRenderingContext2D, x: number, y: number, radius: number, time: number) {
+  const angle = Math.floor(time / 160) % 12 * (Math.PI / 6);
+  context.save();
+  context.translate(x, y);
+  context.rotate(angle);
+  for (let arm = 0; arm < 4; arm += 1) {
+    context.rotate(Math.PI / 2);
+    context.fillStyle = '#513d27';
+    context.fillRect(-3, -radius, 6, radius - 3);
+    context.fillStyle = '#e7d6a1';
+    context.fillRect(-1, -radius + 2, 3, radius - 7);
+    context.fillRect(2, -radius + 4, 5, Math.max(5, Math.round(radius * .36)));
+  }
+  context.fillStyle = '#3b2d21';
+  context.fillRect(-5, -5, 10, 10);
+  context.fillStyle = '#d39d4a';
+  context.fillRect(-2, -2, 4, 4);
+  context.restore();
 }
 
-function drawTerrain(ctx: CanvasRenderingContext2D) {
-  const tile = 32;
-  for (let y = 0; y < WORLD.height; y += tile) {
-    for (let x = 0; x < WORLD.width; x += tile) {
-      const d = hash(x / tile, y / tile);
-      ctx.fillStyle = terrainColor(x, y, d);
-      ctx.fillRect(x, y, tile, tile);
-      if (d > 0.88) {
-        const biome = biomeAt({ x, y });
-        if (biome === 'Terminal Grove') {
-          ctx.fillStyle = '#082a25'; ctx.fillRect(x + 8, y + 7, 17, 22);
-          ctx.fillStyle = '#5cc18c'; ctx.fillRect(x + 11, y + 11, 11, 3); ctx.fillRect(x + 11, y + 18, 7, 3);
-        } else if (biome === 'Wind Coast') {
-          ctx.fillStyle = '#86bdc3'; ctx.fillRect(x + 4, y + 13, 20, 3); ctx.fillRect(x + 13, y + 20, 15, 2);
-        } else if (biome === 'Matter Marsh') {
-          ctx.fillStyle = '#a9be6d'; ctx.fillRect(x + 14, y + 12, 3, 16); ctx.fillRect(x + 7, y + 9, 8, 5); ctx.fillRect(x + 17, y + 5, 8, 6);
-        } else {
-          ctx.fillStyle = '#1c302d'; ctx.fillRect(x + 7, y + 6, 19, 23);
-          ctx.fillStyle = biome === 'Strategy Gardens' ? '#927743' : '#527a5f'; ctx.fillRect(x + 2, y + 2, 29, 10); ctx.fillRect(x + 7, y - 4, 20, 10);
-        }
-      } else if (d < 0.075) {
-        ctx.fillStyle = y < 620 ? '#a6d5ad' : '#b0b87c'; ctx.fillRect(x + 11, y + 15, 4, 4); ctx.fillRect(x + 18, y + 11, 3, 3);
-      }
+function drawAmbientWorld(context: CanvasRenderingContext2D, time: number) {
+  const waterFrame = Math.floor(time / 220) % 4;
+  context.save();
+  for (let index = 0; index < WATER_GLINTS.length; index += 1) {
+    const point = WATER_GLINTS[index];
+    const offset = (waterFrame + index) % 4;
+    context.globalAlpha = .42 + offset * .08;
+    context.fillStyle = offset % 2 ? '#b8eced' : '#82d6e6';
+    context.fillRect(point.x + offset * 2, point.y, 7 + (index % 3) * 2, 2);
+    context.fillRect(point.x - 5 + offset, point.y + 5, 4, 1);
+  }
+
+  const breeze = Math.round(Math.sin(time / 620));
+  context.globalAlpha = .72;
+  for (const tree of TREE_SWAY) {
+    context.fillStyle = '#12392f';
+    context.fillRect(tree.x - 4 + breeze, tree.y - 2, 9, 3);
+    context.fillStyle = tree.color;
+    context.fillRect(tree.x - 6 + breeze, tree.y - 5, 7, 4);
+    context.fillRect(tree.x + 1 + breeze, tree.y - 7, 6, 5);
+  }
+
+  for (const source of STEAM_SOURCES) {
+    for (let puff = 0; puff < 3; puff += 1) {
+      const progress = (time / 1900 + source.phase + puff / 3) % 1;
+      const drift = Math.round(Math.sin(progress * Math.PI * 2 + source.phase) * 3);
+      context.globalAlpha = (1 - progress) * .65;
+      context.fillStyle = progress > .55 ? '#dfe8de' : '#f4ead3';
+      const size = progress > .5 ? 4 : 3;
+      context.fillRect(source.x + drift, source.y - progress * 30, size, size);
+      if (progress > .45) context.fillRect(source.x + drift + 4, source.y - progress * 30 - 2, 2, 2);
     }
   }
-  const hub = PROJECTS.find((project) => project.id === 'website')!;
-  for (const project of PROJECTS) {
-    if (project.id === 'website') continue;
-    ctx.strokeStyle = '#74806a'; ctx.lineWidth = 34; ctx.beginPath(); ctx.moveTo(hub.x, hub.y + 60);
-    ctx.quadraticCurveTo((hub.x + project.x) / 2, hub.y, project.x, project.y + 105); ctx.stroke();
-    ctx.strokeStyle = 'rgba(222, 223, 173, .45)'; ctx.lineWidth = 3; ctx.setLineDash([6, 15]); ctx.stroke(); ctx.setLineDash([]);
-  }
-  for (let i = 0; i < 100; i += 1) {
-    const x = hash(i, 31) * WORLD.width; const y = hash(i, 72) * WORLD.height;
-    ctx.fillStyle = i % 3 === 0 ? '#f3d784' : '#9bd6a5'; ctx.fillRect(Math.round(x), Math.round(y), 3, 3);
-  }
-}
 
-function drawLandmark(ctx: CanvasRenderingContext2D, project: Project) {
-  const { x, y, landmark } = project;
-  ctx.save(); ctx.translate(x, y); ctx.fillStyle = 'rgba(5, 12, 14, .24)'; ctx.fillRect(-82, 59, 164, 31);
-  if (landmark === 'observatory') {
-    ctx.fillStyle = 'rgba(91, 226, 194, .11)'; ctx.beginPath(); ctx.arc(0, 4, 142, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#17272c'; ctx.fillRect(-112, 22, 224, 112); ctx.fillStyle = '#b8c6b4';
-    for (let row = 0; row < 5; row += 1) { const width = 196 - row * 20; ctx.fillRect(-width / 2, 17 - row * 12, width, 12); ctx.fillStyle = row % 2 ? '#879a91' : '#b8c6b4'; }
-    ctx.fillStyle = '#10171e'; ctx.fillRect(-29, 75, 58, 59); ctx.save(); ctx.translate(39, -51); ctx.rotate(-0.55);
-    ctx.fillStyle = '#d5e4cf'; ctx.fillRect(-18, -55, 36, 108); ctx.fillStyle = '#75928b'; ctx.fillRect(-24, -63, 48, 17); ctx.restore();
-  } else if (landmark === 'chess') {
-    ctx.fillStyle = '#2a2523'; ctx.fillRect(-78, -30, 156, 120);
-    for (let row = 0; row < 6; row += 1) for (let col = 0; col < 8; col += 1) { ctx.fillStyle = (row + col) % 2 ? '#c7a865' : '#eee1b7'; ctx.fillRect(-72 + col * 18, -22 + row * 18, 18, 18); }
-    ctx.fillStyle = '#171616'; ctx.font = '54px Georgia'; ctx.fillText('♞', -27, 26);
-  } else if (landmark === 'arena') {
-    ctx.fillStyle = '#6e4934'; ctx.fillRect(-88, -10, 176, 95); ctx.fillStyle = '#bb7852'; ctx.fillRect(-100, -22, 200, 24);
-    ctx.fillStyle = '#d3b579'; ctx.fillRect(-60, 16, 120, 50); ctx.fillStyle = '#3e5b49'; ctx.fillRect(-44, 28, 88, 29); ctx.fillStyle = '#efe0af'; ctx.fillRect(-6, 28, 12, 29);
-  } else if (landmark === 'terminal') {
-    ctx.fillStyle = '#091b1a'; ctx.fillRect(-68, -74, 136, 164); ctx.fillStyle = '#1d4940'; ctx.fillRect(-77, -84, 154, 19);
-    for (let row = 0; row < 5; row += 1) { ctx.fillStyle = row === 2 ? '#79efb3' : '#2e7e63'; ctx.fillRect(-48, -47 + row * 23, 96, 8); }
-    ctx.fillStyle = '#76eaae'; ctx.fillRect(-13, 50, 26, 40);
-  } else if (landmark === 'kiosk') {
-    ctx.fillStyle = '#25493f'; ctx.fillRect(-77, -22, 154, 111); ctx.fillStyle = '#e7dcaa'; ctx.fillRect(-88, -37, 176, 25);
-    ctx.fillStyle = '#0b2421'; ctx.fillRect(-55, 3, 110, 48); ctx.fillStyle = '#77e3b1'; ctx.fillRect(-43, 14, 70, 5); ctx.fillRect(-43, 27, 91, 4);
-    ctx.fillStyle = '#101c1b'; ctx.fillRect(-18, 61, 36, 28);
-  } else if (landmark === 'radio') {
-    ctx.fillStyle = '#223f48'; ctx.fillRect(-64, 24, 128, 67); ctx.fillStyle = '#6bb4c7'; ctx.fillRect(-8, -40, 16, 72);
-    ctx.strokeStyle = '#a9e5ef'; ctx.lineWidth = 9; ctx.beginPath(); ctx.arc(0, -28, 48, 0.3, Math.PI - 0.3); ctx.stroke(); ctx.fillStyle = '#101c23'; ctx.fillRect(-18, 59, 36, 32);
-  } else if (landmark === 'tunnel') {
-    ctx.fillStyle = '#17333c'; ctx.fillRect(-112, -17, 224, 106); ctx.fillStyle = '#d1dfc9'; ctx.fillRect(-123, -29, 246, 20); ctx.fillStyle = '#77bac5';
-    ctx.beginPath(); ctx.arc(-61, 35, 43, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#1d3a41'; ctx.fillRect(-66, -2, 10, 74); ctx.fillRect(-98, 30, 74, 10);
-    ctx.fillStyle = '#06171d'; ctx.fillRect(16, 13, 77, 55);
-  } else if (landmark === 'molecule') {
-    ctx.strokeStyle = '#d9eaa3'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(-52, 50); ctx.lineTo(0, -34); ctx.lineTo(63, 45); ctx.moveTo(0, -34); ctx.lineTo(5, 74); ctx.stroke();
-    for (const node of [[-52, 50], [0, -34], [63, 45], [5, 74]]) { ctx.fillStyle = node[0] === 0 ? '#eacb75' : '#99d887'; ctx.beginPath(); ctx.arc(node[0], node[1], 19, 0, Math.PI * 2); ctx.fill(); }
-  } else if (landmark === 'greenhouse') {
-    ctx.fillStyle = '#18372f'; ctx.fillRect(-102, 18, 204, 75); ctx.fillStyle = '#a6ce9b'; for (let col = 0; col < 5; col += 1) ctx.fillRect(-91 + col * 39, 29, 30, 48);
-    ctx.strokeStyle = '#dce4b0'; ctx.lineWidth = 13; ctx.beginPath(); ctx.moveTo(-108, 19); ctx.lineTo(-67, -37); ctx.lineTo(67, -37); ctx.lineTo(108, 19); ctx.stroke();
-    ctx.fillStyle = '#1c2c24'; ctx.fillRect(-17, 53, 34, 40);
-  } else if (landmark === 'quantum') {
-    ctx.fillStyle = '#242336'; ctx.fillRect(-84, 3, 168, 88); ctx.strokeStyle = '#d0a4ec'; ctx.lineWidth = 7; ctx.beginPath();
-    ctx.ellipse(0, 4, 68, 25, 0.4, 0, Math.PI * 2); ctx.ellipse(0, 4, 68, 25, -0.4, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = '#f0d07a'; ctx.beginPath(); ctx.arc(0, 4, 13, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#0f151d'; ctx.fillRect(-18, 55, 36, 36);
-  } else {
-    ctx.fillStyle = 'rgba(242,207,105,.13)'; ctx.fillRect(-96, -61, 192, 178); ctx.strokeStyle = '#f2cf69'; ctx.lineWidth = 12; ctx.strokeRect(-58, -37, 116, 116);
-    ctx.fillStyle = '#142b29'; ctx.fillRect(-44, -23, 88, 88); ctx.fillStyle = '#f2cf69'; ctx.font = '900 30px "Courier New"'; ctx.textAlign = 'center'; ctx.fillText('NW', 0, 31);
+  for (const light of GLOW_POINTS) {
+    const pulse = .35 + (Math.sin(time / 520 + light.phase) + 1) * .2;
+    context.globalAlpha = pulse;
+    context.fillStyle = light.color;
+    context.fillRect(light.x - 5, light.y - 1, 11, 3);
+    context.fillRect(light.x - 1, light.y - 5, 3, 11);
+    context.globalAlpha = .9;
+    context.fillRect(light.x, light.y, 2, 2);
   }
-  ctx.restore(); drawLabel(ctx, project.name.toUpperCase(), x, y - 127, project.accent);
-}
 
-function drawPlayer(ctx: CanvasRenderingContext2D, player: Point, direction: Direction, walking: boolean, time: number) {
-  const bob = walking ? Math.round(Math.sin(time / 90) * 2) : 0; const x = Math.round(player.x); const y = Math.round(player.y + bob);
-  ctx.save(); ctx.translate(x, y); ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(-13, 17, 26, 7); ctx.fillStyle = '#17222b'; ctx.fillRect(-10, 10, 8, 12); ctx.fillRect(2, 10, 8, 12);
-  ctx.fillStyle = '#f0c27b'; ctx.fillRect(-12, -15, 24, 22); ctx.fillStyle = '#203e4e'; ctx.fillRect(-14, 2, 28, 15); ctx.fillStyle = '#f1d36c'; ctx.fillRect(-15, 0, 30, 5);
-  ctx.fillStyle = '#382c31'; ctx.fillRect(-12, -18, 24, 8); ctx.fillRect(direction === 'left' ? -14 : -12, -12, 5, 9);
-  if (direction === 'down') { ctx.fillStyle = '#253138'; ctx.fillRect(-7, -7, 3, 3); ctx.fillRect(4, -7, 3, 3); }
-  if (direction === 'up') { ctx.fillStyle = '#382c31'; ctx.fillRect(-10, -11, 20, 8); }
-  ctx.restore();
+  context.globalAlpha = .78;
+  drawWindmill(context, 1397, 117, 29, time);
+  drawWindmill(context, 1092, 773, 19, time + 300);
+  context.restore();
 }
 
 export function ProjectWorld() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mapPlayerRef = useRef<HTMLSpanElement>(null);
-  const positionRef = useRef<Point>({ x: 1100, y: 548 });
+  const positionRef = useRef<Point>({ ...START });
   const keysRef = useRef(new Set<string>());
   const directionRef = useRef<Direction>('up');
-  const nearbyRef = useRef<Project | null>(PROJECTS[0]);
+  const nearbyRef = useRef<Project | null>(PROJECTS[10]);
   const modalOpenRef = useRef(false);
-  const [nearbyProject, setNearbyProject] = useState<Project | null>(PROJECTS[0]);
-  const [activeProject, setActiveProject] = useState<Project>(PROJECTS[0]);
+  const [ready, setReady] = useState(false);
+  const [nearbyProject, setNearbyProject] = useState<Project | null>(PROJECTS[10]);
+  const [activeProject, setActiveProject] = useState<Project>(PROJECTS[10]);
   const [projectOpen, setProjectOpen] = useState(false);
-  const [muted, setMuted] = useState(true);
   const [mapOpen, setMapOpen] = useState(false);
-  const [biome, setBiome] = useState('Astral Wilds');
-  const biomeRef = useRef(biome);
+  const [muted, setMuted] = useState(true);
+  const [area, setArea] = useState('Glassroot Fields');
+  const areaRef = useRef(area);
   const [discovered, setDiscovered] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    try { setDiscovered(new Set(JSON.parse(localStorage.getItem('nathan-world-discoveries') || '[]') as string[])); }
-    catch { setDiscovered(new Set()); }
+    try {
+      setDiscovered(new Set(JSON.parse(localStorage.getItem('nathan-world-discoveries-v2') || '[]') as string[]));
+    } catch {
+      setDiscovered(new Set());
+    }
   }, []);
 
-  useEffect(() => { modalOpenRef.current = projectOpen; if (projectOpen) keysRef.current.clear(); }, [projectOpen]);
+  useEffect(() => {
+    modalOpenRef.current = projectOpen;
+    if (projectOpen) keysRef.current.clear();
+  }, [projectOpen]);
 
   useEffect(() => {
     if (muted) return;
     const AudioContextCtor = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AudioContextCtor) return;
-    const audio = new AudioContextCtor(); const gain = audio.createGain(); gain.gain.value = 0.022; gain.connect(audio.destination);
-    const tones = [82.41, 123.47, 164.81].map((frequency, index) => {
-      const oscillator = audio.createOscillator(); const voice = audio.createGain(); oscillator.type = index === 0 ? 'sine' : 'triangle'; oscillator.frequency.value = frequency;
-      voice.gain.value = index === 0 ? 0.6 : 0.14; oscillator.connect(voice).connect(gain); oscillator.start(); return oscillator;
+    const audio = new AudioContextCtor();
+    const gain = audio.createGain();
+    gain.gain.value = 0.014;
+    gain.connect(audio.destination);
+    const notes = [65.41, 98, 130.81].map((frequency, index) => {
+      const oscillator = audio.createOscillator();
+      const voice = audio.createGain();
+      oscillator.type = index === 0 ? 'sine' : 'triangle';
+      oscillator.frequency.value = frequency;
+      voice.gain.value = index === 0 ? 0.6 : 0.12;
+      oscillator.connect(voice).connect(gain);
+      oscillator.start();
+      return oscillator;
     });
-    return () => { gain.gain.setTargetAtTime(0, audio.currentTime, 0.03); tones.forEach((tone) => tone.stop(audio.currentTime + 0.12)); window.setTimeout(() => void audio.close(), 160); };
+    return () => {
+      gain.gain.setTargetAtTime(0, audio.currentTime, 0.03);
+      notes.forEach((note) => note.stop(audio.currentTime + 0.1));
+      window.setTimeout(() => void audio.close(), 130);
+    };
   }, [muted]);
 
   const interact = useCallback(() => {
-    const project = nearbyRef.current; if (!project) return; setActiveProject(project); setProjectOpen(true);
+    const project = nearbyRef.current;
+    if (!project) return;
+    setActiveProject(project);
+    setProjectOpen(true);
     setDiscovered((current) => {
       const next = new Set(current).add(project.id);
-      try { localStorage.setItem('nathan-world-discoveries', JSON.stringify([...next])); } catch { /* optional local progress */ }
+      try {
+        localStorage.setItem('nathan-world-discoveries-v2', JSON.stringify([...next]));
+      } catch {
+        // Progress is intentionally device-local and optional.
+      }
       return next;
     });
   }, []);
@@ -311,108 +314,273 @@ export function ProjectWorld() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       const key = event.key.toLowerCase();
-      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) { event.preventDefault(); keysRef.current.add(key); }
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+        event.preventDefault();
+        keysRef.current.add(key);
+      }
       if ((key === 'e' || key === 'enter') && !event.repeat) interact();
       if (key === 'm' && !event.repeat) setMapOpen((value) => !value);
     };
     const onKeyUp = (event: KeyboardEvent) => keysRef.current.delete(event.key.toLowerCase());
     const clearKeys = () => keysRef.current.clear();
-    window.addEventListener('keydown', onKeyDown); window.addEventListener('keyup', onKeyUp); window.addEventListener('blur', clearKeys);
-    return () => { window.removeEventListener('keydown', onKeyDown); window.removeEventListener('keyup', onKeyUp); window.removeEventListener('blur', clearKeys); };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', clearKeys);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', clearKeys);
+    };
   }, [interact]);
 
   useEffect(() => {
-    const canvas = canvasRef.current; if (!canvas) return; const ctx = canvas.getContext('2d'); if (!ctx) return;
-    let frame = 0; let lastTime = performance.now();
-    const obstacles = PROJECTS.map((project) => ({ x: project.x - 96, y: project.y - 74, w: 192, h: 150 }));
-    const resize = () => {
-      const ratio = Math.min(window.devicePixelRatio || 1, 2); canvas.width = Math.round(window.innerWidth * ratio); canvas.height = Math.round(window.innerHeight * ratio);
-      canvas.style.width = `${window.innerWidth}px`; canvas.style.height = `${window.innerHeight}px`; ctx.setTransform(ratio, 0, 0, ratio, 0, 0); ctx.imageSmoothingEnabled = false;
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) return;
+
+    const world = new Image();
+    const player = new Image();
+    let loaded = 0;
+    let frame = 0;
+    let lastTime = performance.now();
+    let terrainPixels: Uint8ClampedArray | null = null;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const markLoaded = () => {
+      loaded += 1;
+      if (loaded === 2) setReady(true);
     };
-    const canMove = (next: Point) => !obstacles.some((obstacle) => rectsOverlap({ x: next.x - 9, y: next.y - 9, w: 18, h: 27 }, obstacle));
-    const render = (time: number) => {
-      const dt = Math.min((time - lastTime) / 1000, 0.05); lastTime = time; const keys = keysRef.current; let dx = 0; let dy = 0;
-      if (!modalOpenRef.current) { if (keys.has('w') || keys.has('arrowup')) dy -= 1; if (keys.has('s') || keys.has('arrowdown')) dy += 1; if (keys.has('a') || keys.has('arrowleft')) dx -= 1; if (keys.has('d') || keys.has('arrowright')) dx += 1; }
-      if (dx || dy) {
-        const length = Math.hypot(dx, dy); dx /= length; dy /= length;
-        directionRef.current = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
-        const current = positionRef.current; const nextX = { x: clamp(current.x + dx * PLAYER_SPEED * dt, 24, WORLD.width - 24), y: current.y };
-        if (canMove(nextX)) current.x = nextX.x; const nextY = { x: current.x, y: clamp(current.y + dy * PLAYER_SPEED * dt, 24, WORLD.height - 24) };
-        if (canMove(nextY)) current.y = nextY.y;
+    world.onload = () => {
+      const collisionCanvas = document.createElement('canvas');
+      collisionCanvas.width = WORLD.width;
+      collisionCanvas.height = WORLD.height;
+      const collisionContext = collisionCanvas.getContext('2d', { willReadFrequently: true });
+      if (collisionContext) {
+        collisionContext.drawImage(world, 0, 0);
+        terrainPixels = collisionContext.getImageData(0, 0, WORLD.width, WORLD.height).data;
       }
-      const player = positionRef.current; let nearest: Project | null = null; let nearestDistance = Number.POSITIVE_INFINITY;
-      for (const project of PROJECTS) { const distance = Math.hypot(player.x - project.x, player.y - (project.y + 104)); if (distance < 112 && distance < nearestDistance) { nearest = project; nearestDistance = distance; } }
-      if (nearbyRef.current?.id !== nearest?.id) { nearbyRef.current = nearest; setNearbyProject(nearest); }
-      const nextBiome = biomeAt(player); if (biomeRef.current !== nextBiome) { biomeRef.current = nextBiome; setBiome(nextBiome); }
-      if (mapPlayerRef.current) { mapPlayerRef.current.style.left = `${(player.x / WORLD.width) * 100}%`; mapPlayerRef.current.style.top = `${(player.y / WORLD.height) * 100}%`; }
-      const viewWidth = window.innerWidth; const viewHeight = window.innerHeight;
-      const cameraX = clamp(player.x - viewWidth / 2, 0, Math.max(0, WORLD.width - viewWidth)); const cameraY = clamp(player.y - viewHeight / 2, 0, Math.max(0, WORLD.height - viewHeight));
-      ctx.clearRect(0, 0, viewWidth, viewHeight); ctx.save(); ctx.translate(-Math.round(cameraX), -Math.round(cameraY)); drawTerrain(ctx); PROJECTS.forEach((project) => drawLandmark(ctx, project));
-      if (nearest) { ctx.strokeStyle = nearest.accent; ctx.lineWidth = 3; ctx.setLineDash([6, 7]); ctx.beginPath(); ctx.arc(nearest.x, nearest.y + 104, 45, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
-      drawPlayer(ctx, player, directionRef.current, Boolean(dx || dy), time); ctx.restore();
-      const gradient = ctx.createRadialGradient(viewWidth / 2, viewHeight / 2, Math.min(viewWidth, viewHeight) * 0.22, viewWidth / 2, viewHeight / 2, Math.max(viewWidth, viewHeight) * 0.78);
-      gradient.addColorStop(0, 'rgba(2, 9, 11, 0)'); gradient.addColorStop(1, 'rgba(2, 7, 10, .58)'); ctx.fillStyle = gradient; ctx.fillRect(0, 0, viewWidth, viewHeight);
+      markLoaded();
+    };
+    player.onload = markLoaded;
+    world.onerror = markLoaded;
+    player.onerror = markLoaded;
+    world.src = '/world/nathans-world-map.png';
+    player.src = '/world/explorer-sheet.png';
+
+    const resize = () => {
+      canvas.width = Math.ceil(window.innerWidth / 2);
+      canvas.height = Math.ceil(window.innerHeight / 2);
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      context.imageSmoothingEnabled = false;
+    };
+
+    const terrainBlocks = (point: Point) => {
+      if (!terrainPixels) return false;
+      const samples = [[0, 0], [-5, -7], [5, -7], [-5, 2], [5, 2]];
+      return samples.some(([offsetX, offsetY]) => {
+        const x = clamp(Math.round(point.x + offsetX), 0, WORLD.width - 1);
+        const y = clamp(Math.round(point.y + offsetY), 0, WORLD.height - 1);
+        const index = (y * WORLD.width + x) * 4;
+        const red = terrainPixels![index];
+        const green = terrainPixels![index + 1];
+        const blue = terrainPixels![index + 2];
+        const water = blue > 105 && blue > red * 1.28 && blue > green * 1.06;
+        const denseCanopy = green > red * 1.18 && green > blue * 1.12 && green < 88 && red < 67;
+        const mountainEdge = y < 34 || (y < 90 && red > 140 && green > 150 && blue > 160);
+        return water || denseCanopy || mountainEdge;
+      });
+    };
+
+    const canStand = (point: Point) => clearsBlockers(point) && !terrainBlocks(point);
+
+    const render = (time: number) => {
+      const delta = Math.min((time - lastTime) / 1000, 0.05);
+      lastTime = time;
+      let dx = 0;
+      let dy = 0;
+      const keys = keysRef.current;
+      if (!modalOpenRef.current) {
+        if (keys.has('w') || keys.has('arrowup')) dy -= 1;
+        if (keys.has('s') || keys.has('arrowdown')) dy += 1;
+        if (keys.has('a') || keys.has('arrowleft')) dx -= 1;
+        if (keys.has('d') || keys.has('arrowright')) dx += 1;
+      }
+      const walking = Boolean(dx || dy);
+
+      if (walking) {
+        const length = Math.hypot(dx, dy);
+        dx /= length;
+        dy /= length;
+        directionRef.current = Math.abs(dx) > Math.abs(dy)
+          ? dx < 0 ? 'left' : 'right'
+          : dy < 0 ? 'up' : 'down';
+        const current = positionRef.current;
+        const nextX = { x: clamp(current.x + dx * PLAYER_SPEED * delta, 18, WORLD.width - 18), y: current.y };
+        if (canStand(nextX)) current.x = nextX.x;
+        const nextY = { x: current.x, y: clamp(current.y + dy * PLAYER_SPEED * delta, 18, WORLD.height - 18) };
+        if (canStand(nextY)) current.y = nextY.y;
+      }
+
+      const position = positionRef.current;
+      let nearest: Project | null = null;
+      let nearestDistance = Number.POSITIVE_INFINITY;
+      for (const project of PROJECTS) {
+        const distance = Math.hypot(position.x - project.approach.x, position.y - project.approach.y);
+        if (distance < INTERACTION_RADIUS && distance < nearestDistance) {
+          nearest = project;
+          nearestDistance = distance;
+        }
+      }
+      if (nearbyRef.current?.id !== nearest?.id) {
+        nearbyRef.current = nearest;
+        setNearbyProject(nearest);
+      }
+
+      const nextArea = areaAt(position);
+      if (areaRef.current !== nextArea) {
+        areaRef.current = nextArea;
+        setArea(nextArea);
+      }
+      if (mapPlayerRef.current) {
+        mapPlayerRef.current.style.left = `${(position.x / WORLD.width) * 100}%`;
+        mapPlayerRef.current.style.top = `${(position.y / WORLD.height) * 100}%`;
+      }
+
+      const viewWidth = canvas.width;
+      const viewHeight = canvas.height;
+      const cameraX = clamp(Math.round(position.x - viewWidth / 2), 0, Math.max(0, WORLD.width - viewWidth));
+      const cameraY = clamp(Math.round(position.y - viewHeight / 2), 0, Math.max(0, WORLD.height - viewHeight));
+      context.clearRect(0, 0, viewWidth, viewHeight);
+      if (world.complete && world.naturalWidth) context.drawImage(world, -cameraX, -cameraY);
+
+      context.save();
+      context.translate(-cameraX, -cameraY);
+      drawAmbientWorld(context, reducedMotion ? 0 : time);
+      context.restore();
+
+      if (nearest) {
+        const pulse = Math.floor(time / 360) % 2;
+        const x = Math.round(nearest.approach.x - cameraX);
+        const y = Math.round(nearest.approach.y - cameraY - 20 - pulse * 2);
+        context.fillStyle = '#15100c';
+        context.fillRect(x - 6, y - 7, 12, 12);
+        context.fillStyle = nearest.accent;
+        context.fillRect(x - 4, y - 5, 8, 8);
+        context.fillStyle = '#fff6d8';
+        context.fillRect(x - 1, y - 3, 2, 4);
+        context.fillRect(x - 1, y + 2, 2, 2);
+      }
+
+      if (player.complete && player.naturalWidth) {
+        const cellWidth = player.width / 4;
+        const cellHeight = player.height / 4;
+        const column = walking ? [1, 2, 3, 2][Math.floor(time / 125) % 4] : 0;
+        const row = directionRow[directionRef.current];
+        context.drawImage(
+          player,
+          column * cellWidth,
+          row * cellHeight,
+          cellWidth,
+          cellHeight,
+          Math.round(position.x - cameraX - 22),
+          Math.round(position.y - cameraY - 43),
+          44,
+          58,
+        );
+      }
       frame = requestAnimationFrame(render);
     };
-    resize(); window.addEventListener('resize', resize); frame = requestAnimationFrame(render);
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); };
+
+    resize();
+    window.addEventListener('resize', resize);
+    frame = requestAnimationFrame(render);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', resize);
+    };
   }, []);
 
-  const setTouchKey = (key: string, down: boolean) => { if (down) keysRef.current.add(key); else keysRef.current.delete(key); };
-  const projectProgress = `${discovered.size}/${PROJECTS.length}`;
+  const setTouchKey = (key: string, down: boolean) => {
+    if (down) keysRef.current.add(key);
+    else keysRef.current.delete(key);
+  };
+  const progress = `${discovered.size}/${PROJECTS.length}`;
 
   return (
-    <main className="game-shell" aria-label="Nathan's project world">
-      <canvas ref={canvasRef} className="game-canvas" aria-hidden="true" />
-      <header className="game-topbar">
-        <a className="world-brand" href="https://github.com/Nathan-W123" target="_blank" rel="noreferrer">
-          <span className="brand-glyph">NW</span><span><b>NATHAN&apos;S WORLD</b><small>PROJECT ARCHIVE · v0.1</small></span>
+    <main className="pixel-world-shell" aria-label="Nathan's playable project world">
+      <canvas ref={canvasRef} className="pixel-world-canvas" role="img" aria-label="A top-down pixel-art world containing Nathan's project landmarks">
+        Explore Nathan&apos;s projects as a pixel-art world.
+      </canvas>
+
+      <header className="pixel-hud">
+        <a className="pixel-brand" href="https://github.com/Nathan-W123" target="_blank" rel="noreferrer">
+          <span>NW</span>
+          <span><b>NATHAN&apos;S WORLD</b><small>PLAYABLE PROJECT ARCHIVE</small></span>
         </a>
-        <div className="biome-pill"><i /> {biome.toUpperCase()}</div>
-        <div className="game-actions">
-          <span className="discovery-count">{projectProgress} FOUND</span>
-          <button type="button" onClick={() => setMapOpen((value) => !value)} aria-label="Toggle world map"><Map /><span>Map</span></button>
-          <button type="button" onClick={() => setMuted((value) => !value)} aria-label={muted ? 'Turn ambient sound on' : 'Mute ambient sound'}>{muted ? <VolumeX /> : <Volume2 />}</button>
+        <div key={area} className="pixel-location"><small>NOW ENTERING</small><b>{area.toUpperCase()}</b></div>
+        <div className="pixel-hud-actions">
+          <span className="pixel-progress">{progress} DISCOVERED</span>
+          <button className="pixel-icon-button" type="button" onClick={() => setMapOpen((value) => !value)} aria-label="Toggle world map"><Map /></button>
+          <button className="pixel-icon-button" type="button" onClick={() => setMuted((value) => !value)} aria-label={muted ? 'Turn ambient sound on' : 'Mute ambient sound'}>{muted ? <VolumeX /> : <Volume2 />}</button>
         </div>
       </header>
-      <aside className="quest-card">
-        <span>ACTIVE QUEST</span><b>Map the archive</b><p>Follow the paths, approach a landmark, and inspect the signal hidden there.</p>
-        <div><i className={discovered.size >= 3 ? 'complete' : ''} /> DISCOVER 3 PROJECTS · {Math.min(discovered.size, 3)}/3</div>
-      </aside>
+
       {mapOpen && (
-        <aside className="mini-map expanded-map" aria-label="World map">
-          <div className="mini-map-grid">
-            <span className="map-zone zone-strategy">STRATEGY</span><span className="map-zone zone-terminal">TERMINAL</span><span className="map-zone zone-wind">WIND</span><span className="map-zone zone-matter">MATTER</span>
-            {PROJECTS.map((project) => <span key={project.id} className={`map-project-dot ${discovered.has(project.id) ? 'is-found' : ''}`} style={{ left: `${(project.x / WORLD.width) * 100}%`, top: `${(project.y / WORLD.height) * 100}%` }} title={project.name} />)}
-            <span ref={mapPlayerRef} className="map-player">●</span>
+        <aside className="pixel-map" aria-label="World map">
+          <div className="pixel-map-image">
+            {PROJECTS.map((project) => (
+              <span
+                key={project.id}
+                className={`pixel-map-dot ${discovered.has(project.id) ? 'is-found' : ''}`}
+                style={{ left: `${(project.landmark.x / WORLD.width) * 100}%`, top: `${(project.landmark.y / WORLD.height) * 100}%` }}
+                title={project.location}
+              />
+            ))}
+            <span ref={mapPlayerRef} className="pixel-map-player" />
           </div>
-          <b>WORLD MAP</b><small>{projectProgress} DISCOVERIES · GOLD = VISITED</small>
+          <div className="pixel-map-caption"><b>REGION MAP</b><small>GOLD MARKS PLACES YOU&apos;VE VISITED</small></div>
         </aside>
       )}
-      <div className={`interact-prompt ${nearbyProject ? 'is-visible' : ''}`} aria-hidden={!nearbyProject}>
-        <button type="button" onClick={interact} tabIndex={nearbyProject ? 0 : -1}><kbd>E</kbd><span><b>Inspect {nearbyProject?.name ?? 'landmark'}</b><small>{nearbyProject?.kind ?? 'Project signal detected'}</small></span></button>
+
+      <div className={`pixel-interact ${nearbyProject ? 'is-visible' : ''}`} aria-hidden={!nearbyProject}>
+        <button type="button" onClick={interact} tabIndex={nearbyProject ? 0 : -1}>
+          <kbd>E</kbd>
+          <span><b>Enter {nearbyProject?.location ?? 'landmark'}</b><small>PROJECT: {nearbyProject?.projectName ?? 'Unknown'}</small></span>
+        </button>
       </div>
-      <div className="controls-hint"><span><kbd>WASD</kbd> MOVE</span><span><kbd>E</kbd> INTERACT</span><span><kbd>M</kbd> MAP</span></div>
-      <div className="touch-controls" aria-label="Movement controls">
-        <button onPointerDown={() => setTouchKey('w', true)} onPointerUp={() => setTouchKey('w', false)} onPointerCancel={() => setTouchKey('w', false)} aria-label="Move up">▲</button>
-        <button onPointerDown={() => setTouchKey('a', true)} onPointerUp={() => setTouchKey('a', false)} onPointerCancel={() => setTouchKey('a', false)} aria-label="Move left">◀</button>
-        <button onPointerDown={() => setTouchKey('s', true)} onPointerUp={() => setTouchKey('s', false)} onPointerCancel={() => setTouchKey('s', false)} aria-label="Move down">▼</button>
-        <button onPointerDown={() => setTouchKey('d', true)} onPointerUp={() => setTouchKey('d', false)} onPointerCancel={() => setTouchKey('d', false)} aria-label="Move right">▶</button>
+
+      <div className="pixel-help"><span><kbd>WASD</kbd> MOVE</span><span><kbd>E</kbd> ENTER</span><span><kbd>M</kbd> MAP</span></div>
+
+      <div className="pixel-touch" aria-label="Movement controls">
+        <button type="button" onPointerDown={() => setTouchKey('w', true)} onPointerUp={() => setTouchKey('w', false)} onPointerCancel={() => setTouchKey('w', false)} aria-label="Move up">▲</button>
+        <button type="button" onPointerDown={() => setTouchKey('a', true)} onPointerUp={() => setTouchKey('a', false)} onPointerCancel={() => setTouchKey('a', false)} aria-label="Move left">◀</button>
+        <button type="button" onPointerDown={() => setTouchKey('s', true)} onPointerUp={() => setTouchKey('s', false)} onPointerCancel={() => setTouchKey('s', false)} aria-label="Move down">▼</button>
+        <button type="button" onPointerDown={() => setTouchKey('d', true)} onPointerUp={() => setTouchKey('d', false)} onPointerCancel={() => setTouchKey('d', false)} aria-label="Move right">▶</button>
       </div>
+
+      {!ready && <div className="pixel-loading">DRAWING THE WORLD…</div>}
+
       <Dialog open={projectOpen} onOpenChange={setProjectOpen}>
-        <DialogContent className="project-dialog" showCloseButton>
-          <div className={`project-visual visual-${activeProject.landmark}`} style={{ '--project-accent': activeProject.accent } as React.CSSProperties} aria-hidden="true">
-            {activeProject.landmark === 'observatory' ? <><span className="black-hole" /><i className="orbit orbit-one" /><i className="orbit orbit-two" /></> : <strong className="project-sigil">{activeProject.sigil}</strong>}
-            <small>ARCHIVE SIGNAL / {activeProject.biome.toUpperCase()}</small>
+        <DialogContent className="world-dialog" showCloseButton>
+          <div className="world-dialog-scene" aria-hidden="true">
+            <img src="/world/nathans-world-map.png" alt="" style={{ objectPosition: `${(activeProject.landmark.x / WORLD.width) * 100}% ${(activeProject.landmark.y / WORLD.height) * 100}%` }} />
+            <span>DISCOVERY {activeProject.number}</span>
           </div>
-          <DialogHeader className="project-dialog-header">
-            <div className="project-eyebrow"><span>DISCOVERY {activeProject.number}</span><span>{activeProject.kind}</span></div>
-            <DialogTitle>{activeProject.name}</DialogTitle><DialogDescription>{activeProject.summary}</DialogDescription>
-          </DialogHeader>
-          <ul className="project-features">{activeProject.details.map((detail) => <li key={detail}><i />{detail}</li>)}</ul>
-          <div className="project-dialog-actions">
-            <Button render={<a href={activeProject.href} target="_blank" rel="noreferrer" />} className="project-primary"><FolderGit2 /> Explore repository <ExternalLink /></Button>
-            <Button variant="ghost" onClick={() => setProjectOpen(false)}>Return to world</Button>
+          <div className="world-dialog-copy">
+            <DialogHeader className="world-dialog-header">
+              <div className="world-dialog-eyebrow" style={{ color: activeProject.accent }}>PROJECT: {activeProject.projectName.toUpperCase()}</div>
+              <DialogTitle>{activeProject.location}</DialogTitle>
+              <div className="world-dialog-category">{activeProject.category}</div>
+              <DialogDescription>{activeProject.summary}</DialogDescription>
+            </DialogHeader>
+            <ul className="world-dialog-details">
+              {activeProject.details.map((detail) => <li key={detail}><i style={{ backgroundColor: activeProject.accent }} />{detail}</li>)}
+            </ul>
+            <div className="world-dialog-actions">
+              <Button render={<a href={activeProject.href} target="_blank" rel="noreferrer" />} className="world-dialog-primary"><FolderGit2 /> Explore project <ExternalLink /></Button>
+              <Button variant="ghost" onClick={() => setProjectOpen(false)}>Return to world</Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
