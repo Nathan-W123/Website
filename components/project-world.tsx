@@ -116,12 +116,7 @@ const PROJECTS: Project[] = [
   },
 ];
 
-const WORLD_BLOCKERS: Rect[] = [
-  { x: 0, y: 421, w: 424, h: 88 },
-  { x: 499, y: 428, w: 710, h: 84 },
-  { x: 1269, y: 418, w: 267, h: 112 },
-  ...PROJECTS.map((project) => project.building),
-];
+const WORLD_BLOCKERS: Rect[] = PROJECTS.map((project) => project.building);
 
 const directionRow: Record<Direction, number> = { down: 0, left: 1, right: 2, up: 3 };
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -141,101 +136,243 @@ function clearsBlockers(point: Point) {
   return !WORLD_BLOCKERS.some((blocker) => overlaps(feet, blocker));
 }
 
-const WATER_GLINTS: Point[] = [
-  { x: 17, y: 477 }, { x: 74, y: 454 }, { x: 353, y: 460 }, { x: 390, y: 486 },
-  { x: 546, y: 462 }, { x: 642, y: 479 }, { x: 780, y: 472 }, { x: 876, y: 486 },
-  { x: 1124, y: 470 }, { x: 1288, y: 454 }, { x: 1420, y: 505 }, { x: 1490, y: 352 },
-  { x: 1452, y: 66 }, { x: 1510, y: 188 }, { x: 1360, y: 330 }, { x: 1510, y: 690 },
-  { x: 1435, y: 930 }, { x: 1235, y: 1005 }, { x: 960, y: 1008 }, { x: 314, y: 1003 },
+type RotorLayer = { canvas: HTMLCanvasElement; x: number; y: number; center: number; phase: number };
+type WorldLayers = {
+  base: HTMLCanvasElement;
+  water: HTMLCanvasElement;
+  lights: HTMLCanvasElement;
+  trees: HTMLCanvasElement;
+  rotors: RotorLayer[];
+};
+
+const ROTORS = [
+  { x: 1375, y: 109, radius: 65, phase: 0 },
+  { x: 1111, y: 780, radius: 52, phase: 420 },
 ];
 
-const GLOW_POINTS = [
-  { x: 205, y: 541, color: '#77dfff', phase: 0 }, { x: 158, y: 684, color: '#876dff', phase: .7 },
-  { x: 296, y: 675, color: '#8c72ff', phase: 1.3 }, { x: 1044, y: 510, color: '#ba77ff', phase: .4 },
-  { x: 1008, y: 604, color: '#996cff', phase: 1.1 }, { x: 1080, y: 621, color: '#c48bff', phase: 1.8 },
-  { x: 307, y: 112, color: '#ffd471', phase: .2 }, { x: 617, y: 580, color: '#a6f0a7', phase: 1.5 },
+const LIGHT_REGIONS: Rect[] = [
+  { x: 210, y: 36, w: 190, h: 180 }, { x: 100, y: 470, w: 220, h: 230 },
+  { x: 500, y: 480, w: 240, h: 200 }, { x: 570, y: 710, w: 320, h: 190 },
+  { x: 640, y: 270, w: 380, h: 170 }, { x: 970, y: 445, w: 170, h: 225 },
+  { x: 1040, y: 170, w: 130, h: 150 }, { x: 1280, y: 70, w: 200, h: 190 },
+];
+
+const TREE_REGIONS = [
+  { x: 392, y: 214, rx: 42, ry: 50 }, { x: 820, y: 164, rx: 44, ry: 48 },
+  { x: 1135, y: 240, rx: 48, ry: 52 }, { x: 310, y: 600, rx: 48, ry: 56 },
+  { x: 470, y: 665, rx: 50, ry: 58 }, { x: 880, y: 642, rx: 48, ry: 56 },
+  { x: 1180, y: 658, rx: 48, ry: 55 }, { x: 1350, y: 604, rx: 48, ry: 55 },
+];
+
+const STEAM_MASKS: Rect[] = [
+  { x: 731, y: 690, w: 45, h: 67 },
+  { x: 744, y: 267, w: 37, h: 58 },
 ];
 
 const STEAM_SOURCES = [
-  { x: 746, y: 300, phase: 0 }, { x: 925, y: 331, phase: .35 },
-  { x: 700, y: 759, phase: .7 }, { x: 1095, y: 217, phase: .15 },
+  { x: 750, y: 746, phase: 0, height: 48 },
+  { x: 759, y: 309, phase: .43, height: 39 },
 ];
 
-const TREE_SWAY = [
-  { x: 433, y: 258, color: '#245e3d' }, { x: 833, y: 197, color: '#2e7347' },
-  { x: 1153, y: 282, color: '#28613d' }, { x: 342, y: 650, color: '#144a39' },
-  { x: 475, y: 711, color: '#1b533a' }, { x: 887, y: 688, color: '#245b39' },
-  { x: 1182, y: 705, color: '#286443' }, { x: 1362, y: 646, color: '#2b6845' },
-];
-
-function drawWindmill(context: CanvasRenderingContext2D, x: number, y: number, radius: number, time: number) {
-  const angle = Math.floor(time / 160) % 12 * (Math.PI / 6);
-  context.save();
-  context.translate(x, y);
-  context.rotate(angle);
-  for (let arm = 0; arm < 4; arm += 1) {
-    context.rotate(Math.PI / 2);
-    context.fillStyle = '#513d27';
-    context.fillRect(-3, -radius, 6, radius - 3);
-    context.fillStyle = '#e7d6a1';
-    context.fillRect(-1, -radius + 2, 3, radius - 7);
-    context.fillRect(2, -radius + 4, 5, Math.max(5, Math.round(radius * .36)));
-  }
-  context.fillStyle = '#3b2d21';
-  context.fillRect(-5, -5, 10, 10);
-  context.fillStyle = '#d39d4a';
-  context.fillRect(-2, -2, 4, 4);
-  context.restore();
+function makeCanvas() {
+  const canvas = document.createElement('canvas');
+  canvas.width = WORLD.width;
+  canvas.height = WORLD.height;
+  return canvas;
 }
 
-function drawAmbientWorld(context: CanvasRenderingContext2D, time: number) {
-  const waterFrame = Math.floor(time / 220) % 4;
-  context.save();
-  for (let index = 0; index < WATER_GLINTS.length; index += 1) {
-    const point = WATER_GLINTS[index];
-    const offset = (waterFrame + index) % 4;
-    context.globalAlpha = .42 + offset * .08;
-    context.fillStyle = offset % 2 ? '#b8eced' : '#82d6e6';
-    context.fillRect(point.x + offset * 2, point.y, 7 + (index % 3) * 2, 2);
-    context.fillRect(point.x - 5 + offset, point.y + 5, 4, 1);
+function insideRect(x: number, y: number, rect: Rect) {
+  return x >= rect.x && x < rect.x + rect.w && y >= rect.y && y < rect.y + rect.h;
+}
+
+function bladeMetric(x: number, y: number, rotor: (typeof ROTORS)[number]) {
+  const dx = x - rotor.x;
+  const dy = y - rotor.y;
+  let best: { parallel: number; perpendicular: number; px: number; py: number } | null = null;
+  for (let arm = 0; arm < 4; arm += 1) {
+    const angle = Math.PI / 4 + arm * Math.PI / 2;
+    const ux = Math.cos(angle);
+    const uy = Math.sin(angle);
+    const parallel = dx * ux + dy * uy;
+    const perpendicular = Math.abs(-dx * uy + dy * ux);
+    if (parallel > 7 && parallel < rotor.radius + 5 && (!best || perpendicular < best.perpendicular)) {
+      best = { parallel, perpendicular, px: -uy, py: ux };
+    }
+  }
+  return best;
+}
+
+function prepareWorldLayers(world: HTMLImageElement): WorldLayers {
+  const source = makeCanvas();
+  source.getContext('2d')!.drawImage(world, 0, 0);
+  const sourceImage = source.getContext('2d', { willReadFrequently: true })!.getImageData(0, 0, WORLD.width, WORLD.height);
+  const original = sourceImage.data;
+  const baseImage = new ImageData(new Uint8ClampedArray(original), WORLD.width, WORLD.height);
+  const waterImage = new ImageData(WORLD.width, WORLD.height);
+  const lightImage = new ImageData(WORLD.width, WORLD.height);
+  const treeImage = new ImageData(WORLD.width, WORLD.height);
+  const blueWater = new Uint8Array(WORLD.width * WORLD.height);
+
+  for (let pixel = 0; pixel < blueWater.length; pixel += 1) {
+    const index = pixel * 4;
+    const red = original[index];
+    const green = original[index + 1];
+    const blue = original[index + 2];
+    if (blue > 100 && blue > red * 1.25 && blue > green * 1.04 && green > 62) blueWater[pixel] = 1;
   }
 
-  const breeze = Math.round(Math.sin(time / 620));
-  context.globalAlpha = .72;
-  for (const tree of TREE_SWAY) {
-    context.fillStyle = '#12392f';
-    context.fillRect(tree.x - 4 + breeze, tree.y - 2, 9, 3);
-    context.fillStyle = tree.color;
-    context.fillRect(tree.x - 6 + breeze, tree.y - 5, 7, 4);
-    context.fillRect(tree.x + 1 + breeze, tree.y - 7, 6, 5);
-  }
+  for (let y = 0; y < WORLD.height; y += 1) {
+    for (let x = 0; x < WORLD.width; x += 1) {
+      const pixel = y * WORLD.width + x;
+      const index = pixel * 4;
+      const red = original[index];
+      const green = original[index + 1];
+      const blue = original[index + 2];
+      let water = Boolean(blueWater[pixel]);
+      if (!water && red > 165 && green > 175 && blue > 175) {
+        for (let oy = -3; oy <= 3 && !water; oy += 1) {
+          for (let ox = -3; ox <= 3; ox += 1) {
+            const nearX = x + ox;
+            const nearY = y + oy;
+            if (nearX >= 0 && nearX < WORLD.width && nearY >= 0 && nearY < WORLD.height && blueWater[nearY * WORLD.width + nearX]) {
+              water = true;
+              break;
+            }
+          }
+        }
+      }
+      if (water) {
+        waterImage.data.set(original.subarray(index, index + 4), index);
+        baseImage.data[index] = 36 + ((x + y) % 3) * 3;
+        baseImage.data[index + 1] = 126 + ((x + y) % 4) * 3;
+        baseImage.data[index + 2] = 166 + ((x + y) % 5) * 3;
+      }
 
-  for (const source of STEAM_SOURCES) {
-    for (let puff = 0; puff < 3; puff += 1) {
-      const progress = (time / 1900 + source.phase + puff / 3) % 1;
-      const drift = Math.round(Math.sin(progress * Math.PI * 2 + source.phase) * 3);
-      context.globalAlpha = (1 - progress) * .65;
-      context.fillStyle = progress > .55 ? '#dfe8de' : '#f4ead3';
-      const size = progress > .5 ? 4 : 3;
-      context.fillRect(source.x + drift, source.y - progress * 30, size, size);
-      if (progress > .45) context.fillRect(source.x + drift + 4, source.y - progress * 30 - 2, 2, 2);
+      const inLightRegion = LIGHT_REGIONS.some((region) => insideRect(x, y, region));
+      const warmLight = red > 176 && green > 108 && green < 225 && blue < 130 && red > green * 1.03;
+      const arcaneLight = (blue > 145 && red > 85 && blue > green * 1.12) || (green > 150 && blue > 145 && red < 145);
+      if (inLightRegion && (warmLight || arcaneLight)) {
+        lightImage.data.set(original.subarray(index, index + 4), index);
+        baseImage.data[index] = Math.round(red * .42);
+        baseImage.data[index + 1] = Math.round(green * .42);
+        baseImage.data[index + 2] = Math.round(blue * .42);
+      }
+
+      const treeRegion = TREE_REGIONS.find((region) => {
+        const nx = (x - region.x) / region.rx;
+        const ny = (y - region.y) / region.ry;
+        return nx * nx + ny * ny <= 1;
+      });
+      const leafy = green > red * 1.12 && green > blue * 1.07 && green > 55 && green < 158;
+      if (treeRegion && leafy) {
+        treeImage.data.set(original.subarray(index, index + 4), index);
+        const sampleX = clamp(x + 3, 0, WORLD.width - 1);
+        const sampleIndex = (y * WORLD.width + sampleX) * 4;
+        baseImage.data.set(original.subarray(sampleIndex, sampleIndex + 4), index);
+      }
+
+      for (const mask of STEAM_MASKS) {
+        if (!insideRect(x, y, mask)) continue;
+        const paleSmoke = red > 125 && green > 125 && blue > 115 && Math.max(red, green, blue) - Math.min(red, green, blue) < 62;
+        if (paleSmoke) {
+          const sampleX = clamp(mask.x + mask.w + ((x - mask.x) % 18), 0, WORLD.width - 1);
+          const sampleIndex = (y * WORLD.width + sampleX) * 4;
+          baseImage.data.set(original.subarray(sampleIndex, sampleIndex + 4), index);
+        }
+      }
     }
   }
 
-  for (const light of GLOW_POINTS) {
-    const pulse = .35 + (Math.sin(time / 520 + light.phase) + 1) * .2;
-    context.globalAlpha = pulse;
-    context.fillStyle = light.color;
-    context.fillRect(light.x - 5, light.y - 1, 11, 3);
-    context.fillRect(light.x - 1, light.y - 5, 3, 11);
-    context.globalAlpha = .9;
-    context.fillRect(light.x, light.y, 2, 2);
+  const rotors: RotorLayer[] = ROTORS.map((rotor, rotorIndex) => {
+    const size = rotor.radius * 2 + 14;
+    const rotorCanvas = document.createElement('canvas');
+    rotorCanvas.width = size;
+    rotorCanvas.height = size;
+    const rotorImage = new ImageData(size, size);
+    const center = Math.floor(size / 2);
+    for (let localY = 0; localY < size; localY += 1) {
+      for (let localX = 0; localX < size; localX += 1) {
+        const worldX = Math.round(rotor.x + localX - center);
+        const worldY = Math.round(rotor.y + localY - center);
+        if (worldX < 0 || worldY < 0 || worldX >= WORLD.width || worldY >= WORLD.height) continue;
+        const metric = bladeMetric(worldX, worldY, rotor);
+        if (!metric) continue;
+        const width = metric.parallel > rotor.radius * .55 ? 13 : 6;
+        if (metric.perpendicular > width) continue;
+        const sourceIndex = (worldY * WORLD.width + worldX) * 4;
+        const targetIndex = (localY * size + localX) * 4;
+        const red = original[sourceIndex];
+        const green = original[sourceIndex + 1];
+        const blue = original[sourceIndex + 2];
+        const likelyBlade = (red > 115 && green > 82 && blue < 125) || (red > 50 && red > green * 1.07 && blue < 82);
+        if (likelyBlade) rotorImage.data.set(original.subarray(sourceIndex, sourceIndex + 4), targetIndex);
+
+        const sampleDistance = width + 7;
+        const sampleX = clamp(Math.round(worldX + metric.px * sampleDistance), 0, WORLD.width - 1);
+        const sampleY = clamp(Math.round(worldY + metric.py * sampleDistance), 0, WORLD.height - 1);
+        const sampleIndex = (sampleY * WORLD.width + sampleX) * 4;
+        baseImage.data.set(original.subarray(sampleIndex, sampleIndex + 4), sourceIndex);
+      }
+    }
+    rotorCanvas.getContext('2d')!.putImageData(rotorImage, 0, 0);
+    return { canvas: rotorCanvas, x: rotor.x, y: rotor.y, center, phase: rotorIndex * 420 };
+  });
+
+  const base = makeCanvas();
+  const water = makeCanvas();
+  const lights = makeCanvas();
+  const trees = makeCanvas();
+  base.getContext('2d')!.putImageData(baseImage, 0, 0);
+  water.getContext('2d')!.putImageData(waterImage, 0, 0);
+  lights.getContext('2d')!.putImageData(lightImage, 0, 0);
+  trees.getContext('2d')!.putImageData(treeImage, 0, 0);
+  return { base, water, lights, trees, rotors };
+}
+
+function drawSteam(context: CanvasRenderingContext2D, time: number) {
+  for (const source of STEAM_SOURCES) {
+    for (let puff = 0; puff < 5; puff += 1) {
+      const progress = (time / 2300 + source.phase + puff / 5) % 1;
+      const drift = Math.round(Math.sin(progress * 5.8 + source.phase * 4) * 6);
+      const size = 4 + Math.round(progress * 7);
+      context.globalAlpha = Math.max(0, (1 - progress) * .86);
+      context.fillStyle = progress > .48 ? '#d7ded7' : '#f0ead8';
+      context.fillRect(Math.round(source.x + drift - size / 2), Math.round(source.y - progress * source.height), size, size);
+      if (size > 7) context.fillRect(Math.round(source.x + drift + size / 3), Math.round(source.y - progress * source.height - 3), Math.round(size * .65), Math.round(size * .55));
+    }
+  }
+}
+
+function drawAnimatedWorld(context: CanvasRenderingContext2D, layers: WorldLayers, time: number) {
+  context.drawImage(layers.base, 0, 0);
+  const waterX = Math.floor(time / 240) % 4;
+  const waterY = Math.floor(time / 420) % 3;
+  context.globalAlpha = .97;
+  context.drawImage(layers.water, waterX - 2, waterY - 1);
+
+  const sway = Math.round(Math.sin(time / 700) * 2);
+  context.globalAlpha = 1;
+  context.drawImage(layers.trees, sway, 0);
+
+  const lightPulse = .32 + (Math.sin(time / 620) + 1) * .34;
+  context.globalAlpha = lightPulse;
+  context.globalCompositeOperation = 'screen';
+  context.drawImage(layers.lights, 0, 0);
+  context.globalCompositeOperation = 'source-over';
+
+  for (const rotor of layers.rotors) {
+    const step = Math.floor((time + rotor.phase) / 150) % 24;
+    context.save();
+    context.translate(rotor.x, rotor.y);
+    context.rotate(step * Math.PI / 12);
+    context.globalAlpha = 1;
+    context.drawImage(rotor.canvas, -rotor.center, -rotor.center);
+    context.restore();
   }
 
-  context.globalAlpha = .78;
-  drawWindmill(context, 1397, 117, 29, time);
-  drawWindmill(context, 1092, 773, 19, time + 300);
-  context.restore();
+  context.globalAlpha = 1;
+  drawSteam(context, time);
+  context.globalAlpha = 1;
 }
 
 export function ProjectWorld() {
@@ -344,6 +481,7 @@ export function ProjectWorld() {
     let frame = 0;
     let lastTime = performance.now();
     let terrainPixels: Uint8ClampedArray | null = null;
+    let worldLayers: WorldLayers | null = null;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const markLoaded = () => {
@@ -351,6 +489,7 @@ export function ProjectWorld() {
       if (loaded === 2) setReady(true);
     };
     world.onload = () => {
+      worldLayers = prepareWorldLayers(world);
       const collisionCanvas = document.createElement('canvas');
       collisionCanvas.width = WORLD.width;
       collisionCanvas.height = WORLD.height;
@@ -377,7 +516,7 @@ export function ProjectWorld() {
 
     const terrainBlocks = (point: Point) => {
       if (!terrainPixels) return false;
-      const samples = [[0, 0], [-5, -7], [5, -7], [-5, 2], [5, 2]];
+      const samples = [[0, 0], [-3, 0], [3, 0]];
       return samples.some(([offsetX, offsetY]) => {
         const x = clamp(Math.round(point.x + offsetX), 0, WORLD.width - 1);
         const y = clamp(Math.round(point.y + offsetY), 0, WORLD.height - 1);
@@ -385,10 +524,7 @@ export function ProjectWorld() {
         const red = terrainPixels![index];
         const green = terrainPixels![index + 1];
         const blue = terrainPixels![index + 2];
-        const water = blue > 105 && blue > red * 1.28 && blue > green * 1.06;
-        const denseCanopy = green > red * 1.18 && green > blue * 1.12 && green < 88 && red < 67;
-        const mountainEdge = y < 34 || (y < 90 && red > 140 && green > 150 && blue > 160);
-        return water || denseCanopy || mountainEdge;
+        return blue > 112 && blue > red * 1.34 && blue > green * 1.08 && green > 68;
       });
     };
 
@@ -452,12 +588,14 @@ export function ProjectWorld() {
       const cameraX = clamp(Math.round(position.x - viewWidth / 2), 0, Math.max(0, WORLD.width - viewWidth));
       const cameraY = clamp(Math.round(position.y - viewHeight / 2), 0, Math.max(0, WORLD.height - viewHeight));
       context.clearRect(0, 0, viewWidth, viewHeight);
-      if (world.complete && world.naturalWidth) context.drawImage(world, -cameraX, -cameraY);
-
-      context.save();
-      context.translate(-cameraX, -cameraY);
-      drawAmbientWorld(context, reducedMotion ? 0 : time);
-      context.restore();
+      if (worldLayers) {
+        context.save();
+        context.translate(-cameraX, -cameraY);
+        drawAnimatedWorld(context, worldLayers, reducedMotion ? 0 : time);
+        context.restore();
+      } else if (world.complete && world.naturalWidth) {
+        context.drawImage(world, -cameraX, -cameraY);
+      }
 
       if (nearest) {
         const pulse = Math.floor(time / 360) % 2;
