@@ -1,0 +1,15 @@
+{
+  "orbit": {
+    "count": 11,
+    "width": 1280,
+    "height": 720,
+    "pattern": "/plates/orbit/{i2}.webp"
+  },
+  "drive": {
+    "count": 196,
+    "width": 1600,
+    "height": 900,
+    "pattern": "/plates/drive/{i3}.webp",
+    "fps": 20
+  }
+}
