@@ -445,10 +445,14 @@ a {
   position: fixed;
   inset: 0;
   overflow: hidden;
+  height: 100dvh;
   color: #fff6d8;
   background: #061116;
   image-rendering: pixelated;
   isolation: isolate;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .pixel-world-canvas {
   position: absolute;
@@ -682,7 +686,66 @@ a {
 .pixel-interact small { color: #c4b58f; font: 6px var(--font-geist-mono), monospace; letter-spacing: .12em; }
 .pixel-help { gap: 12px; }
 .pixel-help > span { display: flex; align-items: center; gap: 5px; }
-.pixel-touch { display: none; }
+.pixel-touch,
+.pixel-joystick,
+.pixel-mobile-action { display: none; }
+
+.pixel-joystick {
+  position: absolute;
+  z-index: 12;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  width: 116px;
+  height: 116px;
+  place-items: center;
+  color: rgba(255, 245, 216, .55);
+  border: 3px solid rgba(246, 236, 207, .9);
+  background: rgba(9, 9, 11, .7);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, .55), inset 0 0 0 8px rgba(255, 245, 216, .04);
+  touch-action: none;
+  cursor: grab;
+}
+.pixel-joystick:active { cursor: grabbing; }
+.pixel-joystick-arrows {
+  font: 36px/1 var(--font-geist-mono), monospace;
+  pointer-events: none;
+}
+.pixel-joystick-knob {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border: 3px solid #fff0c2;
+  background: #d49e42;
+  box-shadow: 4px 4px 0 rgba(38, 25, 8, .75), inset 0 0 0 5px #f1c967;
+  pointer-events: none;
+  will-change: transform;
+}
+.pixel-mobile-action {
+  position: absolute;
+  z-index: 12;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  width: 72px;
+  height: 72px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #241a0a;
+  border: 3px solid #fff0c2;
+  border-radius: 0;
+  background: #efbf55;
+  box-shadow: 5px 5px 0 rgba(60, 40, 10, .72);
+  touch-action: manipulation;
+}
+.pixel-mobile-action b { font: 900 22px var(--font-geist-mono), monospace; }
+.pixel-mobile-action span { font: 700 7px var(--font-geist-mono), monospace; letter-spacing: .1em; }
+.pixel-mobile-action:disabled {
+  color: #d4c9ab;
+  border-color: rgba(241, 231, 201, .72);
+  background: rgba(26, 24, 23, .75);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, .5);
+}
 
 .world-dialog {
   width: min(820px, calc(100vw - 28px));
@@ -814,29 +877,7 @@ a {
   .pixel-location { top: 43px; min-width: 178px; padding: 7px 12px; }
   .pixel-map { top: 87px; right: 9px; }
   .pixel-help { display: none; }
-  .pixel-touch {
-    position: absolute;
-    z-index: 8;
-    right: 14px;
-    bottom: 15px;
-    display: grid;
-    grid-template-columns: repeat(3, 43px);
-    grid-template-rows: repeat(2, 43px);
-    gap: 3px;
-  }
-  .pixel-touch button {
-    color: #fff3d0;
-    border: 2px solid rgba(249, 239, 207, .88);
-    border-radius: 0;
-    background: rgba(9, 9, 11, .82);
-    box-shadow: 2px 2px rgba(0, 0, 0, .6);
-    touch-action: none;
-  }
-  .pixel-touch button:nth-child(1) { grid-column: 2; }
-  .pixel-touch button:nth-child(2) { grid-column: 1; grid-row: 2; }
-  .pixel-touch button:nth-child(3) { grid-column: 2; grid-row: 2; }
-  .pixel-touch button:nth-child(4) { grid-column: 3; grid-row: 2; }
-  .pixel-interact { right: 14px; bottom: 116px; left: 14px; transform: translateY(8px); }
+  .pixel-interact { right: 12px; bottom: calc(146px + env(safe-area-inset-bottom)); left: 12px; transform: translateY(8px); }
   .pixel-interact.is-visible { transform: none; }
   .pixel-interact button { min-width: 0; width: 100%; padding: 8px 10px; }
   .world-dialog { grid-template-columns: 1fr; }
@@ -845,6 +886,32 @@ a {
   .world-dialog [data-slot='dialog-title'] { font-size: 36px; }
   .world-dialog-details { padding: 0 22px 20px; }
   .world-dialog-actions { flex-wrap: wrap; padding: 14px 22px 23px; }
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  .pixel-joystick { display: grid; }
+  .pixel-mobile-action { display: flex; }
+  .pixel-help { display: none; }
+}
+
+@media (max-height: 520px) and (pointer: coarse) {
+  .pixel-joystick {
+    width: 96px;
+    height: 96px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+  .pixel-joystick-knob { width: 36px; height: 36px; }
+  .pixel-mobile-action {
+    width: 62px;
+    height: 62px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+  .pixel-interact {
+    right: 92px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 124px;
+  }
+  .pixel-interact button { min-width: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

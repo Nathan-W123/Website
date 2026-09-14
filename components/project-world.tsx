@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import { ExternalLink, FolderGit2, Map, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -381,6 +382,8 @@ export function ProjectWorld() {
   const positionRef = useRef<Point>({ ...START });
   const keysRef = useRef(new Set<string>());
   const directionRef = useRef<Direction>('up');
+  const joystickVectorRef = useRef<Point>({ x: 0, y: 0 });
+  const joystickKnobRef = useRef<HTMLSpanElement>(null);
   const nearbyRef = useRef<Project | null>(PROJECTS[10]);
   const modalOpenRef = useRef(false);
   const [ready, setReady] = useState(false);
@@ -507,10 +510,14 @@ export function ProjectWorld() {
     player.src = '/world/explorer-sheet.png';
 
     const resize = () => {
-      canvas.width = Math.ceil(window.innerWidth / 2);
-      canvas.height = Math.ceil(window.innerHeight / 2);
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
+      const viewportWidth = Math.round(window.visualViewport?.width ?? window.innerWidth);
+      const viewportHeight = Math.round(window.visualViewport?.height ?? window.innerHeight);
+      const mobileControls = window.matchMedia('(pointer: coarse)').matches || viewportWidth <= 900;
+      const renderScale = mobileControls ? 1 : 2;
+      canvas.width = Math.ceil(viewportWidth / renderScale);
+      canvas.height = Math.ceil(viewportHeight / renderScale);
+      canvas.style.width = `${viewportWidth}px`;
+      canvas.style.height = `${viewportHeight}px`;
       context.imageSmoothingEnabled = false;
     };
 
@@ -541,6 +548,8 @@ export function ProjectWorld() {
         if (keys.has('s') || keys.has('arrowdown')) dy += 1;
         if (keys.has('a') || keys.has('arrowleft')) dx -= 1;
         if (keys.has('d') || keys.has('arrowright')) dx += 1;
+        dx += joystickVectorRef.current.x;
+        dy += joystickVectorRef.current.y;
       }
       const walking = Boolean(dx || dy);
 
@@ -632,16 +641,47 @@ export function ProjectWorld() {
 
     resize();
     window.addEventListener('resize', resize);
+    window.visualViewport?.addEventListener('resize', resize);
     frame = requestAnimationFrame(render);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener('resize', resize);
+      window.visualViewport?.removeEventListener('resize', resize);
     };
   }, []);
 
-  const setTouchKey = (key: string, down: boolean) => {
-    if (down) keysRef.current.add(key);
-    else keysRef.current.delete(key);
+  const moveJoystick = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const maxDistance = rect.width * .31;
+    const rawX = event.clientX - (rect.left + rect.width / 2);
+    const rawY = event.clientY - (rect.top + rect.height / 2);
+    const distance = Math.hypot(rawX, rawY);
+    const strength = Math.min(distance, maxDistance);
+    const unitX = distance ? rawX / distance : 0;
+    const unitY = distance ? rawY / distance : 0;
+    const deadZone = distance < 8;
+    joystickVectorRef.current = deadZone ? { x: 0, y: 0 } : { x: unitX, y: unitY };
+    if (joystickKnobRef.current) {
+      const x = deadZone ? 0 : unitX * strength;
+      const y = deadZone ? 0 : unitY * strength;
+      joystickKnobRef.current.style.transform = `translate(${x}px, ${y}px)`;
+    }
+  };
+
+  const startJoystick = (event: ReactPointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    moveJoystick(event);
+  };
+
+  const dragJoystick = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) moveJoystick(event);
+  };
+
+  const stopJoystick = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    joystickVectorRef.current = { x: 0, y: 0 };
+    if (joystickKnobRef.current) joystickKnobRef.current.style.transform = 'translate(0, 0)';
   };
   const progress = `${discovered.size}/${PROJECTS.length}`;
 
@@ -690,12 +730,23 @@ export function ProjectWorld() {
 
       <div className="pixel-help"><span><kbd>WASD</kbd> MOVE</span><span><kbd>E</kbd> ENTER</span><span><kbd>M</kbd> MAP</span></div>
 
-      <div className="pixel-touch" aria-label="Movement controls">
-        <button type="button" onPointerDown={() => setTouchKey('w', true)} onPointerUp={() => setTouchKey('w', false)} onPointerCancel={() => setTouchKey('w', false)} aria-label="Move up">▲</button>
-        <button type="button" onPointerDown={() => setTouchKey('a', true)} onPointerUp={() => setTouchKey('a', false)} onPointerCancel={() => setTouchKey('a', false)} aria-label="Move left">◀</button>
-        <button type="button" onPointerDown={() => setTouchKey('s', true)} onPointerUp={() => setTouchKey('s', false)} onPointerCancel={() => setTouchKey('s', false)} aria-label="Move down">▼</button>
-        <button type="button" onPointerDown={() => setTouchKey('d', true)} onPointerUp={() => setTouchKey('d', false)} onPointerCancel={() => setTouchKey('d', false)} aria-label="Move right">▶</button>
+      <div
+        className="pixel-joystick"
+        role="group"
+        aria-label="Drag to move"
+        onPointerDown={startJoystick}
+        onPointerMove={dragJoystick}
+        onPointerUp={stopJoystick}
+        onPointerCancel={stopJoystick}
+        onLostPointerCapture={stopJoystick}
+      >
+        <span className="pixel-joystick-arrows" aria-hidden="true">＋</span>
+        <span ref={joystickKnobRef} className="pixel-joystick-knob" aria-hidden="true" />
       </div>
+
+      <button className="pixel-mobile-action" type="button" onClick={interact} disabled={!nearbyProject} aria-label={nearbyProject ? `Enter ${nearbyProject.location}` : 'No nearby location'}>
+        <b>E</b><span>{nearbyProject ? 'ENTER' : 'ACTION'}</span>
+      </button>
 
       {!ready && <div className="pixel-loading">DRAWING THE WORLD…</div>}
 
