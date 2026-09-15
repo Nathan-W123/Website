@@ -101,7 +101,7 @@ export function BoardWriting({ x, y, w, h }: { x: number; y: number; w: number; 
   return (
     <g className="lf-marker lf-board-ink" filter="url(#lf-watercolor-ink)">
       <text x={gx} y={y + h * 0.3} className="lf-board-name" transform={`rotate(-1.6 ${gx} ${y + h * 0.3})`}>{CONTACT.name}</text>
-      <path d={`M ${gx + 2} ${y + h * 0.36} q ${w * 0.16} 6 ${w * 0.32} 0 t ${w * 0.24} 2`} fill="none" stroke="#d9663f" strokeWidth={3} strokeLinecap="round" opacity={0.85} />
+      <path d={`M ${gx + 2} ${y + h * 0.36} q ${w * 0.16} 6 ${w * 0.32} 0 t ${w * 0.24} 2`} fill="none" stroke="#c9553f" strokeWidth={3} strokeLinecap="round" opacity={0.9} />
       <a href={`mailto:${CONTACT.email}`} className="lf-marker-link">
         <text x={gx + 2} y={y + h * 0.56} className="lf-board-line" transform={`rotate(0.7 ${gx} ${y + h * 0.56})`}>{CONTACT.email}</text>
       </a>
@@ -192,20 +192,12 @@ export function PropDefs() {
       </filter>
       {/* marker ink soaked into paper: grainy density, soft edges, a faint bleed halo, slight wobble */}
       <filter id="lf-watercolor-ink" x="-6%" y="-14%" width="112%" height="128%" colorInterpolationFilters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="11" result="grainNoise" />
-        <feColorMatrix in="grainNoise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.9 0.9 0.9 0 -0.55" result="grain" />
+        {/* crisp like the painting's linework, with a light paper grain in the stroke and a small hand wobble */}
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="11" result="grainNoise" />
+        <feColorMatrix in="grainNoise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.5 0.5 0.5 0 0.32" result="grain" />
         <feComposite in="SourceGraphic" in2="grain" operator="in" result="grainy" />
-        <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="wobble" />
-        <feDisplacementMap in="grainy" in2="wobble" scale="3" xChannelSelector="R" yChannelSelector="G" result="wobbled" />
-        <feGaussianBlur in="wobbled" stdDeviation="0.75" result="soft" />
-        <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="bleedBlur" />
-        <feComponentTransfer in="bleedBlur" result="bleed">
-          <feFuncA type="linear" slope="0.28" />
-        </feComponentTransfer>
-        <feMerge>
-          <feMergeNode in="bleed" />
-          <feMergeNode in="soft" />
-        </feMerge>
+        <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="4" result="wobble" />
+        <feDisplacementMap in="grainy" in2="wobble" scale="1.6" xChannelSelector="R" yChannelSelector="G" />
       </filter>
       <filter id="lf-ink" x="-5%" y="-10%" width="110%" height="120%">
         <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="9" result="n" />

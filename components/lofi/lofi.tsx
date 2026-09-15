@@ -19,7 +19,7 @@ type HotspotId = keyof RoomArt['hotspots'];
 
 const HOTSPOT_OUTLINES: Record<HotspotId, string> = {
   laptop: 'M 41 5 L 96 14 L 90 65 L 82 80 L 58 96 L 25 88 L 5 76 L 5 66 L 35 55 Z',
-  sketchbook: 'M 28 12 L 88 9 L 93 18 L 93 80 L 25 92 L 6 79 L 10 34 L 22 34 Z',
+  sketchbook: 'M 28 17 L 91 14 L 84 79 L 16 85 Z',
 };
 
 function useViewport() {

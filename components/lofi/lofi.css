@@ -180,9 +180,9 @@
 .lf-marker-name { font-size: 38px; font-weight: 700; fill: #3a2a3a; }
 .lf-marker-line { font-size: 21px; font-weight: 500; fill: #3d3340; }
 .lf-marker-name-lg { font-size: 62px; font-weight: 700; fill: #3a2a3a; }
-.lf-board-ink { mix-blend-mode: multiply; opacity: 0.86; }
-.lf-board-name { font-size: 56px; font-weight: 700; fill: #34456a; }
-.lf-board-line { font-size: 29px; font-weight: 600; fill: #3a4a6e; }
+.lf-board-ink { mix-blend-mode: multiply; opacity: 0.92; }
+.lf-board-name { font-size: 56px; font-weight: 700; fill: #4a3142; }
+.lf-board-line { font-size: 29px; font-weight: 600; fill: #4e3646; }
 .lf-marker-link:hover .lf-board-line { fill: #d9663f; }
 .lf-marker-line-lg { font-size: 33px; font-weight: 500; fill: #4a3340; }
 .lf-marker-link { pointer-events: auto; cursor: pointer; }
