@@ -127,8 +127,6 @@
   from { transform: translateX(calc(var(--shift) * -0.5)); }
   to { transform: translateX(calc(var(--shift) * 0.5)); }
 }
-.lf-sun { animation: lf-sun 10s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-@keyframes lf-sun { 0%, 100% { opacity: 0.55; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.08); } }
 .lf-lamp { animation: lf-lamp 6s ease-in-out infinite; }
 @keyframes lf-lamp { 0%, 100% { opacity: 0.55; } 30% { opacity: 0.8; } 60% { opacity: 0.62; } }
 .lf-wisp { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; animation: lf-wisp 7s ease-out infinite; }
@@ -140,13 +138,6 @@
   60% { opacity: 0.6; transform: scaleY(0.95) scaleX(1.05); }
   100% { opacity: 0; transform: scaleY(1.2) scaleX(1.15) translateY(-40px); }
 }
-.lf-ray { opacity: var(--o); animation: lf-ray var(--dur) ease-in-out var(--delay) infinite; }
-@keyframes lf-ray {
-  0%, 100% { opacity: calc(var(--o) * 0.7); transform: translateX(0); }
-  50% { opacity: var(--o); transform: translateX(var(--sway)); }
-}
-.lf-pool { animation: lf-pool 12s ease-in-out infinite; }
-@keyframes lf-pool { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 .lf-mote { opacity: 0; animation: lf-mote var(--dur) ease-in-out var(--delay) infinite; }
 @keyframes lf-mote {
   0% { opacity: 0; transform: translate(0, 0); }
@@ -330,6 +321,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lf-cloud, .lf-sun, .lf-lamp, .lf-mote, .lf-breathe, .lf-hot::after, .lf-ray, .lf-pool { animation: none; }
+  .lf-cloud, .lf-lamp, .lf-mote, .lf-breathe, .lf-hot::after { animation: none; }
   .lf-wisp { animation: none; opacity: 0.5; }
 }

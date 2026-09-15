@@ -60,20 +60,8 @@ const MOTES = Array.from({ length: 18 }, (_, i) => ({
   delay: -(i * 1.7),
 }));
 
-/* ---------- rays ---------- */
-
-const RAYS = [
-  { x: 0.18, w: 0.09, lean: 0.55, spread: 1.7, o: 0.55, sway: 12 },
-  { x: 0.34, w: 0.05, lean: 0.5, spread: 1.9, o: 0.4, sway: 9 },
-  { x: 0.47, w: 0.12, lean: 0.48, spread: 1.6, o: 0.6, sway: 14 },
-  { x: 0.66, w: 0.06, lean: 0.44, spread: 2.0, o: 0.4, sway: 8 },
-  { x: 0.8, w: 0.1, lean: 0.4, spread: 1.7, o: 0.5, sway: 11 },
-];
-
 export function Overlay({ art }: { art: RoomArt }) {
   const o = art.windowOpening;
-  const floorY = art.height + 40;
-  const rayLength = floorY - o.y;
 
   return (
     <svg className="lf-overlay" viewBox={`0 0 ${art.width} ${art.height}`} preserveAspectRatio="none" aria-hidden="true">
@@ -81,24 +69,10 @@ export function Overlay({ art }: { art: RoomArt }) {
         <clipPath id="lf-clip-window">
           <rect x={o.x} y={o.y} width={o.w} height={o.h} />
         </clipPath>
-        <radialGradient id="lf-sunglow" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#fff1cf" stopOpacity="0.9" />
-          <stop offset="0.45" stopColor="#ffd9a4" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#ffc98a" stopOpacity="0" />
-        </radialGradient>
         <radialGradient id="lf-lampglow" cx="0.5" cy="0.5" r="0.5">
           <stop offset="0" stopColor="#ffe6b0" stopOpacity="0.85" />
           <stop offset="0.5" stopColor="#ffd08a" stopOpacity="0.25" />
           <stop offset="1" stopColor="#ffc070" stopOpacity="0" />
-        </radialGradient>
-        <linearGradient id="lf-ray" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fff0cc" stopOpacity="0.55" />
-          <stop offset="0.35" stopColor="#ffe6bd" stopOpacity="0.28" />
-          <stop offset="1" stopColor="#ffdca8" stopOpacity="0" />
-        </linearGradient>
-        <radialGradient id="lf-deskpool" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#fff3d4" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#ffe3b0" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="lf-steam-fade" x1="0" y1="1" x2="0" y2="0">
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
@@ -125,9 +99,6 @@ export function Overlay({ art }: { art: RoomArt }) {
         <filter id="lf-blur-steam" filterUnits="userSpaceOnUse" x={-260} y={-320} width={520} height={360}>
           <feGaussianBlur stdDeviation="2" />
         </filter>
-        <filter id="lf-blur-ray" x="-20%" y="-5%" width="140%" height="110%">
-          <feGaussianBlur stdDeviation="9" />
-        </filter>
         <filter id="lf-blur-mote" x="-100%" y="-100%" width="300%" height="300%">
           <feGaussianBlur stdDeviation="1.4" />
         </filter>
@@ -136,9 +107,6 @@ export function Overlay({ art }: { art: RoomArt }) {
         </filter>
         <PropDefs />
       </defs>
-
-      {/* The glow can spill softly past the panes; clipping its radial fade creates hard vertical seams. */}
-      <circle className="lf-sun" cx={art.sun.x} cy={art.sun.y} r={art.sun.r} fill="url(#lf-sunglow)" style={{ mixBlendMode: 'screen' }} />
 
       {/* clouds and birds stay physically inside the window */}
       <g clipPath="url(#lf-clip-window)">
@@ -169,27 +137,6 @@ export function Overlay({ art }: { art: RoomArt }) {
           </g>
         ))}
       </g>
-
-      {/* sun rays into the room */}
-      <g className="lf-rays" filter="url(#lf-blur-ray)" style={{ mixBlendMode: 'screen' }}>
-        {RAYS.map((r, i) => {
-          const x0 = o.x + o.w * r.x;
-          const w0 = o.w * r.w;
-          const x1 = x0 - rayLength * r.lean;
-          const w1 = w0 * r.spread;
-          return (
-            <polygon
-              key={i}
-              className="lf-ray"
-              style={{ ['--o' as string]: r.o, ['--sway' as string]: `${r.sway}px`, ['--dur' as string]: `${14 + i * 3}s`, ['--delay' as string]: `${-i * 4}s` }}
-              points={`${x0},${o.y} ${x0 + w0},${o.y} ${x1 + w1},${floorY} ${x1},${floorY}`}
-              fill="url(#lf-ray)"
-            />
-          );
-        })}
-      </g>
-      {/* the pool of light on the desk */}
-      <ellipse className="lf-pool" cx={art.lightBeam.x + art.lightBeam.w * 0.45} cy={art.lightBeam.y + art.lightBeam.h * 0.98} rx={art.lightBeam.w * 0.55} ry={art.lightBeam.h * 0.14} fill="url(#lf-deskpool)" style={{ mixBlendMode: 'soft-light' }} />
 
       {/* lamp */}
       {art.lamp && <circle className="lf-lamp" cx={art.lamp.x} cy={art.lamp.y} r={art.lamp.r} fill="url(#lf-lampglow)" style={{ mixBlendMode: 'screen' }} />}
