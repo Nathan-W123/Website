@@ -36,31 +36,33 @@ export type RoomArt = {
   whiteboard: { x: number; y: number; w: number; h: number; wall: { x: number; y: number; w: number; h: number } } | null;
   /** A post and base for the lamp (x of the post, top at the arm hinge, bottom on the desk), or null when the painting's lamp has one. */
   lampStand: { x: number; top: number; bottom: number } | null;
+  /** Inner surface of the whiteboard painted into the room, where the contact details are written. */
+  boardWriting: { x: number; y: number; w: number; h: number } | null;
 };
 
 /**
- * The room painting now includes the blank wall whiteboard and the complete
- * desk lamp. Interactive lettering and ambient motion remain separate so the
- * board can receive real links later and the scene stays alive.
+ * The regenerated 1672x941 room includes the blank whiteboard, the finished
+ * lamp and the title painted directly onto the sketchbook.
  */
 export const ROOM: RoomArt = {
-  src: '/lofi/room-integrated-v3.png',
-  width: 2290,
-  height: 1288,
+  src: '/lofi/room.jpg',
+  width: 1672,
+  height: 941,
   minVisibleHeight: 0.92,
-  focus: { landscape: { x: 0.5, y: 0.56 }, portrait: { x: 0.5, y: 0.5 } },
-  portraitSpan: [500, 1640],
-  windowOpening: { x: 905, y: 100, w: 470, h: 660 },
-  sun: { x: 1110, y: 620, r: 330 },
-  lamp: { x: 600, y: 640, r: 150 },
-  mug: { x: 1042, y: 952 },
-  lightBeam: { x: 750, y: 250, w: 700, h: 780 },
+  focus: { landscape: { x: 0.5, y: 0.5 }, portrait: { x: 0.5, y: 0.5 } },
+  portraitSpan: [380, 1180],
+  windowOpening: { x: 668, y: 62, w: 334, h: 500 },
+  sun: { x: 830, y: 470, r: 230 },
+  lamp: { x: 450, y: 430, r: 110 },
+  mug: { x: 835, y: 712 },
+  lightBeam: { x: 520, y: 180, w: 520, h: 640 },
   hotspots: {
-    laptop: { x: 1160, y: 710, w: 470, h: 360 },
-    sketchbook: { x: 540, y: 965, w: 200, h: 135 },
+    laptop: { x: 850, y: 530, w: 330, h: 260 },
+    sketchbook: { x: 390, y: 700, w: 150, h: 105 },
   },
   bookTitle: null,
-  laptopSticker: { x: 1462, y: 842, rotate: 3 },
+  laptopSticker: { x: 1058, y: 628, rotate: 2 },
   whiteboard: null,
   lampStand: null,
+  boardWriting: null,
 };

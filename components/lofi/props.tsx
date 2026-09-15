@@ -95,6 +95,24 @@ export function WallWhiteboard({ x, y, w, h, wall }: { x: number; y: number; w: 
   );
 }
 
+/** Marker handwriting on the whiteboard that is already painted into the room. Links are live. */
+export function BoardWriting({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
+  const gx = x + w * 0.08;
+  return (
+    <g className="lf-marker" filter="url(#lf-ink)">
+      <text x={gx} y={y + h * 0.3} className="lf-board-name" transform={`rotate(-1.6 ${gx} ${y + h * 0.3})`}>{CONTACT.name}</text>
+      <path d={`M ${gx + 2} ${y + h * 0.36} q ${w * 0.16} 6 ${w * 0.32} 0 t ${w * 0.24} 2`} fill="none" stroke="#d9663f" strokeWidth={3} strokeLinecap="round" opacity={0.85} />
+      <a href={`mailto:${CONTACT.email}`} className="lf-marker-link">
+        <text x={gx + 2} y={y + h * 0.56} className="lf-board-line" transform={`rotate(0.7 ${gx} ${y + h * 0.56})`}>{CONTACT.email}</text>
+      </a>
+      <a href={CONTACT.github} target="_blank" rel="noreferrer" className="lf-marker-link">
+        <text x={gx + 2} y={y + h * 0.76} className="lf-board-line" transform={`rotate(-0.8 ${gx} ${y + h * 0.76})`}>github.com/{CONTACT.github.split('/').pop()}</text>
+      </a>
+      <path d={`M ${x + w - 46} ${y + h - 40} l 4 10 11 1 -8 8 2 11 -9 -5 -9 5 2 -11 -8 -8 11 -1 z`} fill="none" stroke="#d9663f" strokeWidth={2} strokeLinejoin="round" opacity={0.9} />
+    </g>
+  );
+}
+
 /**
  * A stand for the lamp: a post from the arm's hinge straight down to a heavy
  * round base on the desk, shaded like a cylinder and a disc in the lamp's coral.

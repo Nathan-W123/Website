@@ -1,6 +1,6 @@
 'use client';
 
-import { BookTitle, LampStand, LaptopSticker, PropDefs, WallWhiteboard } from './props';
+import { BoardWriting, BookTitle, LampStand, LaptopSticker, PropDefs, WallWhiteboard } from './props';
 import type { RoomArt } from './room';
 
 /**
@@ -211,6 +211,7 @@ export function Overlay({ art }: { art: RoomArt }) {
       {art.laptopSticker && <LaptopSticker {...art.laptopSticker} />}
       {art.whiteboard && <WallWhiteboard {...art.whiteboard} />}
       {art.lampStand && <LampStand {...art.lampStand} />}
+      {art.boardWriting && <BoardWriting {...art.boardWriting} />}
 
       {/* dust in the sunbeam */}
       <g filter="url(#lf-blur-mote)" fill="#fff3d6">
