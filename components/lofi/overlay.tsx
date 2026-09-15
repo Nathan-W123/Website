@@ -93,9 +93,6 @@ export function Overlay({ art }: { art: RoomArt }) {
             <rect x={0} y={art.mug.y - 320} width={art.width} height={320} fill="url(#lf-steam-fade)" />
           </mask>
         )}
-        <filter id="lf-blur-cloud" x="-30%" y="-60%" width="160%" height="220%">
-          <feGaussianBlur stdDeviation="14" />
-        </filter>
         <filter id="lf-blur-steam" filterUnits="userSpaceOnUse" x={-260} y={-320} width={520} height={360}>
           <feGaussianBlur stdDeviation="2" />
         </filter>
@@ -108,21 +105,8 @@ export function Overlay({ art }: { art: RoomArt }) {
         <PropDefs />
       </defs>
 
-      {/* clouds and birds stay physically inside the window */}
+      {/* birds stay physically inside the window */}
       <g clipPath="url(#lf-clip-window)">
-        <g filter="url(#lf-blur-cloud)" style={{ mixBlendMode: 'soft-light' }}>
-          <g className="lf-cloud" style={{ ['--dur' as string]: '140s', ['--shift' as string]: `${o.w * 1.4}px`, ['--delay' as string]: '-30s' }}>
-            <ellipse cx={o.x + o.w * 0.15} cy={o.y + o.h * 0.22} rx={90} ry={26} fill="#fff" opacity={0.9} />
-            <ellipse cx={o.x + o.w * 0.2} cy={o.y + o.h * 0.2} rx={50} ry={30} fill="#fff" opacity={0.9} />
-          </g>
-          <g className="lf-cloud" style={{ ['--dur' as string]: '190s', ['--shift' as string]: `${o.w * 1.4}px`, ['--delay' as string]: '-110s' }}>
-            <ellipse cx={o.x + o.w * 0.55} cy={o.y + o.h * 0.34} rx={110} ry={30} fill="#fff" opacity={0.8} />
-            <ellipse cx={o.x + o.w * 0.6} cy={o.y + o.h * 0.31} rx={60} ry={36} fill="#fff" opacity={0.8} />
-          </g>
-          <g className="lf-cloud" style={{ ['--dur' as string]: '230s', ['--shift' as string]: `${o.w * 1.4}px`, ['--delay' as string]: '-70s' }}>
-            <ellipse cx={o.x + o.w * 0.85} cy={o.y + o.h * 0.12} rx={70} ry={20} fill="#fff" opacity={0.7} />
-          </g>
-        </g>
         {FLIGHTS.map((f, i) => (
           <g key={i} opacity={0}>
             <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur={`${f.dur}s`} begin={`${f.begin}s`} repeatCount="indefinite" />

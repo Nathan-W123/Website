@@ -122,11 +122,6 @@
 .is-zoomed .lf-tag { opacity: 0 !important; }
 
 /* ---- ambient animation (overlay svg) ---- */
-.lf-cloud { animation: lf-drift var(--dur) linear var(--delay) infinite; }
-@keyframes lf-drift {
-  from { transform: translateX(calc(var(--shift) * -0.5)); }
-  to { transform: translateX(calc(var(--shift) * 0.5)); }
-}
 .lf-lamp { animation: lf-lamp 6s ease-in-out infinite; }
 @keyframes lf-lamp { 0%, 100% { opacity: 0.55; } 30% { opacity: 0.8; } 60% { opacity: 0.62; } }
 .lf-wisp { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; animation: lf-wisp 7s ease-out infinite; }
@@ -321,6 +316,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lf-cloud, .lf-lamp, .lf-mote, .lf-breathe, .lf-hot::after { animation: none; }
+  .lf-lamp, .lf-mote, .lf-breathe, .lf-hot::after { animation: none; }
   .lf-wisp { animation: none; opacity: 0.5; }
 }
