@@ -57,8 +57,8 @@ export const ROOM: RoomArt = {
   mug: { x: 760, y: 712 },
   lightBeam: { x: 520, y: 180, w: 520, h: 640 },
   hotspots: {
-    laptop: { x: 850, y: 530, w: 330, h: 260 },
-    sketchbook: { x: 405, y: 712, w: 115, h: 85 },
+    laptop: { x: 850, y: 530, w: 320, h: 250 },
+    sketchbook: { x: 405, y: 715, w: 120, h: 85 },
   },
   bookTitle: null,
   laptopSticker: { x: 1058, y: 628, rotate: 2 },

@@ -17,15 +17,9 @@ declare global {
 const PROJECTS = CHAPTERS.flatMap((c) => c.projects);
 type HotspotId = keyof RoomArt['hotspots'];
 
-const HOTSPOT_OUTLINES: Record<HotspotId, readonly string[]> = {
-  laptop: [
-    'M 34 7 L 88 15 L 91 60 L 32 52 Z',
-    'M 32 52 L 91 60 L 80 80 L 65 96 L 25 86 L 5 71 L 7 59 Z',
-  ],
-  sketchbook: [
-    'M 13 12 L 84 5 L 94 66 L 16 93 Z',
-    'M 16 93 L 94 66 L 91 83 L 15 100 L 3 86 L 13 12 Z',
-  ],
+const HOTSPOT_OUTLINES: Record<HotspotId, string> = {
+  laptop: 'M 41 5 L 96 14 L 90 65 L 82 80 L 58 96 L 25 88 L 5 76 L 5 66 L 35 55 Z',
+  sketchbook: 'M 28 12 L 88 9 L 93 18 L 93 80 L 25 92 L 6 79 L 10 34 L 22 34 Z',
 };
 
 function useViewport() {
@@ -138,7 +132,7 @@ export default function LofiRoom({ art = ROOM }: { art?: RoomArt }) {
                   onPointerLeave={() => setHovered(null)}
                 >
                   <svg className="lf-hot-outline" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                    {HOTSPOT_OUTLINES[id].map((d, index) => <path key={index} d={d} />)}
+                    <path d={HOTSPOT_OUTLINES[id]} />
                   </svg>
                   <span className="lf-tag">{id === 'laptop' ? 'Engineering' : 'Art'}</span>
                 </button>
