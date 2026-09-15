@@ -45,7 +45,7 @@ export type RoomArt = {
  * lamp and the title painted directly onto the sketchbook.
  */
 export const ROOM: RoomArt = {
-  src: '/lofi/room.jpg',
+  src: '/lofi/room-integrated-v4.png',
   width: 1672,
   height: 941,
   minVisibleHeight: 0.92,
@@ -54,15 +54,15 @@ export const ROOM: RoomArt = {
   windowOpening: { x: 668, y: 62, w: 334, h: 500 },
   sun: { x: 830, y: 470, r: 230 },
   lamp: { x: 450, y: 430, r: 110 },
-  mug: { x: 835, y: 712 },
+  mug: { x: 760, y: 712 },
   lightBeam: { x: 520, y: 180, w: 520, h: 640 },
   hotspots: {
     laptop: { x: 850, y: 530, w: 330, h: 260 },
-    sketchbook: { x: 390, y: 700, w: 150, h: 105 },
+    sketchbook: { x: 405, y: 712, w: 115, h: 85 },
   },
   bookTitle: null,
   laptopSticker: { x: 1058, y: 628, rotate: 2 },
   whiteboard: null,
   lampStand: null,
-  boardWriting: null,
+  boardWriting: { x: 1262, y: 178, w: 374, h: 272 },
 };

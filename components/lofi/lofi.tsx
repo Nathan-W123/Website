@@ -19,12 +19,12 @@ type HotspotId = keyof RoomArt['hotspots'];
 
 const HOTSPOT_OUTLINES: Record<HotspotId, readonly string[]> = {
   laptop: [
-    'M 27 5 L 90 12 L 94 60 L 34 65 Z',
-    'M 34 65 L 94 60 L 86 78 L 65 96 L 27 98 L 5 82 L 7 70 Z',
+    'M 34 7 L 88 15 L 91 60 L 32 52 Z',
+    'M 32 52 L 91 60 L 80 80 L 65 96 L 25 86 L 5 71 L 7 59 Z',
   ],
   sketchbook: [
-    'M 15 24 L 86 11 L 95 62 L 23 83 Z',
-    'M 23 83 L 95 62 L 92 78 L 20 97 L 7 79 L 15 24 Z',
+    'M 13 12 L 84 5 L 94 66 L 16 93 Z',
+    'M 16 93 L 94 66 L 91 83 L 15 100 L 3 86 L 13 12 Z',
   ],
 };
 

@@ -10,7 +10,7 @@ import { Rough } from '@/components/sketch/rough';
 
 export const CONTACT = {
   name: 'Nathan W.',
-  email: 'nward.987@gmail.com',
+  email: 'ncward@ucdavis.edu',
   github: 'https://github.com/Nathan-W123',
 };
 
