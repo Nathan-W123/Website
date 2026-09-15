@@ -81,11 +81,6 @@ export function Overlay({ art }: { art: RoomArt }) {
         <clipPath id="lf-clip-window">
           <rect x={o.x} y={o.y} width={o.w} height={o.h} />
         </clipPath>
-        {art.mug && (
-          <clipPath id="lf-clip-steam">
-            <rect x={art.mug.x - 120} y={art.mug.y - 260} width={240} height={258} />
-          </clipPath>
-        )}
         <radialGradient id="lf-sunglow" cx="0.5" cy="0.5" r="0.5">
           <stop offset="0" stopColor="#fff1cf" stopOpacity="0.9" />
           <stop offset="0.45" stopColor="#ffd9a4" stopOpacity="0.35" />
@@ -112,14 +107,22 @@ export function Overlay({ art }: { art: RoomArt }) {
           <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
         {art.mug && (
-          <mask id="lf-steam-mask">
-            <rect x={art.mug.x - 120} y={art.mug.y - 260} width={240} height={258} fill="url(#lf-steam-fade)" />
+          <mask
+            id="lf-steam-mask"
+            maskUnits="userSpaceOnUse"
+            maskContentUnits="userSpaceOnUse"
+            x={0}
+            y={art.mug.y - 320}
+            width={art.width}
+            height={320}
+          >
+            <rect x={0} y={art.mug.y - 320} width={art.width} height={320} fill="url(#lf-steam-fade)" />
           </mask>
         )}
         <filter id="lf-blur-cloud" x="-30%" y="-60%" width="160%" height="220%">
           <feGaussianBlur stdDeviation="14" />
         </filter>
-        <filter id="lf-blur-steam" x="-60%" y="-20%" width="220%" height="140%">
+        <filter id="lf-blur-steam" filterUnits="userSpaceOnUse" x={-260} y={-320} width={520} height={360}>
           <feGaussianBlur stdDeviation="2" />
         </filter>
         <filter id="lf-blur-ray" x="-20%" y="-5%" width="140%" height="110%">
@@ -191,15 +194,15 @@ export function Overlay({ art }: { art: RoomArt }) {
 
       {/* steam: rises from the rim, never drawn over the cup */}
       {art.mug && (
-        <g clipPath="url(#lf-clip-steam)" mask="url(#lf-steam-mask)">
+        <g mask="url(#lf-steam-mask)">
           <g className="lf-steam" filter="url(#lf-blur-steam)" stroke="#fff9f0" fill="none" strokeLinecap="round" transform={`translate(${art.mug.x} ${art.mug.y})`}>
-            <path className="lf-wisp lf-wisp-1" strokeWidth={14}>
+            <path className="lf-wisp lf-wisp-1" d="M -24 -4 C -46 -34 -2 -56 -22 -88 C -42 -118 4 -136 -16 -168" strokeWidth={14}>
               <animate attributeName="d" values="M -24 -4 C -46 -34 -2 -56 -22 -88 C -42 -118 4 -136 -16 -168;M -24 -4 C -4 -34 -44 -56 -20 -88 C 0 -118 -40 -136 -18 -168;M -24 -4 C -46 -34 -2 -56 -22 -88 C -42 -118 4 -136 -16 -168" dur="7s" repeatCount="indefinite" />
             </path>
-            <path className="lf-wisp lf-wisp-2" strokeWidth={18}>
+            <path className="lf-wisp lf-wisp-2" d="M 4 -2 C 34 -34 -20 -60 12 -96 C 40 -128 -14 -148 14 -186" strokeWidth={18}>
               <animate attributeName="d" values="M 4 -2 C 34 -34 -20 -60 12 -96 C 40 -128 -14 -148 14 -186;M 4 -2 C -24 -34 30 -60 2 -96 C -22 -128 30 -148 6 -186;M 4 -2 C 34 -34 -20 -60 12 -96 C 40 -128 -14 -148 14 -186" dur="8.5s" repeatCount="indefinite" />
             </path>
-            <path className="lf-wisp lf-wisp-3" strokeWidth={11}>
+            <path className="lf-wisp lf-wisp-3" d="M 30 -4 C 10 -30 50 -50 28 -80 C 8 -108 46 -124 30 -154" strokeWidth={11}>
               <animate attributeName="d" values="M 30 -4 C 10 -30 50 -50 28 -80 C 8 -108 46 -124 30 -154;M 30 -4 C 50 -30 10 -50 32 -80 C 52 -108 14 -124 30 -154;M 30 -4 C 10 -30 50 -50 28 -80 C 8 -108 46 -124 30 -154" dur="6.5s" repeatCount="indefinite" />
             </path>
           </g>
