@@ -137,9 +137,11 @@ export function Overlay({ art }: { art: RoomArt }) {
         <PropDefs />
       </defs>
 
-      {/* through the window */}
+      {/* The glow can spill softly past the panes; clipping its radial fade creates hard vertical seams. */}
+      <circle className="lf-sun" cx={art.sun.x} cy={art.sun.y} r={art.sun.r} fill="url(#lf-sunglow)" style={{ mixBlendMode: 'screen' }} />
+
+      {/* clouds and birds stay physically inside the window */}
       <g clipPath="url(#lf-clip-window)">
-        <circle className="lf-sun" cx={art.sun.x} cy={art.sun.y} r={art.sun.r} fill="url(#lf-sunglow)" style={{ mixBlendMode: 'screen' }} />
         <g filter="url(#lf-blur-cloud)" style={{ mixBlendMode: 'soft-light' }}>
           <g className="lf-cloud" style={{ ['--dur' as string]: '140s', ['--shift' as string]: `${o.w * 1.4}px`, ['--delay' as string]: '-30s' }}>
             <ellipse cx={o.x + o.w * 0.15} cy={o.y + o.h * 0.22} rx={90} ry={26} fill="#fff" opacity={0.9} />
