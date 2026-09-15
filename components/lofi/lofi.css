@@ -118,7 +118,7 @@
 .lf-hot.is-hover .lf-tag,
 .lf-hot:focus-visible .lf-tag { opacity: 1; transform: translate(-50%, -100%); }
 .is-zoomed .lf-hot { cursor: default; }
-.is-zoomed .lf-hot-outline { animation: none; opacity: 0; }
+.is-zoomed .lf-hot-outline { animation: none !important; opacity: 0 !important; }
 .is-zoomed .lf-tag { opacity: 0 !important; }
 
 /* ---- ambient animation (overlay svg) ---- */

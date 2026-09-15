@@ -1,0 +1,448 @@
+/* The art sketchbook overlay, painted in the room's style: cream paper from a
+   generated painting, the room's brown-plum ink, coral accents, paper grain. */
+.sb-wrap {
+  --paper: #efe3d1;
+  --ink: #4a3142;
+  --ink-soft: #7a6170;
+  --coral: #c9553f;
+  --hand: var(--font-caveat, 'Caveat'), 'Segoe Print', cursive;
+  --body: var(--font-nunito, 'Nunito'), system-ui, sans-serif;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+}
+.sb-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: radial-gradient(ellipse at 50% 45%, rgba(58, 31, 40, 0.15), rgba(40, 20, 30, 0.5));
+  cursor: zoom-out;
+}
+/* ---- the book, in book units (cover = 1000x900, spine at x=0) ---- */
+.sbx-stage {
+  position: absolute;
+  inset: 0;
+  perspective: 2600px;
+  perspective-origin: 50% 50%;
+  pointer-events: none;
+}
+.sbx {
+  --red: #8f4b3e;
+  --spine: #5a3a45;
+  --line: #3f1a1f;
+  --page-edge: #ead3c0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  transform-style: preserve-3d;
+  transition: transform 1s cubic-bezier(0.55, 0, 0.2, 1);
+  pointer-events: auto;
+}
+.sbx-base {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1000px;
+  height: 725px;
+  transform-origin: 0 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+.is-reading .sbx-base { opacity: 0; }
+.sbx-board,
+.sbx-stack,
+.sbx-spine { opacity: 0; transition: opacity 0.6s ease 0.3s; pointer-events: none; }
+.is-reading .sbx-board,
+.is-reading .sbx-stack,
+.is-reading .sbx-spine { opacity: 1; }
+.sbx-board {
+  position: absolute;
+  left: -1026px;
+  top: -22px;
+  width: 2052px;
+  height: 944px;
+  border-radius: 10px;
+  background-color: var(--red);
+  background-size: 100% 100%;
+  box-shadow: inset 0 0 0 3px var(--line), inset 0 0 50px rgba(60, 25, 30, 0.35), 0 26px 40px rgba(40, 18, 26, 0.45);
+}
+.sbx-stack {
+  position: absolute;
+  left: -1000px;
+  top: 902px;
+  width: 2000px;
+  height: 26px;
+}
+.sbx-stack i {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  height: 11px;
+  background: var(--page-edge);
+  border: 2px solid var(--line);
+  border-radius: 2px;
+}
+.sbx-stack i:first-child { top: 0; }
+.sbx-stack i:last-child { top: 13px; left: 30px; right: 30px; }
+.sbx-spine {
+  position: absolute;
+  left: -7px;
+  top: -4px;
+  width: 14px;
+  height: 908px;
+  background: var(--spine);
+  box-shadow: 0 0 40px 16px rgba(70, 40, 40, 0.28);
+  z-index: 3;
+}
+.sbx-page {
+  position: absolute;
+  top: 0;
+  width: 1000px;
+  height: 900px;
+  z-index: 2;
+  background-color: var(--red);
+  background-size: 100% 100%;
+  box-shadow: inset 0 0 0 3px var(--line);
+}
+.sbx-page-right { left: 0; border-radius: 2px 8px 8px 2px; }
+.sbx-page-left { left: -1000px; border-radius: 8px 2px 2px 8px; box-shadow: inset 0 0 0 3px var(--line), inset 14px 0 0 -8px rgba(60, 25, 30, 0.35); }
+/* the paper glued onto each board, inset like a real hardcover */
+.sbx-paper {
+  position: absolute;
+  inset: 26px 26px 30px;
+  overflow: hidden;
+}
+.sbx-page-right .sbx-paper { inset: 26px 30px 30px 22px; }
+.sbx-page-left .sbx-paper { inset: 26px 22px 30px 30px; }
+.sbx-paper .sb-page { position: absolute; inset: 0; border-radius: 4px; }
+.sbx-inner-paper {
+  position: absolute;
+  inset: 26px 22px 30px 30px;
+  border-radius: 4px;
+  background: #efd8c2;
+  box-shadow: inset 0 0 0 3px var(--line);
+}
+/* while the book is still on the desk it is seen through the same soft zoom as the painting */
+
+.sbx-sheet,
+.sbx-cover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1000px;
+  height: 900px;
+  transform-origin: 0 50%;
+  transform-style: preserve-3d;
+}
+.sbx-sheet .sb-face { background-color: var(--red); box-shadow: inset 0 0 0 3px var(--line); }
+.sbx-sheet { z-index: 5; }
+.sbx-cover { z-index: 6; }
+.sbx-cover .sbx-cover-front { pointer-events: none; }
+.sbx-cover-front {
+  background-color: var(--red);
+  background-size: 100% 100%;
+  border-radius: 2px 8px 8px 2px;
+}
+.sbx-sharp {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 100%;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.is-reading .sbx-sharp { opacity: 1; }
+.sbx-cover-inside {
+  background-color: var(--red);
+  background-size: 100% 100%;
+  border-radius: 8px 2px 2px 8px;
+  box-shadow: inset 0 0 0 3px var(--line), inset 14px 0 0 -8px rgba(60, 25, 30, 0.35);
+}
+.sbx-cover-inside .sbx-paper { inset: 26px 22px 30px 30px; }
+/* the page paper for the book pages */
+.sbx .sb-page { box-shadow: inset 0 0 0 3px var(--line); }
+.sbx .sb-page-left { border-radius: 8px 2px 2px 8px; }
+.sbx .sb-page-right { border-radius: 2px 8px 8px 2px; }
+
+/* ---- pages ---- */
+.sb-page {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: #efd8c2;
+  background-size: 200% 100%;
+  color: var(--ink);
+  font-family: var(--hand);
+  box-shadow: inset 0 0 0 2px var(--line);
+}
+.sb-page-left { background-position: 0% 0; border-radius: 6px 2px 2px 6px; }
+.sb-page-right { background-position: 100% 0; border-radius: 2px 6px 6px 2px; }
+.sb-page-left::before,
+.sb-page-right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.sb-page-left::before { background: linear-gradient(90deg, rgba(60, 30, 35, 0) 70%, rgba(60, 30, 35, 0.28)); }
+.sb-page-right::before { background: linear-gradient(270deg, rgba(60, 30, 35, 0) 70%, rgba(60, 30, 35, 0.28)); }
+.sb-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='6'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.34 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* warm light from the window, the same direction as on the desk */
+.sb-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(250deg, rgba(255, 214, 170, 0.3), rgba(255, 214, 170, 0) 45%, rgba(120, 70, 80, 0.12));
+  mix-blend-mode: multiply;
+}
+.sb-pagenum {
+  position: absolute;
+  bottom: 3%;
+  font-size: clamp(12px, 1.3vw, 18px);
+  color: var(--ink-soft);
+  filter: url(#lf-watercolor-ink);
+}
+.sb-page-left .sb-pagenum { left: 5%; }
+.sb-page-right .sb-pagenum { right: 5%; }
+
+/* ---- flipping sheet and cover ---- */
+.sb-sheet,
+.sb-cover {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  z-index: 5;
+}
+.sb-cover { z-index: 6; width: 51.5%; top: -1.5%; height: 103%; pointer-events: none; }
+.sb-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+.sb-face-back { transform: rotateY(180deg); }
+.sb-face-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(60, 35, 35, 0.4), rgba(60, 35, 35, 0) 40%);
+}
+.sb-face-shade-back { background: linear-gradient(270deg, rgba(60, 35, 35, 0.4), rgba(60, 35, 35, 0) 40%); }
+
+
+/* ---- contents page ---- */
+.sb-toc {
+  position: absolute;
+  inset: 8% 9% 10% 11%;
+  display: flex;
+  flex-direction: column;
+}
+.sb-name {
+  margin: 0;
+  font-size: clamp(30px, 4.6vw, 68px);
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(-1.5deg);
+  filter: url(#lf-watercolor-ink);
+}
+.sb-ig {
+  margin-top: 0.4em;
+  align-self: flex-start;
+  font-size: clamp(16px, 1.9vw, 28px);
+  color: var(--coral);
+  text-decoration: none;
+  transform: rotate(0.8deg);
+  filter: url(#lf-watercolor-ink);
+}
+.sb-ig:hover { text-decoration: underline wavy; }
+.sb-rule { width: 70%; height: 12px; margin: 0.9em 0 1.1em; filter: url(#lf-ink); }
+.sb-toc-label {
+  margin: 0 0 0.3em;
+  font-family: var(--hand);
+  font-size: clamp(14px, 1.4vw, 20px);
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  filter: url(#lf-watercolor-ink);
+}
+.sb-toc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35em;
+}
+.sb-toc-list button {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  width: 100%;
+  padding: 0.25em 0.3em;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--hand);
+  font-size: clamp(20px, 2.6vw, 40px);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 6px;
+  transition: transform 0.2s ease, background 0.2s ease;
+  filter: url(#lf-watercolor-ink);
+}
+.sb-toc-list button:hover { background: rgba(201, 85, 63, 0.1); transform: translateX(4px) rotate(-0.5deg); }
+.sb-toc-list button:focus-visible { outline: 2px dashed var(--coral); outline-offset: 2px; }
+.sb-toc-num { font-size: 0.6em; color: var(--coral); font-weight: 700; }
+.sb-toc-dots { flex: 1; border-bottom: 2px dotted rgba(74, 49, 66, 0.45); transform: translateY(-0.3em); }
+.sb-toc-page { font-size: 0.75em; color: var(--ink-soft); }
+
+/* ---- section pages ---- */
+.sb-section-head {
+  position: absolute;
+  left: 9%;
+  top: 5%;
+  z-index: 2;
+  transform: rotate(-2deg);
+  pointer-events: none;
+  filter: url(#lf-watercolor-ink);
+}
+.sb-section-head h2 { margin: 0; font-size: clamp(26px, 3.6vw, 54px); font-weight: 700; line-height: 1; }
+.sb-section-head p { margin: 0.1em 0 0; font-size: clamp(13px, 1.4vw, 20px); color: var(--ink-soft); }
+.sb-nav {
+  position: absolute;
+  bottom: 2.5%;
+  z-index: 3;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--hand);
+  font-size: clamp(13px, 1.4vw, 20px);
+  cursor: pointer;
+  padding: 4px 8px;
+  filter: url(#lf-watercolor-ink);
+}
+.sb-nav:hover { color: var(--coral); }
+.sb-nav-prev { left: 12%; }
+.sb-nav-next { right: 12%; }
+
+/* scrapbook photos: painted prints on soft-edged card, a warm wash over each */
+.sb-scrap {
+  position: absolute;
+  margin: 0;
+  padding: 3.5% 3.5% 4.5%;
+  background: #f7ecdc;
+  border-radius: 2px;
+  box-shadow: 0 5px 10px rgba(60, 35, 35, 0.28), 0 1px 0 rgba(60, 35, 35, 0.15), inset 0 0 0 1px rgba(90, 60, 60, 0.18);
+  transform: rotate(var(--rot));
+  z-index: 1;
+  transition: transform 0.25s ease;
+}
+.sb-scrap::before {
+  /* hand-drawn outline like the painting's linework */
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1.5px solid rgba(74, 49, 66, 0.35);
+  border-radius: 3px;
+  pointer-events: none;
+  filter: url(#lf-ink);
+}
+.sb-scrap:hover { transform: rotate(var(--rot)) scale(1.04); z-index: 2; }
+.sb-photo {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #d8c4b3;
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 0 0 1px rgba(74, 49, 66, 0.25);
+}
+.sb-photo img { display: block; width: 100%; height: 100%; object-fit: cover; filter: saturate(0.85) contrast(0.95); }
+.sb-photo-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 210, 170, 0.25), rgba(120, 70, 90, 0.18));
+  mix-blend-mode: multiply;
+}
+.sb-photo-empty { font-family: var(--hand); font-size: clamp(11px, 1.2vw, 17px); color: rgba(74, 49, 66, 0.5); }
+.sb-scrap figcaption {
+  margin-top: 0.35em;
+  text-align: center;
+  font-size: clamp(11px, 1.25vw, 18px);
+  color: var(--ink);
+  line-height: 1.1;
+  filter: url(#lf-watercolor-ink);
+}
+.sb-fix { position: absolute; display: block; pointer-events: none; }
+/* washi tape: translucent, fibrous, torn ends */
+.sb-fix-tape .sb-fix {
+  width: 36%;
+  height: 9%;
+  top: -4%;
+  background-color: rgba(214, 160, 120, 0.55);
+  background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0 2px, transparent 2px 5px);
+  clip-path: polygon(2% 0, 98% 4%, 100% 40%, 97% 100%, 3% 96%, 0 55%);
+  box-shadow: 0 1px 2px rgba(60, 35, 35, 0.18);
+  filter: url(#lf-ink);
+}
+.sb-fix-tape .sb-fix-a { left: -9%; transform: rotate(-40deg); }
+.sb-fix-tape .sb-fix-b { right: -9%; transform: rotate(38deg); background-color: rgba(159, 180, 151, 0.55); }
+/* push pin */
+.sb-fix-pin .sb-fix-a { left: 50%; top: -3%; width: 8%; aspect-ratio: 1; border-radius: 50%; transform: translateX(-50%); background: radial-gradient(circle at 35% 35%, #ea8a72, #a9463b 70%); box-shadow: 0 2px 3px rgba(60, 35, 35, 0.45), inset 0 0 0 1px rgba(74, 49, 66, 0.4); }
+.sb-fix-pin .sb-fix-b { display: none; }
+/* photo corners */
+.sb-fix-corners .sb-fix { width: 12%; aspect-ratio: 1; background: rgba(74, 49, 66, 0.6); }
+.sb-fix-corners .sb-fix-a { left: -1%; top: -1%; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.sb-fix-corners .sb-fix-b { right: -1%; top: -1%; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+
+/* doodles in the ink */
+.sb-doodle { position: absolute; width: 8%; height: auto; fill: none; stroke: var(--coral); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; filter: url(#lf-ink); opacity: 0.9; }
+.sb-doodle-heart { stroke: var(--coral); }
+.sb-doodle-squiggle { width: 16%; stroke: var(--ink-soft); }
+.sb-doodle-arrow { stroke: var(--ink-soft); }
+.sb-note { width: auto; font-family: var(--hand); font-size: clamp(11px, 1.3vw, 19px); color: var(--ink-soft); white-space: nowrap; filter: url(#lf-watercolor-ink); }
+
+/* ---- controls ---- */
+.sb-close {
+  position: absolute;
+  left: max(20px, env(safe-area-inset-left));
+  top: max(18px, env(safe-area-inset-top));
+  z-index: 3;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: rgba(58, 31, 40, 0.55);
+  color: #fff3e2;
+  font-family: var(--hand);
+  font-size: 18px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.sb-close:hover { background: rgba(58, 31, 40, 0.75); }
+
+@media (max-width: 720px) {
+  .sb-stage { width: min(96vw, calc((100vh - 140px) * 2.22)); }
+  .sb-close { font-size: 15px; padding: 6px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-scrap { transition: none; }
+}

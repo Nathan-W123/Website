@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { CHAPTERS } from '@/components/notebook/content';
 import { Overlay } from './overlay';
+import { Sketchbook } from './sketchbook';
 import { ROOM, type Rect, type RoomArt } from './room';
 import './lofi.css';
 
@@ -86,6 +87,7 @@ export default function LofiRoom({ art = ROOM }: { art?: RoomArt }) {
       setOrigin(box.toScreen(r.x + r.w / 2, r.y + r.h / 2));
       setZoomed(id);
       setHovered(null);
+      (document.activeElement as HTMLElement | null)?.blur();
     },
     [art, box],
   );
@@ -108,7 +110,7 @@ export default function LofiRoom({ art = ROOM }: { art?: RoomArt }) {
 
   return (
     <div ref={rootRef} className={`lf-root${zoomed ? ' is-zoomed' : ''}`}>
-      <motion.div className="lf-stage" style={{ transformOrigin: `${origin.sx}px ${origin.sy}px` }} animate={target} transition={{ type: 'spring', stiffness: 60, damping: 18, mass: 1 }}>
+      <motion.div className="lf-stage" style={{ transformOrigin: `${origin.sx}px ${origin.sy}px` }} animate={target} transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1] }}>
         <motion.div className="lf-parallax" style={{ transform: parallax }}>
           {vp && box.letterboxed && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -170,26 +172,10 @@ export default function LofiRoom({ art = ROOM }: { art?: RoomArt }) {
             </div>
           </motion.section>
         )}
-        {zoomed === 'sketchbook' && (
-          <motion.section key="sketchbook" className="lf-panel lf-panel-paper" initial={{ opacity: 0, scale: 0.96, rotate: -1, x: '-50%', y: '-50%' }} animate={{ opacity: 1, scale: 1, rotate: -0.5, x: '-50%', y: '-50%' }} exit={{ opacity: 0, scale: 0.98, x: '-50%', y: '-50%' }} transition={{ delay: 0.45, duration: 0.35 }} aria-label="Art projects">
-            <div className="lf-paper-head">
-              <h2>Sketchbook</h2>
-              <button type="button" className="lf-back lf-back-paper" onClick={close}>← back to the desk</button>
-            </div>
-            <p className="lf-lede">Art projects live here. The pages are blank until you send me the pieces; each one gets a spread of its own.</p>
-            <ul className="lf-polaroids">
-              {['sketch 01', 'sketch 02', 'sketch 03', 'sketch 04', 'sketch 05', 'sketch 06'].map((s, i) => (
-                <li key={s} style={{ ['--tilt' as string]: `${(i % 3) - 1}deg` }}>
-                  <span className="lf-polaroid-img" />
-                  <span className="lf-polaroid-cap">{s}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.section>
-        )}
+        {zoomed === 'sketchbook' && <Sketchbook key="sketchbook" onClose={close} unit={box.k * target.scale} hotspot={art.hotspots.sketchbook} />}
       </AnimatePresence>
 
-      {zoomed && <button type="button" className="lf-scrim" aria-label="Back to the desk" onClick={close} />}
+      {zoomed === 'laptop' && <button type="button" className="lf-scrim" aria-label="Back to the desk" onClick={close} />}
     </div>
   );
 }

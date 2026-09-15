@@ -13,28 +13,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://nathans-world.ncward173407.chatgpt.site'),
-  title: "Nathan's World — A Playable Project Archive",
-  description: "Explore Nathan's projects as a top-down pixel world, with each biome hiding a different experiment, system, or simulation.",
+  metadataBase: new URL('https://nateward.me'),
+  title: 'Nathan W.',
+  description: 'Nathan Ward: art, machine learning and numerical modelling projects, and how to get in touch. Follow the signpost.',
+  alternates: { canonical: '/' },
   openGraph: {
-    title: "Nathan's World — A Playable Project Archive",
-    description: 'Walk the world. Discover the work. Explore the code.',
+    title: 'Nathan W.',
+    description: 'Art, ML / AI and numerical modelling projects. Follow the signpost.',
     url: '/',
     siteName: 'Nathan W.',
     type: 'website',
-    images: [
-      {
-        url: '/og.png',
-        width: 1672,
-        height: 941,
-        alt: "Nathan's World — a playable pixel-art project archive",
-      },
-    ],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'A hand-drawn wooden signpost: Contact me, My art, My projects' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Nathan's World — A Playable Project Archive",
-    description: 'Walk the world. Discover the work. Explore the code.',
+    title: 'Nathan W.',
+    description: 'Art, ML / AI and numerical modelling projects. Follow the signpost.',
     images: ['/og.png'],
   },
 };
