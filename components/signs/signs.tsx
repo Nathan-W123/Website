@@ -8,7 +8,7 @@ import type { Study } from './studies';
 import { SignChain } from './chain';
 import { Doodles } from './doodles';
 import { HangingSign } from './hanging';
-import { Landing } from './landing';
+import { Landing, type Lightbox } from './landing';
 import { IndexCard, StickyBoard } from './notes';
 import { ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
@@ -49,7 +49,7 @@ const plankDir = (p: Plank): Dir => (p.href === '#/contact' ? 'up' : p.dir === '
 
 const FAR = '200';
 const SWIPE = 1.05;
-const TEAR = 1.6;
+const TEAR = 0.95;
 const ease = [0.7, 0, 0.3, 1] as const;
 type Mode = 'swipe' | 'tear' | 'fade';
 type Move = { dir: Dir; mode: Mode; slow?: number };
@@ -62,42 +62,54 @@ const tornEdge = (from: number) => {
   return `polygon(${pts.join(', ')}, 100% 100%, 0% 100%)`;
 };
 const FLAT = tornEdge(TORN.length);
+/** Paper at rest: no shear, no squash, no roll along the torn edge. */
+const REST = { rotateX: 0, rotateY: 0, skewX: 0, skewY: 0, scaleX: 1, scaleY: 1, '--fold': 0, '--tear': 0, '--curl': 0 };
 
 const variants: Variants = {
   enter: ({ dir: d, mode }: Move) =>
     mode === 'tear'
-      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, transition: { duration: 0.01 } }
+      ? { ...REST, x: 0, y: 0, scale: 1, rotate: 0, clipPath: FLAT, zIndex: 0, transition: { duration: 0.01 } }
       : mode === 'fade'
-        ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 0, '--fold': 0 }
-        : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0 },
-  center: ({ mode }: Move) => ({ x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 1, '--fold': 0, transition: mode === 'fade' ? { duration: 0.5, ease: 'easeOut' } : { duration: SWIPE, ease } }),
+        ? { ...REST, x: 0, y: 0, scale: 1, rotate: 0, clipPath: FLAT, zIndex: 1, opacity: 0 }
+        : { ...REST, x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, clipPath: FLAT, zIndex: 1 },
+  center: ({ mode }: Move) => ({ ...REST, x: 0, y: 0, scale: 1, rotate: 0, clipPath: FLAT, zIndex: 1, opacity: 1, transition: mode === 'fade' ? { duration: 0.5, ease: 'easeOut' } : { duration: SWIPE, ease } }),
   exit: ({ dir: d, mode, slow = 1 }: Move) =>
     mode === 'tear'
       ? {
           // the top-right corner is pinched and pulled down-left: the tear runs along the top toward the
           // left corner while the sheet folds and swings about that corner; once the tear reaches it the
-          // whole sheet drops away
+          // whole sheet drops away. Paper is not a board, so it shears (skew), draws in on itself
+          // (scaleX/scaleY) and the freed edge rolls over behind it (--tear and --curl drive .sg-curl)
           clipPath: [FLAT, tornEdge(10), tornEdge(7), tornEdge(4), tornEdge(1), tornEdge(0), tornEdge(0)],
-          rotate: [0, 3, 7, 12, 18, 26, 70],
-          rotateX: [0, -6, -12, -18, -22, -24, -40],
-          x: ['0vw', '0.5vw', '1vw', '1.5vw', '2vw', '2vw', '10vw'],
-          y: ['0vh', '0vh', '0.5vh', '1vh', '2vh', '4vh', '130vh'],
-          scale: [1, 1, 1, 1, 1, 1, 0.9],
-          '--fold': [0, 0.25, 0.45, 0.6, 0.7, 0.75, 0.75],
+          rotate: [0, 3, 8, 14, 20, 28, 74],
+          rotateX: [0, -7, -13, -19, -23, -26, -44],
+          rotateY: [0, 5, 10, 14, 17, 19, 34],
+          skewX: [0, -3, -5.5, -7.5, -9, -10, -5],
+          skewY: [0, 1, 2.5, 4, 5, 5.5, 2],
+          scaleX: [1, 0.99, 0.975, 0.955, 0.93, 0.9, 0.74],
+          scaleY: [1, 0.985, 0.965, 0.94, 0.91, 0.88, 0.72],
+          scale: 1,
+          x: ['0vw', '0.6vw', '1.2vw', '1.8vw', '2.3vw', '2.6vw', '12vw'],
+          y: ['0vh', '0vh', '0.6vh', '1.2vh', '2.2vh', '4vh', '130vh'],
+          '--fold': [0, 0.3, 0.5, 0.65, 0.75, 0.8, 0.8],
+          '--tear': [0, 0.2, 0.42, 0.64, 0.84, 1, 1],
+          '--curl': [0, 0.3, 0.52, 0.7, 0.84, 0.94, 1],
           zIndex: 5,
-          transition: { duration: TEAR * slow, times: [0, 0.14, 0.28, 0.42, 0.56, 0.68, 1], ease: ['easeIn', 'linear', 'linear', 'linear', 'easeOut', 'easeIn'] },
+          transition: { duration: TEAR * slow, times: [0, 0.12, 0.24, 0.36, 0.48, 0.6, 1], ease: ['easeIn', 'linear', 'linear', 'linear', 'easeOut', 'easeIn'] },
         }
       : mode === 'fade'
-        ? { opacity: 0, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, transition: { duration: 0.35, ease: 'easeIn' } }
-        : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0, transition: { duration: SWIPE, ease } },
+        ? { ...REST, opacity: 0, x: 0, y: 0, scale: 1, rotate: 0, clipPath: FLAT, zIndex: 0, transition: { duration: 0.35, ease: 'easeIn' } }
+        : { ...REST, x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, clipPath: FLAT, zIndex: 1, transition: { duration: SWIPE, ease } },
 };
 
 export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
   const [move, setMove] = useState<Move>({ dir: 'left', mode: 'swipe' });
   const [swipe, setSwipe] = useState<{ id: number; dir: Dir } | null>(null);
-  const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
+  const [lightbox, setLightbox] = useState<Lightbox | null>(null);
   const [project, setProject] = useState<Card | null>(null);
+  // the landing page is taller than the screen: once it is scrolled the pencil name gets out of the way
+  const [scrolled, setScrolled] = useState(false);
   // the direction a plank was clicked in, consumed by the next hash change
   const pending = useRef<Dir | null>(null);
   // set by any Home control: the next trip home tears the sheet off instead of swiping
@@ -183,8 +195,10 @@ export default function Signs() {
           animate="center"
           exit="exit"
         >
+          {/* the roll of paper along the torn edge; invisible until a tear drives --tear and --curl */}
+          <span className="sg-curl" aria-hidden="true" />
           <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
-          {route.page === 'home' && <Landing onGo={onPlank} />}
+          {route.page === 'home' && <Landing onGo={onPlank} onOpenProject={setProject} onOpenArt={setLightbox} onScrolled={setScrolled} />}
 
           {route.page === 'art' && !route.section && (
             <div className="sg-wall">
@@ -241,7 +255,7 @@ export default function Signs() {
         </motion.section>
       </AnimatePresence>
 
-      <NameTag page={route.page} onHome={goHome} />
+      <NameTag page={route.page} onHome={goHome} dim={scrolled} />
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
 
@@ -677,14 +691,14 @@ function CaseStudy({ study }: { study: Study }) {
 
 /* ---------- the name: big on the landing page, shrinks into the top-left corner on the about page ---------- */
 
-function NameTag({ page, onHome }: { page: Route['page']; onHome: () => void }) {
+function NameTag({ page, onHome, dim }: { page: Route['page']; onHome: () => void; dim?: boolean }) {
   const mode = page === 'home' ? 'home' : page === 'about' ? 'corner' : 'hidden';
   return (
     <motion.h1
       layout
       className={`nt nt-${mode}`}
       transition={{ layout: { type: 'spring', stiffness: 120, damping: 18 } }}
-      animate={{ opacity: mode === 'hidden' ? 0 : 1 }}
+      animate={{ opacity: mode === 'hidden' || dim ? 0 : 1 }}
       initial={false}
     >
       {mode === 'corner' ? (
@@ -725,12 +739,19 @@ function About({ onBack }: { onBack: () => void }) {
           <span className="ld-photo-pic">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={base() + ABOUT.photo}
+              src={base() + ABOUT.photos[0]}
               alt="Nathan"
               draggable={false}
               onError={(e) => {
-                const fig = e.currentTarget.closest('figure');
-                if (fig) (fig as HTMLElement).style.display = 'none';
+                // try the next spelling of the file name, and give up on the frame once they run out
+                const img = e.currentTarget;
+                const i = ABOUT.photos.findIndex((src) => img.src.endsWith(src));
+                const next = ABOUT.photos[i + 1];
+                if (next) img.src = base() + next;
+                else {
+                  const fig = img.closest('figure');
+                  if (fig) (fig as HTMLElement).style.display = 'none';
+                }
               }}
             />
           </span>

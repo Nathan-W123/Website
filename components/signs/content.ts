@@ -13,8 +13,11 @@ export const ABOUT = {
     'I enjoy building in fast-evolving environments: AI, startups, numerical modelling and more.',
   ],
   based: 'based in Davis',
-  /** Drop the portrait at public/about/nathan.jpg; the frame hides itself until it exists. */
-  photo: '/about/nathan.jpg',
+  /**
+   * Drop the portrait in public/about/ under any of these names; the frame tries
+   * them in order and hides itself if none of them are there.
+   */
+  photos: ['/about/nathan.jpg', '/about/nathan.jpeg', '/about/nathan.png', '/about/nathan.webp'],
 };
 
 /** Commissions and clients, listed on an index card on the art board. */
@@ -80,3 +83,29 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
     cards: pick(['black-hole', 'aero', 'hf-scf', 'quantize', 'formulate']).map(toCard),
   },
 ];
+
+/**
+ * What I am building at the moment, listed down the landing page, newest first.
+ * A project entry points at its card in PROJECT_GROUPS so the same viewer opens;
+ * an art entry points at a piece in ART so the same lightbox opens. Add to the
+ * top of RECENT as things ship.
+ */
+export type RecentItem = { key: string; title: string; line: string; status: string; image: string; card?: Card; art?: ArtItem };
+
+const ALL_CARDS = PROJECT_GROUPS.flatMap((g) => g.cards);
+const ALL_ART = ART.flatMap((s) => s.items);
+
+const recentProject = (id: string, status: string): RecentItem | undefined => {
+  const card = ALL_CARDS.find((c) => c.id === id);
+  return card && card.image ? { key: card.id, title: card.title.toLowerCase(), line: card.line, status, image: card.image, card } : undefined;
+};
+const recentArt = (image: string, status: string, title: string, line: string): RecentItem | undefined => {
+  const art = ALL_ART.find((it) => it.image === image);
+  return art ? { key: image, title, line, status, image, art } : undefined;
+};
+
+export const RECENT: RecentItem[] = [
+  recentProject('kumi', 'building now'),
+  recentProject('quantize', 'just finished'),
+  recentArt('/art/shoes/purple-monster.webp', 'just finished', 'purple monster', 'Gengar over the whole upper of a pair of Air Force 1s, in Angelus leather paint.'),
+].filter((r): r is RecentItem => !!r);
