@@ -193,18 +193,6 @@ export const CHAPTERS: Chapter[] = [
         ],
         href: 'https://github.com/Nathan-W123/Kumi',
       }),
-      project('make', 'umber', {
-        id: 'kumi-site',
-        name: 'Kumi Website',
-        tagline: 'The framework-free marketing site for Kumi.',
-        stack: 'HTML · CSS · no framework',
-        notes: [
-          'Nine hand-authored pages and one shared stylesheet',
-          'Path-prefix-safe links for embedded previews',
-          'Accessibility and reduced-motion regression tests',
-        ],
-        href: 'https://github.com/Nathan-W123/Kumi-Website',
-      }),
       project('make', 'chem', {
         id: 'nonstandard',
         name: 'Nonstandard Conditions',

@@ -55,6 +55,7 @@ export default function Signs() {
   const [dir, setDir] = useState<Dir>('left');
   const [swipe, setSwipe] = useState<{ id: number; dir: Dir } | null>(null);
   const [lightbox, setLightbox] = useState<{ image: string; caption: string } | null>(null);
+  const [project, setProject] = useState<Card | null>(null);
   // the direction a plank was clicked in, consumed by the next hash change
   const pending = useRef<Dir | null>(null);
   // how each route was entered, so going back reverses it
@@ -109,12 +110,13 @@ export default function Signs() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (lightbox) setLightbox(null);
+        else if (project) setProject(null);
         else if (route.page !== 'home') window.history.back();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [lightbox, route]);
+  }, [lightbox, project, route]);
 
   return (
     <div className="sg-root">
@@ -176,13 +178,15 @@ export default function Signs() {
             </div>
           )}
 
-          {route.page === 'projects' && route.group && <Cards group={route.group} onBack={() => go('#/projects')} />}
+          {route.page === 'projects' && route.group && <Cards group={route.group} onBack={() => go('#/projects')} onOpen={setProject} />}
 
           {route.page === 'contact' && <Contact onBack={() => go('#/')} />}
         </motion.section>
       </AnimatePresence>
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
+
+      <AnimatePresence>{project && <ProjectView key={project.id} card={project} onClose={() => setProject(null)} />}</AnimatePresence>
 
       <AnimatePresence>
         {lightbox && (
@@ -284,7 +288,7 @@ function Contact({ onBack }: { onBack: () => void }) {
   );
 }
 
-function Cards({ group, onBack }: { group: string; onBack: () => void }) {
+function Cards({ group, onBack, onOpen }: { group: string; onBack: () => void; onOpen: (c: Card) => void }) {
   const g = PROJECT_GROUPS.find((x) => x.id === group);
   if (!g) return null;
   return (
@@ -293,14 +297,14 @@ function Cards({ group, onBack }: { group: string; onBack: () => void }) {
       <h1 className="sg-wall-title">{g.label}</h1>
       <ul className="sg-cards">
         {g.cards.map((c, i) => (
-          <ProjectCard key={c.id} card={c} index={i} />
+          <ProjectCard key={c.id} card={c} index={i} onOpen={onOpen} />
         ))}
       </ul>
     </div>
   );
 }
 
-function ProjectCard({ card, index }: { card: Card; index: number }) {
+function ProjectCard({ card, index, onOpen }: { card: Card; index: number; onOpen: (c: Card) => void }) {
   const body = (
     <>
       <svg className="sg-card-border" viewBox="0 0 320 400" preserveAspectRatio="none" aria-hidden="true">
@@ -328,17 +332,128 @@ function ProjectCard({ card, index }: { card: Card; index: number }) {
             <li key={s}>{s}</li>
           ))}
         </ul>
-        {card.href && <span className="sg-card-link">Open ↗</span>}
+        <span className="sg-card-link">{card.images.length > 1 ? `${card.images.length} photos` : 'Open'} →</span>
       </div>
     </>
   );
   return (
     <motion.li className="sg-card" initial={{ y: 80, opacity: 0, rotate: 3 }} animate={{ y: 0, opacity: 1, rotate: index % 2 ? 1.2 : -1.2 }} transition={{ type: 'spring', stiffness: 120, damping: 16, delay: 0.6 + index * 0.08 }}>
-      {card.href ? (
-        <a href={card.href} target="_blank" rel="noreferrer">{body}</a>
-      ) : (
-        <div>{body}</div>
-      )}
+      <button type="button" onClick={() => onOpen(card)} aria-label={`Open ${card.title}`}>{body}</button>
     </motion.li>
+  );
+}
+
+/* ---------- project viewer: a framed photo you can page through, with the write-up under it ---------- */
+
+function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
+  const [i, setI] = useState(0);
+  const [dir, setDir] = useState(1);
+  const n = card.images.length;
+  const step = useCallback(
+    (d: number) => {
+      if (n < 2) return;
+      setDir(d);
+      setI((k) => (k + d + n) % n);
+    },
+    [n],
+  );
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') step(1);
+      else if (e.key === 'ArrowLeft') step(-1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [step]);
+  const shot = card.images[i];
+  const drag = useRef<number | null>(null);
+  return (
+    <motion.div className="sg-lightbox sg-project" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+      <motion.article
+        className="sg-pv"
+        initial={{ scale: 0.8, rotate: -2, y: 30 }}
+        animate={{ scale: 1, rotate: 0, y: 0 }}
+        exit={{ scale: 0.85, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="sg-pv-frame"
+          onPointerDown={(e) => {
+            drag.current = e.clientX;
+          }}
+          onPointerUp={(e) => {
+            if (drag.current !== null && Math.abs(e.clientX - drag.current) > 40) step(e.clientX < drag.current ? 1 : -1);
+            drag.current = null;
+          }}
+        >
+          <AnimatePresence mode="wait" initial={false} custom={dir}>
+            {shot ? (
+              <motion.figure
+                key={shot.src}
+                custom={dir}
+                initial={{ x: dir * 80, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -dir * 80, opacity: 0 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={base() + shot.src} alt={shot.caption} draggable={false} />
+                <figcaption>
+                  {shot.caption}
+                  {shot.credit && !shot.credit.startsWith('own') && (
+                    <>
+                      {' '}
+                      <a href={shot.credit} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
+                        (source)
+                      </a>
+                    </>
+                  )}
+                </figcaption>
+              </motion.figure>
+            ) : (
+              <p className="sg-pv-empty">No photos yet</p>
+            )}
+          </AnimatePresence>
+          {n > 1 && (
+            <>
+              <button type="button" className="sg-pv-arrow sg-pv-prev" onClick={() => step(-1)} aria-label="Previous photo">
+                ‹
+              </button>
+              <button type="button" className="sg-pv-arrow sg-pv-next" onClick={() => step(1)} aria-label="Next photo">
+                ›
+              </button>
+              <span className="sg-pv-count">
+                {i + 1} / {n}
+              </span>
+            </>
+          )}
+        </div>
+        <div className="sg-pv-text">
+          <h2>{card.title}</h2>
+          <p className="sg-pv-line">{card.line}</p>
+          {card.notes.length > 0 && (
+            <ul className="sg-pv-notes">
+              {card.notes.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          )}
+          <ul className="sg-chips">
+            {card.stack.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+          {card.href && (
+            <a className="sg-pv-link" href={card.href} target="_blank" rel="noreferrer">
+              Open project ↗
+            </a>
+          )}
+        </div>
+        <button type="button" className="sg-close" onClick={onClose} aria-label="Close">
+          ×
+        </button>
+      </motion.article>
+    </motion.div>
   );
 }

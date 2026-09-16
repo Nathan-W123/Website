@@ -87,15 +87,7 @@ const PROJECTS: Project[] = [
     landmark: { x: 730, y: 357 }, approach: { x: 728, y: 404 }, building: { x: 658, y: 290, w: 146, h: 94 },
   },
   {
-    id: 'kumi-site', number: '05', location: 'The Printworks', projectName: 'Kumi Website', category: 'WEB · HTML',
-    href: 'https://github.com/Nathan-W123/Kumi-Website', area: 'Alderwatch', accent: '#e08250',
-    tagline: 'The framework-free marketing site for Kumi.',
-    image: 'projects/kumi-site.webp',
-    details: ['Nine hand-authored pages and one shared stylesheet', 'Path-prefix-safe links for embedded previews', 'Accessibility and reduced-motion regression tests'],
-    landmark: { x: 928, y: 376 }, approach: { x: 921, y: 405 }, building: { x: 862, y: 322, w: 118, h: 64 },
-  },
-  {
-    id: 'voice-agents', number: '06', location: 'Signal House', projectName: 'Voice Agents', category: 'VOICE AI · TYPESCRIPT',
+    id: 'voice-agents', number: '05', location: 'Signal House', projectName: 'Voice Agents', category: 'VOICE AI · TYPESCRIPT',
     href: 'https://github.com/Nathan-W123/YCHackVoiceAgents', area: 'Alderwatch', accent: '#c99357',
     tagline: 'A real-time voice-capture app built at a YC hackathon.',
     image: 'projects/voice-agents.webp',
@@ -103,7 +95,7 @@ const PROJECTS: Project[] = [
     landmark: { x: 1095, y: 239 }, approach: { x: 1102, y: 298 }, building: { x: 1054, y: 190, w: 88, h: 82 },
   },
   {
-    id: 'aero', number: '07', location: 'Gale Works', projectName: 'Aero', category: 'FLUID DYNAMICS · PYTHON',
+    id: 'aero', number: '06', location: 'Gale Works', projectName: 'Aero', category: 'FLUID DYNAMICS · PYTHON',
     href: 'https://github.com/Nathan-W123/Aero', area: 'Gale Coast', accent: '#65bccc',
     tagline: 'A lattice-Boltzmann wind-tunnel simulator for 2D and 3D flows.',
     image: 'projects/aero.webp',
@@ -111,7 +103,7 @@ const PROJECTS: Project[] = [
     landmark: { x: 1370, y: 169 }, approach: { x: 1402, y: 228 }, building: { x: 1352, y: 124, w: 116, h: 78 },
   },
   {
-    id: 'quantize', number: '08', location: 'Atom Garden', projectName: 'Quantize', category: 'MOLECULAR SCIENCE · PYTHON',
+    id: 'quantize', number: '07', location: 'Atom Garden', projectName: 'Quantize', category: 'MOLECULAR SCIENCE · PYTHON',
     href: 'https://github.com/Nathan-W123/Quantize', area: 'Lumenwood', accent: '#a786ff',
     tagline: 'Recovers molecular geometry from rotational spectra plus quantum chemistry.',
     image: 'projects/quantize.webp',
@@ -119,7 +111,7 @@ const PROJECTS: Project[] = [
     landmark: { x: 205, y: 554 }, approach: { x: 205, y: 624 }, building: { x: 143, y: 506, w: 135, h: 102 },
   },
   {
-    id: 'formulate', number: '09', location: 'Glassroot Conservatory', projectName: 'Formulate', category: 'MATERIALS DESIGN · PYTHON',
+    id: 'formulate', number: '08', location: 'Glassroot Conservatory', projectName: 'Formulate', category: 'MATERIALS DESIGN · PYTHON',
     href: 'https://github.com/Nathan-W123/Formulate', area: 'Glassroot Fields', accent: '#7ecf92',
     tagline: 'An inverse materials engine that turns desired behaviour into ranked candidate molecules.',
     image: 'projects/formulate.webp',
@@ -127,7 +119,7 @@ const PROJECTS: Project[] = [
     landmark: { x: 617, y: 593 }, approach: { x: 618, y: 648 }, building: { x: 536, y: 512, w: 156, h: 118 },
   },
   {
-    id: 'hf-scf', number: '10', location: 'Violet Spire', projectName: 'HF–SCF Engine', category: 'QUANTUM CHEMISTRY · PYTHON',
+    id: 'hf-scf', number: '09', location: 'Violet Spire', projectName: 'HF–SCF Engine', category: 'QUANTUM CHEMISTRY · PYTHON',
     href: 'https://github.com/Nathan-W123/HF-SCF-Engine', area: 'Violet Reach', accent: '#a878e8',
     tagline: 'A Hartree–Fock quantum-chemistry engine with an interactive web calculator.',
     image: 'projects/hf-scf.webp',
@@ -135,7 +127,7 @@ const PROJECTS: Project[] = [
     landmark: { x: 1044, y: 560 }, approach: { x: 1060, y: 676 }, building: { x: 1010, y: 467, w: 80, h: 130 },
   },
   {
-    id: 'nonstandard', number: '11', location: 'Harbour Light', projectName: 'Nonstandard Conditions', category: 'GAME · REACT / THREE.JS / RDKIT',
+    id: 'nonstandard', number: '10', location: 'Harbour Light', projectName: 'Nonstandard Conditions', category: 'GAME · REACT / THREE.JS / RDKIT',
     href: 'https://github.com/EthanVTruong/nonstandardconditions', area: 'Gale Coast', accent: '#f0b357',
     tagline: 'A single-player organic-chemistry workshop: buy materials, run a real three-station lab, fulfil commissions.',
     image: 'projects/nonstandard.webp',
@@ -143,7 +135,7 @@ const PROJECTS: Project[] = [
     landmark: { x: 1358, y: 330 }, approach: { x: 1358, y: 410 }, building: { x: 1343, y: 300, w: 32, h: 96 },
   },
   {
-    id: 'website', number: '12', location: "Traveler's Archive", projectName: 'Nathan’s World', category: 'INTERACTIVE WEB · TYPESCRIPT',
+    id: 'website', number: '11', location: "Traveler's Archive", projectName: 'Nathan’s World', category: 'INTERACTIVE WEB · TYPESCRIPT',
     href: 'https://github.com/Nathan-W123/Website', area: 'Glassroot Fields', accent: '#f3c75e',
     tagline: 'This playable map: a top-down world where every building is a project.',
     image: 'projects/website.webp',

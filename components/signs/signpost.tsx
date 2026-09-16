@@ -521,7 +521,7 @@ export function Signpost({
   // level dips toward you, one above it rises), so only a hair of in-plane wobble is added here
   const rots: number[] = planks.map(() => r1((rand() - 0.5) * 3));
   // yaw about the post (a CSS 3D rotation): each plank swings toward or away from the viewer, within 30 degrees
-  const YAWS = [38, -22, 46, -34, 26, -44, 30];
+  const YAWS = [36, -22, 40, -30, 26, -40, 30];
   const yaws = planks.map((_, i) => YAWS[i % YAWS.length]);
   // stack: neighbours that differ more in angle get more room, so their converging ends never cross a label
   const ys: number[] = [];
@@ -529,7 +529,8 @@ export function Signpost({
   planks.forEach((_, i) => {
     if (i > 0) {
       const d = (Math.abs(rots[i] - rots[i - 1]) * Math.PI) / 180;
-      yy += plankH + gap + Math.max(0, Math.round(300 * Math.tan(d)) - gap);
+      // lower planks sit further below the camera, so their near ends dip more: open the gap as the stack goes down
+      yy += plankH + gap + i * 22 + Math.max(0, Math.round(300 * Math.tan(d)) - gap);
     }
     ys.push(yy);
   });

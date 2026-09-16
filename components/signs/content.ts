@@ -1,5 +1,6 @@
 import { CHAPTERS, type NotebookProject } from '@/components/notebook/content';
 import { SECTIONS } from '@/components/lofi/sketchbook-content';
+import { GALLERY, type Shot } from './gallery';
 
 export const NAME = 'Nathan W.';
 
@@ -23,28 +24,28 @@ export const ART = [
 const all: NotebookProject[] = CHAPTERS.flatMap((c) => c.projects);
 const pick = (ids: string[]) => ids.map((id) => all.find((p) => p.id === id)).filter((p): p is NotebookProject => !!p);
 
-export type Card = { id: string; title: string; line: string; stack: string[]; href?: string; image?: string };
+export type Card = { id: string; title: string; line: string; stack: string[]; href?: string; image?: string; notes: string[]; images: Shot[] };
 
-const toCard = (p: NotebookProject): Card => ({ id: p.id, title: p.name, line: p.tagline, stack: p.stack.split(' · '), href: p.href, image: p.image });
+/** Gallery images come from ./gallery (1-4 per project); the first one is the card cover. */
+const toCard = (p: NotebookProject): Card => {
+  const images = GALLERY[p.id] ?? (p.image ? [{ src: p.image, caption: p.name }] : []);
+  return { id: p.id, title: p.name, line: p.tagline, stack: p.stack.split(' · '), href: p.href, image: images[0]?.src ?? p.image, notes: p.notes, images };
+};
 
 export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
   {
     id: 'ml-ai',
     label: 'ML / AI',
-    cards: pick(['gambit', 'siege', 'kumi', 'voice-agents', 'kumi-site']).map(toCard),
+    cards: pick(['gambit', 'siege', 'kumi', 'voice-agents']).map(toCard),
   },
   {
     id: 'education',
     label: 'Education',
-    cards: [
-      { id: 'ucd', title: 'UC Davis', line: 'Degree, major and years go here.', stack: ['fill me in'] },
-      { id: 'coursework', title: 'Coursework', line: 'The classes worth naming: numerical methods, machine learning, quantum chemistry.', stack: ['fill me in'] },
-      { id: 'teaching', title: 'Teaching / research', line: 'Any lab, TA or research work goes here.', stack: ['fill me in'] },
-    ],
+    cards: pick(['nonstandard']).map(toCard),
   },
   {
     id: 'numerical',
     label: 'Numerical models',
-    cards: pick(['black-hole', 'aero', 'hf-scf', 'quantize', 'formulate', 'nonstandard']).map(toCard),
+    cards: pick(['black-hole', 'aero', 'hf-scf', 'quantize', 'formulate']).map(toCard),
   },
 ];
