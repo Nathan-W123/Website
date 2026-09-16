@@ -2,7 +2,9 @@
 
 import { motion } from 'motion/react';
 import { PencilDefs } from '@/components/sketch/rough';
-import type { CSSProperties } from 'react';
+import { useEffect, useSyncExternalStore, type CSSProperties } from 'react';
+import { ART } from './content';
+import { GALLERY } from './gallery';
 import type { Plank } from './signpost';
 
 /**
@@ -14,10 +16,26 @@ import type { Plank } from './signpost';
 
 const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 
-const ART_TILES = ['/art/doodles/dragon.webp', '/art/shoes/wave-dragon.webp', '/art/doodles/elephant.webp', '/art/shoes/blue-doodle.webp'];
-const PROJECT_TILES = ['/projects/black-hole/1.webp', '/projects/aero/1.webp', '/projects/gambit/1.webp', '/projects/siege/2.webp'];
+/** Each photo shows one picture, picked at random per visit from everything on the site. */
+const ART_POOL = ART.flatMap((s) => s.items.map((it) => it.image));
+const PROJECT_POOL = Object.values(GALLERY).map((g) => g[0]?.src).filter((x): x is string => !!x);
+// picks are made on the client only (the server renders the first picture), and forgotten when the page unmounts
+const picks = new Map<string, number>();
+const pick = (key: string, n: number) => {
+  let v = picks.get(key);
+  if (v === undefined) {
+    v = Math.floor(Math.random() * n);
+    picks.set(key, v);
+  }
+  return v;
+};
+const noop = () => () => {};
+function useRandomPick(key: string, n: number) {
+  return useSyncExternalStore(noop, () => pick(key, n), () => 0);
+}
 
-function Photo({ title, tiles, href, tilt, delay, onGo, plank }: { title: string; tiles: string[]; href: string; tilt: number; delay: number; onGo: (p: Plank) => void; plank: Plank }) {
+function Photo({ title, pool, href, tilt, delay, onGo, plank }: { title: string; pool: string[]; href: string; tilt: number; delay: number; onGo: (p: Plank) => void; plank: Plank }) {
+  const src = pool[useRandomPick(title, pool.length)] ?? pool[0];
   return (
     <motion.a
       className="ld-photo"
@@ -27,16 +45,14 @@ function Photo({ title, tiles, href, tilt, delay, onGo, plank }: { title: string
       initial={{ y: 40, opacity: 0, rotate: tilt - 6 }}
       animate={{ y: 0, opacity: 1, rotate: tilt }}
       transition={{ type: 'spring', stiffness: 140, damping: 16, delay }}
-      whileHover={{ rotate: 0, scale: 1.04, y: -6 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ rotate: -tilt * 0.6, scale: 1.07, y: -12, transition: { type: 'spring', stiffness: 300, damping: 12 } }}
+      whileTap={{ scale: 0.97, rotate: tilt }}
     >
       <span className="ld-tape ld-tape-l" aria-hidden="true" />
       <span className="ld-tape ld-tape-r" aria-hidden="true" />
-      <span className="ld-photo-grid">
-        {tiles.map((t) => (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img key={t} src={base() + t} alt="" draggable={false} />
-        ))}
+      <span className="ld-photo-pic">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={base() + src} alt="" draggable={false} />
       </span>
       <span className="ld-photo-caption">{title}</span>
     </motion.a>
@@ -44,6 +60,8 @@ function Photo({ title, tiles, href, tilt, delay, onGo, plank }: { title: string
 }
 
 export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void }) {
+  // a fresh random pair next time the landing page is shown
+  useEffect(() => () => picks.clear(), []);
   return (
     <div className="ld">
       <PencilDefs />
@@ -52,8 +70,8 @@ export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void
         <span>{name}</span>
       </motion.h1>
       <div className="ld-row">
-        <Photo title="my art" tiles={ART_TILES} href="#/art" tilt={-3} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
-        <Photo title="my projects" tiles={PROJECT_TILES} href="#/projects" tilt={2.5} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
+        <Photo title="my art" pool={ART_POOL} href="#/art" tilt={-3} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
+        <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={2.5} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
       </div>
       <motion.a
         className="ld-sticky"
@@ -62,10 +80,12 @@ export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void
         initial={{ scale: 0.6, opacity: 0, rotate: 12 }}
         animate={{ scale: 1, opacity: 1, rotate: 4 }}
         transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 1 }}
-        whileHover={{ rotate: 0, scale: 1.06 }}
-        whileTap={{ scale: 0.97 }}
+        whileHover={{ rotate: -3, scale: 1.1, y: -10, transition: { type: 'spring', stiffness: 320, damping: 11 } }}
+        whileTap={{ scale: 0.96, rotate: 4 }}
       >
-        <span className="ld-sticky-tape" aria-hidden="true" />
+        <span className="note-shadow" aria-hidden="true" />
+        <span className="note-paper" aria-hidden="true" />
+        <span className="note-tape" aria-hidden="true" />
         <span className="ld-sticky-text">contact me</span>
         <span className="ld-sticky-sub">insta · linkedin · github · email →</span>
       </motion.a>

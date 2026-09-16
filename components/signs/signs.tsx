@@ -190,6 +190,9 @@ export default function Signs() {
                 </div>
                 {lightbox.materials && lightbox.materials.length > 0 && (
                   <aside className="sg-materials">
+                    <span className="note-shadow" aria-hidden="true" />
+                    <span className="note-paper" aria-hidden="true" />
+                    <span className="note-tape" aria-hidden="true" />
                     <h3>Materials</h3>
                     <ul>
                       {lightbox.materials.map((m) => (
