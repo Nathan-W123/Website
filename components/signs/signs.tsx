@@ -103,6 +103,8 @@ export default function Signs() {
   const [project, setProject] = useState<Card | null>(null);
   // the landing page scrolls to the bench; the name tag steps aside once the hero is scrolled past
   const [scrolled, setScrolled] = useState(false);
+  // while a sheet is being torn off, the name waits underneath until the tear is done
+  const [nameHold, setNameHold] = useState(false);
   // the direction a plank was clicked in, consumed by the next hash change
   const pending = useRef<Dir | null>(null);
   // set by any Home control: the next trip home tears the sheet off instead of swiping
@@ -137,7 +139,11 @@ export default function Signs() {
       // debug: window.__SLOW = 6 plays the tear in slow motion
       setMove({ dir: d, mode, slow: (window as unknown as { __SLOW?: number }).__SLOW || 1 });
       setRoute(next);
-      if (mode === 'tear') (document.getElementById('sg-curl-anim') as SVGAnimateElement | null)?.beginElement();
+      if (mode === 'tear') {
+        (document.getElementById('sg-curl-anim') as SVGAnimateElement | null)?.beginElement();
+        setNameHold(true);
+        window.setTimeout(() => setNameHold(false), TEAR * 1000 * ((window as unknown as { __SLOW?: number }).__SLOW || 1) - 150);
+      }
       if (!first.current && mode === 'swipe') setSwipe({ id: ++swipes.current, dir: d });
       first.current = false;
     };
@@ -249,7 +255,7 @@ export default function Signs() {
       </AnimatePresence>
 
       <CurlDefs />
-      <NameTag page={route.page === 'home' && scrolled ? 'art' : route.page} onHome={goHome} />
+      <NameTag page={(route.page === 'home' && scrolled) || nameHold ? 'art' : route.page} onHome={goHome} />
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
 

@@ -344,6 +344,10 @@
   .nb-go { right: 40px; bottom: 18px; font-size: 30px; }
 }
 
+@media (max-width: 1200px) and (min-width: 721px) {
+  .ld-sticky { top: auto; bottom: 9%; transform: none; }
+}
+
 /* ---- the name tag (root layer) ---- */
 .nt {
   position: absolute;
