@@ -7,6 +7,7 @@ import { ABOUT, ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } fr
 import type { Study } from './studies';
 import { SignChain } from './chain';
 import { Doodles } from './doodles';
+import { Scribble } from './scribble';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
 import { IndexCard, StickyBoard } from './notes';
@@ -200,6 +201,7 @@ export default function Signs() {
           exit="exit"
           onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 120)}
         >
+          <Scribble />
           <motion.div className="sg-fold" variants={foldVariants} aria-hidden="true" />
           {route.page === 'home' && move.mode === 'tear' && <TornRemnant />}
           <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />

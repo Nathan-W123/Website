@@ -403,6 +403,11 @@
   .nt-corner { top: 12px; left: 14px; font-size: 28px; }
 }
 
+/* ---- scribble layer: pencil lines a visitor draws on the paper, under the stickers ---- */
+.sg-scribble { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; z-index: 0; }
+.sg-page { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M4 24 L6 18 L20 4 L24 8 L10 22 Z' fill='%23fff' stroke='%23111' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M4 24 L6 18 L10 22 Z' fill='%23111'/%3E%3C/svg%3E") 4 24, auto; }
+.sg-page a, .sg-page button, .sg-page [role="button"] { cursor: pointer; }
+
 /* ---- margin doodles ---- */
 .sg-doodles { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .dd { position: absolute; }
