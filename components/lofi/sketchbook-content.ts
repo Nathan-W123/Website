@@ -60,7 +60,7 @@ export const SECTIONS: Section[] = [
       { page: 'left', x: 24, y: 58, w: 50, ratio: 1.338, rotate: -2, caption: 'graffiti air force 1s', image: art('shoes', 'graffiti'), fix: 'corners' },
       { page: 'right', x: 8, y: 10, w: 46, ratio: 1.003, rotate: 3, caption: 'great wave + dragon', image: art('shoes', 'wave-dragon'), fix: 'tape' },
       { page: 'right', x: 52, y: 22, w: 42, ratio: 0.988, rotate: -4, caption: 'strawberries', image: art('shoes', 'strawberries'), fix: 'pin' },
-      { page: 'right', x: 18, y: 56, w: 44, ratio: 0.963, rotate: 2, caption: 'purple monster', image: art('shoes', 'purple-monster'), fix: 'tape' },
+      { page: 'right', x: 18, y: 56, w: 44, ratio: 0.963, rotate: 2, caption: 'gengar', image: art('shoes', 'purple-monster'), fix: 'tape' },
     ],
     doodles: [
       { page: 'left', x: 80, y: 62, kind: 'star', rotate: 12 },

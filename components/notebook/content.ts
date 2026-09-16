@@ -196,9 +196,9 @@ export const CHAPTERS: Chapter[] = [
       project('make', 'fluid', {
         id: 'high-risk-roads',
         name: 'High Risk Roads',
-        tagline: 'A GIS study of where Sacramento roads are most dangerous, from raw crash records to a ranked map.',
-        stack: 'ArcGIS Pro · spatial analysis · crash data',
-        notes: ['Crash records joined to the road network and scored by segment', 'Hotspot and density mapping to rank the highest-risk corridors', 'Final project for ECI 016 at UC Davis, written up as a report'],
+        tagline: 'Which Sacramento streets are dangerous once traffic and length are accounted for: crash rates against a 95% critical rate, mapped.',
+        stack: 'R · tidyverse · Leaflet · OpenStreetMap',
+        notes: ['2023 collision records joined to AADT counts and OpenStreetMap road lengths', 'Crash rate per 10 million vehicle-miles tested against a critical rate; 11 corridors flagged', 'Final project for ECI 016 at UC Davis, written up as a 16-page report'],
         href: '/docs/high-risk-roads-sacramento.pdf',
       }),
       project('make', 'fluid', {

@@ -126,7 +126,6 @@ export function Landing({ onGo, onOpenProject, onOpenArt }: { onGo: (p: Plank) =
 
       {/* the bench: most recent things, just finished or in progress */}
       <section className="ld-bench" id="bench">
-        <h2 className="ld-bench-title">most recent</h2>
         <div className="ld-bench-row">
           {RECENT.map((r, i) => {
             const tilt = [-3, 2.5, -2][i % 3];

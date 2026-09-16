@@ -65,4 +65,15 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: '/projects/formulate/3.webp', caption: 'Learned boiling point on 2,050 held-out compounds' },
     { src: '/projects/formulate/4.webp', caption: 'Expert uncertainty calibration vs 68% honesty line' },
   ],
+  "high-risk-roads": [
+    { src: "/projects/high-risk-roads/1.webp", caption: "The 11 flagged corridors across Sacramento" },
+    { src: "/projects/high-risk-roads/2.webp", caption: "Every 2023 crash on the flagged roads" },
+    { src: "/projects/high-risk-roads/3.webp", caption: "Crash share by hour: 22% fall in the 4-6 PM peak" },
+    { src: "/projects/high-risk-roads/4.webp", caption: "Crash rate vs critical rate, road by road" },
+  ],
+  "sasd-hfml": [
+    { src: "/projects/sasd-hfml/3.webp", caption: "Five-phase pipeline diagram with trace detail" },
+    { src: "/projects/sasd-hfml/1.webp", caption: "Streamlit control panel after a full Run All" },
+    { src: "/projects/sasd-hfml/2.webp", caption: "Phase 4 upstream trace log, per-HFML counts" },
+  ],
 };

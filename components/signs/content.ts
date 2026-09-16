@@ -79,13 +79,18 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
     cards: pick(['gambit', 'siege', 'kumi', 'voice-agents']).map(toCard),
   },
   {
-    id: 'education',
-    label: 'Education',
+    id: 'general',
+    label: 'General',
     cards: pick(['nonstandard']).map(toCard),
   },
   {
     id: 'numerical',
     label: 'Numerical models',
     cards: pick(['black-hole', 'aero', 'hf-scf', 'quantize', 'formulate']).map(toCard),
+  },
+  {
+    id: 'gis',
+    label: 'GIS',
+    cards: pick(['high-risk-roads', 'sasd-hfml']).map(toCard),
   },
 ];

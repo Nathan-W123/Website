@@ -105,6 +105,7 @@ export default function Signs() {
   const [scrolled, setScrolled] = useState(false);
   // while a sheet is being torn off, the name waits underneath until the tear is done
   const [nameHold, setNameHold] = useState(false);
+  const [tearing, setTearing] = useState(false);
   // the direction a plank was clicked in, consumed by the next hash change
   const pending = useRef<Dir | null>(null);
   // set by any Home control: the next trip home tears the sheet off instead of swiping
@@ -143,6 +144,8 @@ export default function Signs() {
         (document.getElementById('sg-curl-anim') as SVGAnimateElement | null)?.beginElement();
         setNameHold(true);
         window.setTimeout(() => setNameHold(false), TEAR * 1000 * ((window as unknown as { __SLOW?: number }).__SLOW || 1) - 150);
+        setTearing(true);
+        window.setTimeout(() => setTearing(false), TEAR * 1000 * ((window as unknown as { __SLOW?: number }).__SLOW || 1) + 50);
       }
       if (!first.current && mode === 'swipe') setSwipe({ id: ++swipes.current, dir: d });
       first.current = false;
@@ -184,7 +187,7 @@ export default function Signs() {
   }, [lightbox, project, route]);
 
   return (
-    <div className="sg-root">
+    <div className={`sg-root${tearing ? ' sg-tearing' : ''}`}>
       <AnimatePresence mode="sync" custom={move} initial={false}>
         <motion.section
           key={routeKey(route)}
@@ -373,9 +376,9 @@ function ArtWall({ section, onOpen, onBack }: { section: string; onOpen: (v: { i
 }
 
 /**
- * Slowly scrolls a row forever (about 38 px/s), wrapping at the halfway point
- * of the doubled content so the loop is seamless. Pauses while the pointer is
- * over it or a finger is on it, and does nothing under prefers-reduced-motion.
+ * Scrolls a row forever (about 57 px/s), wrapping at the halfway point of the
+ * doubled content so the loop is seamless. Pauses only while a finger is on it,
+ * and does nothing under prefers-reduced-motion.
  */
 function useAutoScroll(enabled: boolean, key: string) {
   const ref = useRef<HTMLDivElement>(null);
@@ -392,7 +395,7 @@ function useAutoScroll(enabled: boolean, key: string) {
       const dt = Math.min(0.05, (t - last) / 1000);
       last = t;
       if (!paused && el.scrollWidth > el.clientWidth + 10) {
-        carry += 38 * dt;
+        carry += 57 * dt;
         const step = Math.floor(carry);
         if (step) {
           carry -= step;
@@ -414,8 +417,9 @@ function useAutoScroll(enabled: boolean, key: string) {
         last = performance.now();
       }, after);
     };
-    const onEnter = () => hold();
-    const onLeave = () => release(400);
+    // hovering does not stop the drift; only a finger on the row (scrolling it by hand) does
+    const onEnter = () => {};
+    const onLeave = () => {};
     const onTouchStart = () => hold();
     const onTouchEnd = () => release(2500);
     el.addEventListener('pointerenter', onEnter);
@@ -701,10 +705,10 @@ function CurlDefs() {
   return (
     <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
       <defs>
-        <filter id="sg-curl" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+        <filter id="sg-curl" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
           <feImage href={CURL_MAP} preserveAspectRatio="none" x="0%" y="0%" width="100%" height="100%" result="map" />
           <feDisplacementMap in="SourceGraphic" in2="map" scale="0" xChannelSelector="R" yChannelSelector="G">
-            <animate id="sg-curl-anim" attributeName="scale" from="0" to="320" dur="0.7s" begin="indefinite" fill="freeze" calcMode="spline" keySplines="0.35 0 0.7 1" />
+            <animate id="sg-curl-anim" attributeName="scale" from="0" to="260" dur="0.6s" begin="indefinite" fill="freeze" calcMode="spline" keySplines="0.35 0 0.7 1" />
           </feDisplacementMap>
         </filter>
       </defs>
