@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     url: '/',
     siteName: 'Nathan W.',
     type: 'website',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'A hand-drawn wooden signpost: Contact me, My art, My projects' }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Nathan W. — a lined-paper page with taped photos of his art and projects' }],
   },
   twitter: {
     card: 'summary_large_image',
