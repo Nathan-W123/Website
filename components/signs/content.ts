@@ -7,7 +7,7 @@ export const NAME = 'Nathan W.';
 
 /** The about page: a one-liner, a paragraph, a photo and where I am. */
 export const ABOUT = {
-  tagline: 'Chemist by training, builder by habit, product-minded by choice.',
+  tagline: 'Learning by building.',
   paragraphs: [
     "Hi, I'm Nathan, a senior at UC Davis in Engineering and Chemistry. By 18 I had placed in the top 1% in the nation in organic chemistry, and today I do quantum chemical research at UC Davis.",
     'I enjoy building in fast-evolving environments: AI, startups, numerical modelling and more.',
@@ -18,13 +18,14 @@ export const ABOUT = {
 };
 
 /** Commissions and clients, listed on an index card on the art board. */
-export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', 'NewSong School of Music', 'Akers Real Estate'];
+export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', 'NewSong School of Music', 'Akers Real Estate', 'FAM (Foster Adoption Ministry)'];
 
 /** The bench: things just finished or in progress, shown under the landing page. */
 export type Recent = { kind: 'project'; id: string; status: string } | { kind: 'art'; section: string; image: string; title: string; status: string };
 export const RECENT: Recent[] = [
   { kind: 'project', id: 'kumi', status: 'building now' },
   { kind: 'project', id: 'quantize', status: 'just finished' },
+  { kind: 'project', id: 'formulate', status: 'just finished' },
   { kind: 'art', section: 'shoes', image: '/art/shoes/purple-monster.webp', title: 'Gengar shoes', status: 'just finished' },
 ];
 

@@ -75,6 +75,24 @@ export function Landing({ onGo, onOpenProject, onOpenArt }: { onGo: (p: Plank) =
         <Photo title="my art" pool={ART_POOL} href="#/art" tilt={-4} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
         <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={3} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
       </div>
+      {/* the cue to scroll: highlighted like a marker stroke, arrow bobbing */}
+      <motion.a
+        className="ld-cue"
+        href="#bench"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById('bench')?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2, duration: 0.6 }}
+        whileHover={{ scale: 1.04 }}
+      >
+        <span className="ld-cue-text">things I&apos;ve been building</span>
+        <motion.span className="ld-cue-arrow" animate={{ y: [0, 9, 0] }} transition={{ duration: 1.3, repeat: Infinity, ease: 'easeInOut' }}>
+          ↓
+        </motion.span>
+      </motion.a>
       {/* about me: a strip of tape stuck to the page that opens the about page */}
       <motion.a
         className="ld-tapelink"
@@ -103,13 +121,6 @@ export function Landing({ onGo, onOpenProject, onOpenArt }: { onGo: (p: Plank) =
         <span className="note-paper" aria-hidden="true" />
         <span className="note-tape" aria-hidden="true" />
         <span className="ld-sticky-text">contact me</span>
-      </motion.a>
-      {/* the cue to scroll: written under the photos, arrow bobbing */}
-      <motion.a className="ld-cue" href="#bench" onClick={(e) => { e.preventDefault(); document.getElementById('bench')?.scrollIntoView({ behavior: 'smooth' }); }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3, duration: 0.6 }}>
-        things I&apos;ve been building
-        <motion.span className="ld-cue-arrow" animate={{ y: [0, 8, 0] }} transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}>
-          ↓
-        </motion.span>
       </motion.a>
       </section>
 

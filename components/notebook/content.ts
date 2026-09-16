@@ -193,6 +193,22 @@ export const CHAPTERS: Chapter[] = [
         ],
         href: 'https://github.com/Nathan-W123/Kumi',
       }),
+      project('make', 'fluid', {
+        id: 'high-risk-roads',
+        name: 'High Risk Roads',
+        tagline: 'A GIS study of where Sacramento roads are most dangerous, from raw crash records to a ranked map.',
+        stack: 'ArcGIS Pro · spatial analysis · crash data',
+        notes: ['Crash records joined to the road network and scored by segment', 'Hotspot and density mapping to rank the highest-risk corridors', 'Final project for ECI 016 at UC Davis, written up as a report'],
+        href: '/docs/high-risk-roads-sacramento.pdf',
+      }),
+      project('make', 'fluid', {
+        id: 'sasd-hfml',
+        name: 'SASD HFML Pipeline',
+        tagline: "A desktop app that runs a sewer district's monthly high-frequency mainline pipeline: SQL to Excel to ArcGIS to PDF maps.",
+        stack: 'Python · Streamlit · arcpy · SQL Server',
+        notes: ['Five phases from database query to exported map, run from one Streamlit screen', 'Upsert sync into ArcGIS attribute tables and a recursive upstream trace of mains, laterals and parcels', 'Built for analysts with ArcGIS Pro on their own Windows machines'],
+        href: 'https://github.com/Nathan-W123/SASD-HFML-Project',
+      }),
       project('make', 'chem', {
         id: 'nonstandard',
         name: 'Nonstandard Conditions',

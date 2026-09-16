@@ -132,7 +132,7 @@ function Arrow({ seed }: { seed: number }) {
 }
 
 /** The set differs a little per page (seed), so every swipe lands on fresh margins. */
-export function Doodles({ seed = 1 }: { seed?: number }) {
+export function Doodles({ seed = 1, sparse = false }: { seed?: number; sparse?: boolean }) {
   const v = seed % 3;
   // decorative only: skipped on the server so hand-drawn paths never have to match between runtimes
   const client = useSyncExternalStore(() => () => {}, () => true, () => false);
@@ -151,16 +151,20 @@ export function Doodles({ seed = 1 }: { seed?: number }) {
       <At left="3%" bottom="1.5%" w={300} className="dd-wide">
         <Pencil seed={seed + 4} />
       </At>
-      {/* left margin */}
-      <At left="7%" top="17%" w={56} className="dd-wide">
-        <Star seed={seed + 10} />
-      </At>
-      <At left="4%" top="42%" w={92} className="dd-wide">
-        {v === 1 ? <Heart seed={seed + 13} /> : <Spiral seed={seed + 12} />}
-      </At>
-      <At left="8%" top="68%" w={34} className="dd-wide">
-        <Star seed={seed + 11} delay={1.1} s={0.9} />
-      </At>
+      {/* left margin (skipped on the landing page, where the tape link lives) */}
+      {!sparse && (
+        <>
+          <At left="7%" top="17%" w={56} className="dd-wide">
+            <Star seed={seed + 10} />
+          </At>
+          <At left="4%" top="42%" w={92} className="dd-wide">
+            {v === 1 ? <Heart seed={seed + 13} /> : <Spiral seed={seed + 12} />}
+          </At>
+          <At left="8%" top="68%" w={34} className="dd-wide">
+            <Star seed={seed + 11} delay={1.1} s={0.9} />
+          </At>
+        </>
+      )}
       {/* right margin */}
       <At right="4%" top="8%" w={104} className="dd-wide">
         <Sun seed={seed + 15} />

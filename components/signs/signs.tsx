@@ -190,7 +190,7 @@ export default function Signs() {
           exit="exit"
           onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 120)}
         >
-          <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
+          <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} sparse={route.page === 'home'} />
           {route.page === 'home' && <Landing onGo={onPlank} onOpenProject={setProject} onOpenArt={setLightbox} />}
 
           {route.page === 'art' && !route.section && (
