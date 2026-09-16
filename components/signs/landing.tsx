@@ -75,13 +75,21 @@ export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void
         <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={3} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
       </div>
       {/* about me: an index card taped under the photos */}
-      <motion.section className="ld-about" initial={{ y: 30, opacity: 0, rotate: -3 }} animate={{ y: 0, opacity: 1, rotate: -1.5 }} transition={{ type: 'spring', stiffness: 140, damping: 16, delay: 0.85 }}>
+      <motion.a
+        className="ld-about"
+        href="#/about"
+        onClick={() => onGo({ label: 'About me', dir: 'right', href: '#/about' })}
+        initial={{ y: 30, opacity: 0, rotate: -3 }}
+        animate={{ y: 0, opacity: 1, rotate: -1.5 }}
+        transition={{ type: 'spring', stiffness: 140, damping: 16, delay: 0.85 }}
+        whileHover={{ rotate: 0, scale: 1.03, y: -6, transition: { type: 'spring', stiffness: 300, damping: 14 } }}
+        whileTap={{ scale: 0.98 }}
+      >
         <span className="ld-tape ld-tape-top" aria-hidden="true" />
         <h2>{ABOUT.title}</h2>
-        {ABOUT.paragraphs.map((p) => (
-          <p key={p}>{p}</p>
-        ))}
-      </motion.section>
+        <p>{ABOUT.paragraphs[0]}</p>
+        <span className="ld-about-more">read more →</span>
+      </motion.a>
       <motion.a
         className="ld-sticky"
         href="#/contact"

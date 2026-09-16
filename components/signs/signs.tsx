@@ -3,14 +3,15 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion, type Variants } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
-import { ART, CONTACTS, NAME, PROJECT_GROUPS, type Card } from './content';
+import { ABOUT, ART, CONTACTS, NAME, PROJECT_GROUPS, type Card } from './content';
 import type { Study } from './studies';
 import { SignChain } from './chain';
 import { Doodles } from './doodles';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
+import { StickyBoard } from './notes';
 import { TONE_DARK, outline, shadow, tone } from './ink';
-import { Signpost, type Plank } from './signpost';
+import type { Plank } from './signpost';
 import './signs.css';
 
 declare global {
@@ -27,13 +28,14 @@ const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
  *   #/projects    projects signpost     #/projects/<group>    project cards
  *   #/contact     contact chain
  */
-type Route = { page: 'home' } | { page: 'art'; section?: string } | { page: 'projects'; group?: string } | { page: 'contact' };
+type Route = { page: 'home' } | { page: 'art'; section?: string } | { page: 'projects'; group?: string } | { page: 'contact' } | { page: 'about' };
 
 const parse = (hash: string): Route => {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
   if (parts[0] === 'art') return { page: 'art', section: parts[1] };
   if (parts[0] === 'projects') return { page: 'projects', group: parts[1] };
   if (parts[0] === 'contact') return { page: 'contact' };
+  if (parts[0] === 'about') return { page: 'about' };
   return { page: 'home' };
 };
 const routeKey = (r: Route) => (r.page === 'art' ? `art/${r.section ?? ''}` : r.page === 'projects' ? `projects/${r.group ?? ''}` : r.page);
@@ -138,16 +140,9 @@ export default function Signs() {
           {route.page === 'home' && <Landing name={NAME} onGo={onPlank} />}
 
           {route.page === 'art' && !route.section && (
-            <div className="sg-center">
-              <Signpost
-                title="My art"
-                seed={11}
-                onPlank={onPlank}
-                planks={[
-                  { label: 'Home', dir: 'left', href: '#/', small: true },
-                  ...ART.map((s, i) => ({ label: s.label, dir: (i % 2 === 0 ? 'right' : 'left') as 'left' | 'right', href: `#/art/${s.id}` })),
-                ]}
-              />
+            <div className="sg-wall">
+              <BackSign label="Home" onClick={() => go('#/')} />
+              <StickyBoard title="my art" onGo={onPlank} notes={ART.map((s) => ({ label: s.label.toLowerCase(), sub: `${s.items.length} pieces`, href: `#/art/${s.id}`, dir: 'right' as const }))} />
             </div>
           )}
 
@@ -156,22 +151,17 @@ export default function Signs() {
           )}
 
           {route.page === 'projects' && !route.group && (
-            <div className="sg-center">
-              <Signpost
-                title="My projects"
-                seed={21}
-                onPlank={onPlank}
-                planks={[
-                  { label: 'Home', dir: 'right', href: '#/', small: true },
-                  ...PROJECT_GROUPS.map((g, i) => ({ label: g.label, dir: (i % 2 === 0 ? 'left' : 'right') as 'left' | 'right', href: `#/projects/${g.id}` })),
-                ]}
-              />
+            <div className="sg-wall">
+              <BackSign label="Home" onClick={() => go('#/')} />
+              <StickyBoard title="my projects" onGo={onPlank} notes={PROJECT_GROUPS.map((g) => ({ label: g.label.toLowerCase(), sub: `${g.cards.length} ${g.cards.length === 1 ? 'project' : 'projects'}`, href: `#/projects/${g.id}`, dir: 'right' as const }))} />
             </div>
           )}
 
           {route.page === 'projects' && route.group && <Cards group={route.group} onBack={() => go('#/projects')} onOpen={setProject} />}
 
           {route.page === 'contact' && <Contact onBack={() => go('#/')} />}
+
+          {route.page === 'about' && <About onBack={() => go('#/')} />}
         </motion.section>
       </AnimatePresence>
 
@@ -603,6 +593,59 @@ function CaseStudy({ study }: { study: Study }) {
           ))}
         </ul>
       </Section>
+    </div>
+  );
+}
+
+/* ---------- about page: one big notebook page ---------- */
+
+function About({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="sg-wall sg-about">
+      <BackSign label="Home" onClick={onBack} />
+      <motion.article className="ab-card" initial={{ y: 40, opacity: 0, rotate: -2 }} animate={{ y: 0, opacity: 1, rotate: -0.6 }} transition={{ type: 'spring', stiffness: 120, damping: 16, delay: 0.5 }}>
+        <span className="ld-tape ld-tape-l" aria-hidden="true" />
+        <span className="ld-tape ld-tape-r" aria-hidden="true" />
+        <h1>{ABOUT.title}</h1>
+        {ABOUT.paragraphs.map((p) => (
+          <p key={p} className="ab-lead">
+            {p}
+          </p>
+        ))}
+        <section>
+          <h2>Education</h2>
+          <ul>
+            {ABOUT.education.map((e) => (
+              <li key={e.school}>
+                {e.degree}, {e.school} — {e.when}
+              </li>
+            ))}
+          </ul>
+        </section>
+        <section>
+          <h2>Skills</h2>
+          <dl className="ab-skills">
+            {ABOUT.skills.map((g) => (
+              <div key={g.group}>
+                <dt>{g.group}</dt>
+                <dd>{g.items.join(' · ')}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+        <section>
+          <h2>Find me</h2>
+          <ul className="ab-links">
+            {CONTACTS.map((c) => (
+              <li key={c.id}>
+                <a href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
+                  {c.label}: {c.handle}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </motion.article>
     </div>
   );
 }

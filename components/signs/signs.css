@@ -139,7 +139,12 @@
 .ld-tape-r { right: -26px; transform: rotate(30deg); }
 /* about me: a ruled index card */
 .ld-about {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
   position: relative;
+  transition: box-shadow 0.25s ease;
   width: min(560px, 92vw);
   margin: 6px 0 0;
   padding: 22px 26px 20px;
@@ -152,6 +157,8 @@
 }
 .ld-about h2 { margin: 0 0 4px; font-family: var(--hand); font-weight: 400; font-size: 34px; line-height: 1; color: #4b4b4b; text-shadow: 0.5px 0.5px 0 #8a8a8a; filter: url(#pencil-wobble); }
 .ld-about p { margin: 0 0 4px; font-size: 18px; line-height: 28px; }
+.ld-about-more { display: block; margin-top: 4px; font-size: 20px; text-decoration: underline; text-underline-offset: 4px; }
+.ld-about:hover { box-shadow: 12px 14px 0 var(--ink); }
 .ld-tape-top { left: 50%; top: -14px; transform: translateX(-50%) rotate(-3deg); width: 110px; }
 @media (min-width: 1100px) {
   .ld-about { align-self: flex-start; margin: 10px 0 0 9%; width: 460px; }
@@ -189,6 +196,72 @@
   .ld-sticky { position: relative; right: auto; bottom: auto; align-self: flex-end; margin: 10px 5% 0 0; width: 190px; min-height: 140px; padding: 20px 16px 20px; }
   .ld-sticky-text { font-size: 30px; }
   .ld-sticky-sub { font-size: 16px; }
+}
+
+/* ---- sticky-note boards (art sections, project groups) ---- */
+.nb { display: flex; flex-direction: column; align-items: center; gap: 34px; padding: 84px 16px 40px; }
+.nb-title { margin: 0; font-family: var(--hand); font-weight: 400; font-size: clamp(48px, 7vw, 84px); line-height: 1; color: #4b4b4b; text-shadow: 0.5px 0.5px 0 #8a8a8a; filter: url(#pencil-wobble); transform: rotate(-2deg); }
+.nb-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 44px 56px; max-width: 1100px; }
+.nb-row > .nb-note:nth-child(2n) { margin-top: 36px; }
+.nb-note {
+  position: relative;
+  display: block;
+  width: 230px;
+  height: 230px;
+  padding: 36px 24px 24px;
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--hand);
+  cursor: pointer;
+}
+.nb-label, .nb-sub, .nb-go { position: relative; display: block; }
+.nb-label { font-size: 42px; line-height: 1; text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 3px; }
+.nb-sub { margin-top: 12px; font-size: 20px; opacity: 0.8; }
+.nb-go { position: absolute; right: 44px; bottom: 26px; font-size: 40px; line-height: 1; }
+.nb-note:hover .note-shadow { transform: translate(12px, 14px); }
+.nb-note:hover .note-tape { transform: translateX(-50%) rotate(2deg) translateY(-3px); }
+.nb-note:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
+@media (max-width: 720px) {
+  .nb { padding: 70px 12px 30px; gap: 26px; }
+  .nb-row { gap: 26px 20px; }
+  .nb-row > .nb-note:nth-child(2n) { margin-top: 24px; }
+  .nb-note { width: 158px; height: 158px; padding: 26px 16px 16px; }
+  .nb-label { font-size: 28px; }
+  .nb-sub { font-size: 16px; margin-top: 8px; }
+  .nb-go { right: 40px; bottom: 18px; font-size: 30px; }
+}
+
+/* ---- about page ---- */
+.sg-about { display: flex; justify-content: center; padding: 90px 16px 60px; }
+.ab-card {
+  position: relative;
+  width: min(760px, 94vw);
+  padding: 34px 40px 36px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 10px 11px 0 var(--ink);
+  background-image: repeating-linear-gradient(to bottom, transparent 0 30px, #e6e6e6 30px 32px);
+  background-position: 0 70px;
+  font-family: var(--hand);
+}
+.ab-card h1 { margin: 0 0 14px; font-family: var(--hand); font-weight: 400; font-size: 54px; line-height: 1; color: #4b4b4b; text-shadow: 0.5px 0.5px 0 #8a8a8a; filter: url(#pencil-wobble); }
+.ab-card .ab-lead { margin: 0 0 8px; font-size: 21px; line-height: 32px; }
+.ab-card section { margin-top: 22px; }
+.ab-card h2 { display: inline-block; margin: 0 0 6px; font-family: var(--sign); font-size: 24px; letter-spacing: 0.06em; line-height: 1; border-bottom: 3px solid var(--ink); padding-bottom: 2px; transform: rotate(-1deg); }
+.ab-card ul { margin: 0; padding-left: 22px; font-size: 19px; line-height: 32px; }
+.ab-skills { margin: 0; display: grid; grid-template-columns: max-content 1fr; column-gap: 18px; row-gap: 2px; font-size: 19px; line-height: 32px; }
+.ab-skills div { display: contents; }
+.ab-skills dt { font-family: var(--sign); font-size: 19px; letter-spacing: 0.05em; }
+.ab-skills dd { margin: 0; }
+.ab-card .ab-links { list-style: none; padding: 0; }
+.ab-card .ab-links a { color: inherit; text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 720px) {
+  .sg-about { padding: 70px 12px 40px; }
+  .ab-card { padding: 22px 20px 24px; background-position: 0 56px; background-image: repeating-linear-gradient(to bottom, transparent 0 26px, #e6e6e6 26px 28px); }
+  .ab-card h1 { font-size: 42px; }
+  .ab-card .ab-lead { font-size: 18px; line-height: 28px; }
+  .ab-card ul { font-size: 17px; line-height: 28px; }
+  .ab-skills { grid-template-columns: 1fr; font-size: 17px; line-height: 26px; row-gap: 6px; }
 }
 
 /* ---- margin doodles ---- */
@@ -363,7 +436,7 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
    separate spans so the tape can hang past the edge without being clipped by the folded corner) */
 .note-shadow, .note-paper { position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%); pointer-events: none; }
 .note-shadow { background: var(--ink); transform: translate(7px, 8px); transition: transform 0.25s ease; }
-.note-paper { background: #fff59b; background-image: repeating-linear-gradient(to bottom, transparent 0 27px, rgba(17, 17, 17, 0.1) 27px 29px); background-position: 0 44px; }
+.note-paper { background: #fff59b; }
 .note-paper::after { content: ''; position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; background: linear-gradient(135deg, transparent 50%, #e2d36e 50%); }
 .note-tape { position: absolute; left: 50%; top: -9px; width: 92px; height: 22px; transform: translateX(-50%) rotate(-2deg); background: rgba(255, 255, 255, 0.45); border: 2px solid rgba(17, 17, 17, 0.4); box-shadow: 1px 1px 0 rgba(17, 17, 17, 0.2); transition: transform 0.25s ease; }
 .sg-materials {

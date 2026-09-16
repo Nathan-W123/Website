@@ -5,12 +5,20 @@ import { STUDIES, type Study } from './studies';
 
 export const NAME = 'Nathan W.';
 
-/** The about-me card on the landing page. */
+/** About me: one short paragraph on the landing card, the full page adds education and skills. */
 export const ABOUT = {
   title: 'about me',
   paragraphs: [
-    "Hi, I'm Nathan, at UC Davis. I like building things that compute: a Hartree-Fock engine written from the integrals up, a lattice-Boltzmann wind tunnel, a black-hole ray tracer, a chess net that plays bullet on Lichess, and the backend that lets teams of coding agents share one repo.",
-    'Away from the keyboard I draw: Copic doodles, pencil animals and hand-painted Air Force 1s. The signs and photos on this site are how I like to show it.',
+    "I'm a chemistry student at UC Davis who likes building the software and engineering tools that scientific problems need: a Hartree-Fock engine written from the integrals up, a wind tunnel that runs on a laptop, inverse tools that turn a spectrum or a target property into a molecule. The same hands draw Copic doodles and paint Air Force 1s.",
+  ],
+  education: [{ school: 'UC Davis', degree: 'B.S. Chemistry', when: 'expected graduation year to fill in' }],
+  /** Skills, grouped so they can be read at a glance. */
+  skills: [
+    { group: 'Software', items: ['Python', 'C/C++', 'React', 'Next.js', 'Node.js', 'PostgreSQL'] },
+    { group: 'ML / data', items: ['PyTorch', 'scikit-learn', 'NumPy', 'SciPy', 'pandas'] },
+    { group: 'Chemistry', items: ['NMR', 'mass spectrometry', 'synthesis', 'chromatography'] },
+    { group: 'Computational chemistry', items: ['Gaussian', 'Psi4', 'PySCF', 'RDKit'] },
+    { group: 'Engineering', items: ['AutoCAD', 'CFD', 'GIS', 'sensors / embedded systems'] },
   ],
 };
 
