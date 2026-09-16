@@ -153,8 +153,16 @@ export default function Signs() {
       first.current = false;
     };
     apply();
+    const closeOverlays = () => {
+      setProject(null);
+      setLightbox(null);
+    };
     window.addEventListener('hashchange', apply);
-    return () => window.removeEventListener('hashchange', apply);
+    window.addEventListener('hashchange', closeOverlays);
+    return () => {
+      window.removeEventListener('hashchange', apply);
+      window.removeEventListener('hashchange', closeOverlays);
+    };
   }, []);
 
   useEffect(() => {
@@ -190,6 +198,7 @@ export default function Signs() {
 
   return (
     <div className={`sg-root${tearing ? ' sg-tearing' : ''}`}>
+      <div className="sg-stage" inert={!!(project || lightbox)}>
       <AnimatePresence mode="sync" custom={move} initial={false}>
         <motion.section
           key={routeKey(route)}
@@ -265,13 +274,69 @@ export default function Signs() {
       <NameTag page={(route.page === 'home' && scrolled) || nameHold ? 'art' : route.page} onHome={goHome} />
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
+      </div>
 
       <AnimatePresence>{project && <ProjectView key={project.id} card={project} onClose={() => setProject(null)} />}</AnimatePresence>
 
       <AnimatePresence>
         {lightbox && (
           <motion.div className="sg-lightbox" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLightbox(null)}>
-            <motion.figure initial={{ scale: 0.7, rotate: -3 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0.8 }} transition={{ type: 'spring', stiffness: 220, damping: 22 }} onClick={(e) => e.stopPropagation()}>
+            <Lightbox item={lightbox} onClose={() => setLightbox(null)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ---------- modal behaviour shared by the art lightbox and the project viewer ---------- */
+
+/**
+ * Focus moves into the overlay when it opens, Tab stays inside it, and focus
+ * goes back to whatever opened it when it closes. The rest of the page is
+ * made inert by the shell while an overlay is up.
+ */
+function useDialog<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  // whatever had focus when the overlay was asked for, read on the first render before focus moves into it
+  const [opener] = useState<HTMLElement | null>(() => (typeof document === 'undefined' ? null : (document.activeElement as HTMLElement | null)));
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const items = Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+      if (items.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = items[0], last = items[items.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === el)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    el.addEventListener('keydown', onKey);
+    return () => {
+      el.removeEventListener('keydown', onKey);
+      opener?.focus({ preventScroll: true });
+    };
+  }, [opener]);
+  return ref;
+}
+
+function Lightbox({ item, onClose }: { item: { image: string; caption: string; materials?: string[] }; onClose: () => void }) {
+  const ref = useDialog<HTMLElement>();
+  const lightbox = item;
+  // a real <dialog> would need showModal() for its top layer, which fights the motion transitions; the role plus useDialog does the same job
+  return (
+    // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
+    <motion.figure ref={ref} role="dialog" aria-modal="true" aria-labelledby="sg-lb-caption" tabIndex={-1} initial={{ scale: 0.7, rotate: -3 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0.8, transition: { duration: 0.2, ease: 'easeIn' } }} transition={{ type: 'spring', stiffness: 220, damping: 22 }} onClick={(e) => e.stopPropagation()}>
               <div className="sg-lb-row">
                 <div className="sg-lightbox-frame">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -291,13 +356,9 @@ export default function Signs() {
                   </aside>
                 )}
               </div>
-              <figcaption>{lightbox.caption}</figcaption>
-              <button type="button" className="sg-close" onClick={() => setLightbox(null)} aria-label="Close">×</button>
+              <figcaption id="sg-lb-caption">{lightbox.caption}</figcaption>
+              <button type="button" className="sg-close" onClick={onClose} aria-label="Close">×</button>
             </motion.figure>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   );
 }
 
@@ -367,7 +428,7 @@ function ArtWall({ section, onOpen, onBack }: { section: string; onOpen: (v: { i
         {shown.map((it, k) => {
           const i = k % items.length;
           return (
-            <HangingSign key={`${it.image}-${k}`} index={i} w={300} ratio={it.ratio} string={170 + (i % 3) * 58} seed={100 + i * 7} onClick={() => onOpen({ image: it.image, caption: it.caption, materials: it.materials })} className="hg-frame">
+            <HangingSign key={`${it.image}-${k}`} index={i} w={300} ratio={it.ratio} string={170 + (i % 3) * 58} seed={100 + i * 7} onClick={() => onOpen({ image: it.image, caption: it.caption, materials: it.materials })} className="hg-frame" decoy={k >= items.length}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={base() + it.image} alt={it.caption} loading="lazy" draggable={false} />
               <span className="hg-caption">{it.caption}</span>
@@ -537,13 +598,19 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
   }, [step]);
   const shot = card.images[i];
   const drag = useRef<number | null>(null);
+  const ref = useDialog<HTMLElement>();
   return (
     <motion.div className="sg-lightbox sg-project" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
-      <motion.article
+      {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
+      <motion.article role="dialog"
+        ref={ref}
+        aria-modal="true"
+        aria-labelledby="sg-pv-title"
+        tabIndex={-1}
         className="sg-pv"
         initial={{ scale: 0.8, rotate: -2, y: 30 }}
         animate={{ scale: 1, rotate: 0, y: 0 }}
-        exit={{ scale: 0.85, opacity: 0 }}
+        exit={{ scale: 0.85, opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } }}
         transition={{ type: 'spring', stiffness: 220, damping: 22 }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -600,7 +667,7 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
           )}
         </div>
         <div className="sg-pv-text">
-          <h2>{card.title}</h2>
+          <h2 id="sg-pv-title">{card.title}</h2>
           <p className="sg-pv-line">{card.line}</p>
           {card.study ? (
             <CaseStudy study={card.study} />
@@ -721,6 +788,7 @@ function NameTag({ page, onHome }: { page: Route['page']; onHome: () => void }) 
       transition={{ layout: { type: 'spring', stiffness: 120, damping: 18 } }}
       animate={{ opacity: mode === 'hidden' ? 0 : 1 }}
       initial={false}
+      aria-hidden={mode === 'hidden'}
     >
       {mode === 'corner' ? (
         <button type="button" className="nt-btn" onClick={onHome} aria-label="Home">

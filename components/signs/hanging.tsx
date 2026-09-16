@@ -10,7 +10,7 @@ import { INK, Ring, Rope, outline, shadow } from './ink';
  * screen and settles with a swing. Children render inside the frame.
  */
 
-export function HangingSign({ children, index = 0, w = 320, h = 200, string = 220, seed = 7, onClick, href, className = '', ratio, delay = 0.5 }: { children: ReactNode; index?: number; w?: number; h?: number; string?: number; seed?: number; onClick?: () => void; href?: string; className?: string; ratio?: number; delay?: number }) {
+export function HangingSign({ children, index = 0, w = 320, h = 200, string = 220, seed = 7, onClick, href, className = '', ratio, delay = 0.5, decoy = false }: { children: ReactNode; index?: number; w?: number; h?: number; string?: number; seed?: number; onClick?: () => void; href?: string; className?: string; ratio?: number; delay?: number; /** a repeat of a sign already on the wall: clickable, but not announced or tabbed to */ decoy?: boolean }) {
   const boardH = ratio ? Math.round(w / ratio) : h;
   const total = string + boardH + 26;
   const xl = w * 0.2, xr = w * 0.8;
@@ -44,6 +44,6 @@ export function HangingSign({ children, index = 0, w = 320, h = 200, string = 22
     </motion.div>
   );
   if (href) return <a className="hg-link" href={href} target={href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">{body}</a>;
-  if (onClick) return <button type="button" className="hg-link" onClick={onClick}>{body}</button>;
+  if (onClick) return <button type="button" className="hg-link" onClick={onClick} aria-hidden={decoy || undefined} tabIndex={decoy ? -1 : undefined}>{body}</button>;
   return body;
 }

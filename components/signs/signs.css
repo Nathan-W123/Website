@@ -581,6 +581,11 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   background: rgba(255, 255, 255, 0.92);
 }
 .sg-lightbox figure { position: relative; margin: 0; max-width: min(94vw, 1280px); }
+/* the overlays take focus when they open; the dashed ring is for their controls, not the box */
+.sg-lightbox figure:focus, .sg-pv:focus { outline: none; }
+.sg-close:focus-visible, .sg-pv-arrow:focus-visible, .sg-back:focus-visible, .ld-cue:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
+/* pages, name and speed lines share the stage under the overlays */
+.sg-stage { display: contents; }
 .sg-lb-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: nowrap; }
 /* sticky notes: a yellow sheet with a folded corner, a solid shadow and a strip of tape (the layers are
    separate spans so the tape can hang past the edge without being clipped by the folded corner) */
