@@ -32,6 +32,9 @@ yarn-error.log*
 # deployment and generated files
 .vercel
 next-env.d.ts
+# written by the next.js postinstall
+AGENTS.md
+CLAUDE.md
 /dist/
 /.wrangler/
 /outputs/
