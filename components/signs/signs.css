@@ -110,7 +110,63 @@
 .sg-plank:active > g { transform: translate(6px, 8px); }
 
 /* ---- landing: pencil name, taped photos, sticky note ---- */
-.ld { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 36px 16px 40px; gap: 18px; }
+.ld { position: relative; z-index: 1; }
+/* first screen: name, photos, tape, sticky note, and the cue at the bottom */
+.ld-hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 36px 16px 90px; gap: 18px; }
+.ld-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--hand);
+  font-size: 26px;
+  color: #333;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ld-cue-arrow { display: inline-block; font-size: 30px; line-height: 1; }
+/* the bench under it */
+.ld-bench { position: relative; display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 40px 16px 90px; }
+.ld-bench-title { margin: 0; font-family: var(--hand); font-weight: 400; font-size: clamp(44px, 6vw, 72px); line-height: 1; color: #4b4b4b; text-shadow: 0.5px 0.5px 0 #8a8a8a; filter: url(#pencil-wobble); transform: rotate(-2deg); }
+.ld-bench-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 44px clamp(36px, 6vw, 90px); max-width: 1200px; }
+.ld-bench-row > .ld-bench-item:nth-child(2) { margin-top: 34px; }
+.ld-bench-item {
+  position: relative;
+  display: block;
+  width: min(300px, 80vw);
+  padding: 12px 12px 14px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 9px 10px 0 var(--ink);
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transform: rotate(var(--tilt));
+  transition: box-shadow 0.25s ease;
+}
+.ld-bench-item:hover { box-shadow: 14px 16px 0 var(--ink); }
+.ld-bench-item:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
+.ld-bench-pic { display: block; aspect-ratio: 16 / 11; border: 2px solid var(--ink); background: #fff; overflow: hidden; }
+.ld-bench-pic img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+.ld-bench-item:hover .ld-bench-pic img { transform: scale(1.05); }
+.ld-bench-name { display: block; margin-top: 10px; font-family: var(--hand); font-size: 30px; line-height: 1; }
+.ld-bench-line { display: block; margin-top: 6px; font-family: var(--hand); font-size: 17px; line-height: 1.3; color: #444; }
+.ld-status {
+  position: absolute;
+  top: -12px;
+  right: -14px;
+  padding: 4px 12px 5px;
+  background: #fff59b;
+  box-shadow: 4px 4px 0 var(--ink);
+  font-family: var(--hand);
+  font-size: 18px;
+  line-height: 1;
+  transform: rotate(6deg);
+}
 .ld-row { display: flex; flex-wrap: nowrap; justify-content: center; align-items: flex-start; gap: clamp(40px, 12vw, 200px); margin-top: 8px; }
 /* staggered: the second photo hangs lower */
 .ld-row .ld-photo:nth-child(2) { margin-top: clamp(30px, 7vh, 70px); }
@@ -142,8 +198,8 @@
 /* about me: a strip of masking tape with the words written on it */
 .ld-tapelink {
   position: absolute;
-  left: 13%;
-  bottom: 22%;
+  left: 5%;
+  top: 15%;
   display: block;
   padding: 10px 40px 12px;
   font-family: var(--hand);
@@ -186,8 +242,8 @@
 }
 .ld-sticky {
   position: absolute;
-  right: 6%;
-  top: 50%;
+  right: 3%;
+  top: 54%;
   transform: translateY(-40%);
   display: flex;
   align-items: center;
@@ -205,7 +261,12 @@
 .ld-sticky-text { display: block; font-size: 42px; line-height: 1.1; text-align: center; text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 3px; }
 .ld-photo:focus-visible, .ld-sticky:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
 @media (max-width: 720px) {
-  .ld { padding: 40px 16px 32px; gap: 22px; }
+  .ld-hero { padding: 40px 16px 80px; gap: 22px; min-height: 100vh; }
+  .ld-cue { font-size: 21px; bottom: 18px; }
+  .ld-bench { padding: 24px 16px 60px; gap: 22px; }
+  .ld-bench-row { gap: 30px; }
+  .ld-bench-row > .ld-bench-item:nth-child(2) { margin-top: 0; }
+  .ld-bench-item { width: min(300px, 84vw); }
   .ld-row { gap: 26px; }
   .ld-row .ld-photo:nth-child(2) { margin-top: 44px; }
   .ld-photo { width: min(300px, 43vw); padding: 8px 8px 10px; box-shadow: 6px 7px 0 var(--ink); }

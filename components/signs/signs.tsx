@@ -49,7 +49,7 @@ const plankDir = (p: Plank): Dir => (p.href === '#/contact' ? 'up' : p.dir === '
 
 const FAR = '200';
 const SWIPE = 1.05;
-const TEAR = 1.6;
+const TEAR = 1.0;
 const ease = [0.7, 0, 0.3, 1] as const;
 type Mode = 'swipe' | 'tear' | 'fade';
 type Move = { dir: Dir; mode: Mode; slow?: number };
@@ -66,30 +66,33 @@ const FLAT = tornEdge(TORN.length);
 const variants: Variants = {
   enter: ({ dir: d, mode }: Move) =>
     mode === 'tear'
-      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, transition: { duration: 0.01 } }
+      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, filter: 'none', transition: { duration: 0.01 } }
       : mode === 'fade'
-        ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 0, '--fold': 0 }
-        : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0 },
-  center: ({ mode }: Move) => ({ x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 1, '--fold': 0, transition: mode === 'fade' ? { duration: 0.5, ease: 'easeOut' } : { duration: SWIPE, ease } }),
+        ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 0, '--fold': 0, filter: 'none' }
+        : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0, filter: 'none' },
+  center: ({ mode }: Move) => ({ x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 1, '--fold': 0, filter: 'none', transition: mode === 'fade' ? { duration: 0.5, ease: 'easeOut' } : { duration: SWIPE, ease } }),
   exit: ({ dir: d, mode, slow = 1 }: Move) =>
     mode === 'tear'
       ? {
           // the top-right corner is pinched and pulled down-left: the tear runs along the top toward the
           // left corner while the sheet folds and swings about that corner; once the tear reaches it the
           // whole sheet drops away
+          // the paper itself bends: a displacement filter (sg-curl, driven by SMIL from the same moment)
+          // curls the pulled corner in while the tear runs; the rigid swing is now only a small part of it
           clipPath: [FLAT, tornEdge(10), tornEdge(7), tornEdge(4), tornEdge(1), tornEdge(0), tornEdge(0)],
-          rotate: [0, 3, 7, 12, 18, 26, 70],
-          rotateX: [0, -6, -12, -18, -22, -24, -40],
-          x: ['0vw', '0.5vw', '1vw', '1.5vw', '2vw', '2vw', '10vw'],
-          y: ['0vh', '0vh', '0.5vh', '1vh', '2vh', '4vh', '130vh'],
+          rotate: [0, 1, 3, 6, 9, 12, 50],
+          rotateX: [0, -3, -6, -9, -12, -14, -35],
+          x: ['0vw', '0.3vw', '0.6vw', '1vw', '1.4vw', '1.6vw', '8vw'],
+          y: ['0vh', '0vh', '0.3vh', '0.6vh', '1.2vh', '2.5vh', '130vh'],
           scale: [1, 1, 1, 1, 1, 1, 0.9],
-          '--fold': [0, 0.25, 0.45, 0.6, 0.7, 0.75, 0.75],
+          '--fold': [0, 0.3, 0.5, 0.65, 0.75, 0.8, 0.8],
+          filter: 'url(#sg-curl)',
           zIndex: 5,
           transition: { duration: TEAR * slow, times: [0, 0.14, 0.28, 0.42, 0.56, 0.68, 1], ease: ['easeIn', 'linear', 'linear', 'linear', 'easeOut', 'easeIn'] },
         }
       : mode === 'fade'
-        ? { opacity: 0, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, transition: { duration: 0.35, ease: 'easeIn' } }
-        : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0, transition: { duration: SWIPE, ease } },
+        ? { opacity: 0, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, filter: 'none', transition: { duration: 0.35, ease: 'easeIn' } }
+        : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0, filter: 'none', transition: { duration: SWIPE, ease } },
 };
 
 export default function Signs() {
@@ -98,6 +101,8 @@ export default function Signs() {
   const [swipe, setSwipe] = useState<{ id: number; dir: Dir } | null>(null);
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
+  // the landing page scrolls to the bench; the name tag steps aside once the hero is scrolled past
+  const [scrolled, setScrolled] = useState(false);
   // the direction a plank was clicked in, consumed by the next hash change
   const pending = useRef<Dir | null>(null);
   // set by any Home control: the next trip home tears the sheet off instead of swiping
@@ -132,6 +137,7 @@ export default function Signs() {
       // debug: window.__SLOW = 6 plays the tear in slow motion
       setMove({ dir: d, mode, slow: (window as unknown as { __SLOW?: number }).__SLOW || 1 });
       setRoute(next);
+      if (mode === 'tear') (document.getElementById('sg-curl-anim') as SVGAnimateElement | null)?.beginElement();
       if (!first.current && mode === 'swipe') setSwipe({ id: ++swipes.current, dir: d });
       first.current = false;
     };
@@ -182,9 +188,10 @@ export default function Signs() {
           initial="enter"
           animate="center"
           exit="exit"
+          onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 120)}
         >
           <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
-          {route.page === 'home' && <Landing onGo={onPlank} />}
+          {route.page === 'home' && <Landing onGo={onPlank} onOpenProject={setProject} onOpenArt={setLightbox} />}
 
           {route.page === 'art' && !route.section && (
             <div className="sg-wall">
@@ -241,7 +248,8 @@ export default function Signs() {
         </motion.section>
       </AnimatePresence>
 
-      <NameTag page={route.page} onHome={goHome} />
+      <CurlDefs />
+      <NameTag page={route.page === 'home' && scrolled ? 'art' : route.page} onHome={goHome} />
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
 
@@ -672,6 +680,29 @@ function CaseStudy({ study }: { study: Study }) {
         </ul>
       </Section>
     </div>
+  );
+}
+
+/* ---------- curl filter: a smooth displacement map that bends the pulled corner of a torn sheet down and in ---------- */
+
+const CURL_MAP =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><defs><linearGradient id='g' x1='1' y1='0' x2='0.25' y2='0.9'><stop offset='0' stop-color='rgb(30,215,128)'/><stop offset='0.55' stop-color='rgb(128,128,128)'/><stop offset='1' stop-color='rgb(128,128,128)'/></linearGradient></defs><rect width='100' height='100' fill='url(#g)'/></svg>",
+  );
+
+function CurlDefs() {
+  return (
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+      <defs>
+        <filter id="sg-curl" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+          <feImage href={CURL_MAP} preserveAspectRatio="none" x="0%" y="0%" width="100%" height="100%" result="map" />
+          <feDisplacementMap in="SourceGraphic" in2="map" scale="0" xChannelSelector="R" yChannelSelector="G">
+            <animate id="sg-curl-anim" attributeName="scale" from="0" to="320" dur="0.7s" begin="indefinite" fill="freeze" calcMode="spline" keySplines="0.35 0 0.7 1" />
+          </feDisplacementMap>
+        </filter>
+      </defs>
+    </svg>
   );
 }
 

@@ -20,6 +20,14 @@ export const ABOUT = {
 /** Commissions and clients, listed on an index card on the art board. */
 export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', 'NewSong School of Music', 'Akers Real Estate'];
 
+/** The bench: things just finished or in progress, shown under the landing page. */
+export type Recent = { kind: 'project'; id: string; status: string } | { kind: 'art'; section: string; image: string; title: string; status: string };
+export const RECENT: Recent[] = [
+  { kind: 'project', id: 'kumi', status: 'building now' },
+  { kind: 'project', id: 'quantize', status: 'just finished' },
+  { kind: 'art', section: 'shoes', image: '/art/shoes/purple-monster.webp', title: 'Gengar shoes', status: 'just finished' },
+];
+
 export const CONTACTS = [
   { id: 'instagram', label: 'Instagram', handle: '@naze_draws', href: 'https://instagram.com/naze_draws' },
   { id: 'linkedin', label: 'LinkedIn', handle: 'linkedin.com/in/nathan-ward', href: 'https://www.linkedin.com/in/nathan-ward' },

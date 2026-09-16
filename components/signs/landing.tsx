@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import { PencilDefs } from '@/components/sketch/rough';
 import { useEffect, useSyncExternalStore, type CSSProperties } from 'react';
-import { ART } from './content';
+import { ART, PROJECT_GROUPS, RECENT, type Card } from './content';
 import { GALLERY } from './gallery';
 import type { Plank } from './signpost';
 
@@ -60,11 +60,14 @@ function Photo({ title, pool, href, tilt, delay, onGo, plank }: { title: string;
   );
 }
 
-export function Landing({ onGo }: { onGo: (p: Plank) => void }) {
+const cardById = (id: string) => PROJECT_GROUPS.flatMap((g) => g.cards).find((c) => c.id === id);
+
+export function Landing({ onGo, onOpenProject, onOpenArt }: { onGo: (p: Plank) => void; onOpenProject: (c: Card) => void; onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void }) {
   // a fresh random pair next time the landing page is shown
   useEffect(() => () => picks.clear(), []);
   return (
     <div className="ld">
+      <section className="ld-hero">
       <PencilDefs />
       {/* the name itself lives at the root (NameTag) so it can travel to the corner on the about page */}
       <div className="ld-name-space" aria-hidden="true" />
@@ -101,6 +104,79 @@ export function Landing({ onGo }: { onGo: (p: Plank) => void }) {
         <span className="note-tape" aria-hidden="true" />
         <span className="ld-sticky-text">contact me</span>
       </motion.a>
+      {/* the cue to scroll: written under the photos, arrow bobbing */}
+      <motion.a className="ld-cue" href="#bench" onClick={(e) => { e.preventDefault(); document.getElementById('bench')?.scrollIntoView({ behavior: 'smooth' }); }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3, duration: 0.6 }}>
+        things I&apos;ve been building
+        <motion.span className="ld-cue-arrow" animate={{ y: [0, 8, 0] }} transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}>
+          ↓
+        </motion.span>
+      </motion.a>
+      </section>
+
+      {/* the bench: most recent things, just finished or in progress */}
+      <section className="ld-bench" id="bench">
+        <h2 className="ld-bench-title">most recent</h2>
+        <div className="ld-bench-row">
+          {RECENT.map((r, i) => {
+            const tilt = [-3, 2.5, -2][i % 3];
+            if (r.kind === 'project') {
+              const card = cardById(r.id);
+              if (!card) return null;
+              return (
+                <motion.button
+                  key={r.id}
+                  type="button"
+                  className="ld-bench-item"
+                  style={{ ['--tilt' as string]: `${tilt}deg` } as CSSProperties}
+                  onClick={() => onOpenProject(card)}
+                  initial={{ y: 40, opacity: 0, rotate: tilt - 5 }}
+                  whileInView={{ y: 0, opacity: 1, rotate: tilt }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ type: 'spring', stiffness: 140, damping: 16, delay: i * 0.12 }}
+                  whileHover={{ rotate: 0, scale: 1.05, y: -8 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="ld-tape ld-tape-l" aria-hidden="true" />
+                  <span className="ld-tape ld-tape-r" aria-hidden="true" />
+                  <span className="ld-bench-pic">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {card.image && <img src={base() + card.image} alt="" draggable={false} />}
+                  </span>
+                  <span className="ld-bench-name">{card.title}</span>
+                  <span className="ld-bench-line">{card.line}</span>
+                  <span className="ld-status">{r.status}</span>
+                </motion.button>
+              );
+            }
+            const item = ART.find((s) => s.id === r.section)?.items.find((it) => it.image === r.image);
+            return (
+              <motion.button
+                key={r.image}
+                type="button"
+                className="ld-bench-item"
+                style={{ ['--tilt' as string]: `${tilt}deg` } as CSSProperties}
+                onClick={() => onOpenArt({ image: r.image, caption: item?.caption ?? r.title, materials: item?.materials })}
+                initial={{ y: 40, opacity: 0, rotate: tilt - 5 }}
+                whileInView={{ y: 0, opacity: 1, rotate: tilt }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ type: 'spring', stiffness: 140, damping: 16, delay: i * 0.12 }}
+                whileHover={{ rotate: 0, scale: 1.05, y: -8 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="ld-tape ld-tape-l" aria-hidden="true" />
+                <span className="ld-tape ld-tape-r" aria-hidden="true" />
+                <span className="ld-bench-pic">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={base() + r.image} alt="" draggable={false} />
+                </span>
+                <span className="ld-bench-name">{r.title}</span>
+                <span className="ld-bench-line">hand-painted Air Force 1s</span>
+                <span className="ld-status">{r.status}</span>
+              </motion.button>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
