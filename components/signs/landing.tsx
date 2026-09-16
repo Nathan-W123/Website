@@ -18,7 +18,8 @@ const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 
 /** Each photo shows one picture, picked at random per visit from everything on the site. */
 const ART_POOL = ART.flatMap((s) => s.items.map((it) => it.image));
-const PROJECT_POOL = Object.values(GALLERY).map((g) => g[0]?.src).filter((x): x is string => !!x);
+// project pictures, not plots: app screens, renders and game shots only
+const PROJECT_POOL = ['/projects/black-hole/1.webp', '/projects/black-hole/2.webp', '/projects/aero/1.webp', '/projects/aero/2.webp', '/projects/aero/4.webp', '/projects/gambit/1.webp', '/projects/siege/1.webp', '/projects/siege/2.webp', '/projects/kumi/1.webp', '/projects/kumi/2.webp', '/projects/voice-agents/1.webp', '/projects/hf-scf/1.webp', '/projects/hf-scf/2.webp', '/projects/nonstandard/2.webp', '/projects/nonstandard/3.webp'].filter((p) => Object.values(GALLERY).some((g) => g.some((sh) => sh.src === p)));
 // picks are made on the client only (the server renders the first picture), and forgotten when the page unmounts
 const picks = new Map<string, number>();
 const pick = (key: string, n: number) => {
@@ -70,8 +71,8 @@ export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void
         <span>{name}</span>
       </motion.h1>
       <div className="ld-row">
-        <Photo title="my art" pool={ART_POOL} href="#/art" tilt={-3} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
-        <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={2.5} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
+        <Photo title="my art" pool={ART_POOL} href="#/art" tilt={-4} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
+        <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={3} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
       </div>
       <motion.a
         className="ld-sticky"

@@ -7,7 +7,7 @@
 export const OWNER = {
   name: 'Nathan W.',
   /** Replace with the real handle. */
-  instagram: 'nathan.w.art',
+  instagram: 'naze_draws',
 };
 
 export type ScrapItem = {

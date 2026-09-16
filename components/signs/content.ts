@@ -6,8 +6,8 @@ import { STUDIES, type Study } from './studies';
 export const NAME = 'Nathan W.';
 
 export const CONTACTS = [
-  { id: 'instagram', label: 'Instagram', handle: '@nathan.w.art', href: 'https://instagram.com/nathan.w.art', note: 'replace with the real handle' },
-  { id: 'linkedin', label: 'LinkedIn', handle: 'Nathan Ward', href: 'https://www.linkedin.com/in/', note: 'replace with the real profile' },
+  { id: 'instagram', label: 'Instagram', handle: '@naze_draws', href: 'https://instagram.com/naze_draws' },
+  { id: 'linkedin', label: 'LinkedIn', handle: 'linkedin.com/in/nathan-ward', href: 'https://www.linkedin.com/in/nathan-ward' },
   { id: 'github', label: 'GitHub', handle: 'Nathan-W123', href: 'https://github.com/Nathan-W123' },
   { id: 'email', label: 'Email', handle: 'ncward@ucdavis.edu', href: 'mailto:ncward@ucdavis.edu' },
 ];

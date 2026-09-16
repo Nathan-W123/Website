@@ -109,7 +109,9 @@
   text-shadow: 0.5px 0.5px 0 #8a8a8a;
 }
 .ld-name span { background: linear-gradient(#3f3f3f, #6a6a6a 60%, #4a4a4a); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.ld-row { display: flex; flex-wrap: nowrap; justify-content: center; align-items: flex-start; gap: 64px; margin-top: 8px; }
+.ld-row { display: flex; flex-wrap: nowrap; justify-content: center; align-items: flex-start; gap: clamp(40px, 12vw, 200px); margin-top: 8px; }
+/* staggered: the second photo hangs lower */
+.ld-row .ld-photo:nth-child(2) { margin-top: clamp(40px, 9vh, 96px); }
 .ld-photo {
   position: relative;
   display: block;
@@ -123,8 +125,9 @@
   text-decoration: none;
   transform: rotate(var(--tilt));
 }
-.ld-photo-pic { display: block; aspect-ratio: 1 / 1; border: 2px solid var(--ink); background: #fff; overflow: hidden; }
-.ld-photo-pic img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+/* the whole picture shows: the frame takes the picture's own shape, capped so tall pieces stay on screen */
+.ld-photo-pic { display: block; border: 2px solid var(--ink); background: #fff; overflow: hidden; }
+.ld-photo-pic img { width: 100%; height: auto; max-height: min(420px, 46vh); object-fit: contain; display: block; transition: transform 0.4s ease; }
 .ld-photo:hover .ld-photo-pic img { transform: scale(1.06); }
 .ld-photo:hover { box-shadow: 14px 16px 0 var(--ink); }
 .ld-photo:hover .ld-tape-l { transform: rotate(-38deg) translateY(-2px); }
@@ -154,7 +157,8 @@
 .ld-photo:focus-visible, .ld-sticky:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
 @media (max-width: 720px) {
   .ld { padding: 40px 16px 32px; gap: 22px; }
-  .ld-row { gap: 22px; }
+  .ld-row { gap: 26px; }
+  .ld-row .ld-photo:nth-child(2) { margin-top: 44px; }
   .ld-photo { width: min(300px, 43vw); padding: 8px 8px 10px; box-shadow: 6px 7px 0 var(--ink); }
   .ld-photo-caption { font-size: 24px; margin-top: 8px; }
   .ld-tape { width: 64px; height: 20px; top: -10px; }
@@ -230,15 +234,16 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   left: 10px;
   top: 10px;
   z-index: 5;
-  width: 230px;
+  width: 270px;
   height: 80px;
   border: 0;
   background: transparent;
   padding: 0;
   cursor: pointer;
   font-family: var(--sign);
-  font-size: 26px;
-  letter-spacing: 0.05em;
+  font-size: 23px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
   color: var(--ink);
   transform: scale(0.8);
   transform-origin: top left;
@@ -309,7 +314,7 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 .sg-card { position: relative; aspect-ratio: 320 / 400; }
 .sg-card > a, .sg-card > div { display: block; position: absolute; inset: 0; color: inherit; text-decoration: none; }
-.sg-card-border { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sg-card-border { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .sg-card-body { position: absolute; inset: 18px 30px 30px 18px; display: flex; flex-direction: column; gap: 8px; }
 .sg-card-shot { aspect-ratio: 16 / 10; border: 3px solid var(--ink); border-radius: 6px; overflow: hidden; background: #eee; }
 .sg-card-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }

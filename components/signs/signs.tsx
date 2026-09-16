@@ -9,7 +9,7 @@ import { SignChain } from './chain';
 import { Doodles } from './doodles';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
-import { TONE, TONE_DARK, outline, shadow, tone } from './ink';
+import { TONE_DARK, outline, shadow, tone } from './ink';
 import { Signpost, type Plank } from './signpost';
 import './signs.css';
 
@@ -249,12 +249,12 @@ function Dashes({ dir }: { dir: Dir }) {
 /* ---------- pages ---------- */
 
 function BackSign({ label, onClick }: { label: string; onClick: () => void }) {
-  const pts: [number, number][] = [[8, 34], [46, 6], [214, 6], [200, 34], [214, 62], [46, 62]];
+  const pts: [number, number][] = [[8, 34], [46, 6], [254, 6], [240, 34], [254, 62], [46, 62]];
   return (
     <button type="button" className="sg-back" onClick={onClick}>
-      <svg viewBox="0 0 230 80" width="230" height="80" aria-hidden="true">
+      <svg viewBox="0 0 270 80" width="270" height="80" aria-hidden="true">
         <Rough kind="poly" points={pts.map(([a, b]) => [a + 6, b + 7])} seed={76} opts={shadow(76)} />
-        <Rough kind="poly" points={[[46, 62], [214, 62], [214, 70], [46, 70], [8, 42]]} seed={78} opts={{ ...tone(78, TONE_DARK), stroke: '#111', strokeWidth: 1.6 }} />
+        <Rough kind="poly" points={[[46, 62], [254, 62], [254, 70], [46, 70], [8, 42]]} seed={78} opts={{ ...tone(78, TONE_DARK), stroke: '#111', strokeWidth: 1.6 }} />
         <Rough kind="poly" points={pts} seed={77} opts={outline(3, 77)} />
       </svg>
       <span>{label}</span>
@@ -390,12 +390,12 @@ function ProjectCard({ card, index, onOpen }: { card: Card; index: number; onOpe
       <svg className="sg-card-border" viewBox="0 0 320 400" preserveAspectRatio="none" aria-hidden="true">
         <Rough kind="rect" x={14} y={14} w={300} h={380} seed={300 + index} opts={shadow(300 + index)} />
         <Rough kind="rect" x={4} y={4} w={300} h={380} seed={310 + index} opts={outline(3, 310 + index)} />
-        {/* strips of tape over the top corners */}
-        <g transform="rotate(-28 40 8)">
-          <Rough kind="rect" x={12} y={0} w={56} h={18} seed={320 + index} opts={{ stroke: '#111', strokeWidth: 1.6, roughness: 1, fill: TONE, fillStyle: 'solid' }} />
+        {/* strips of tape across the top corners, hanging over the edge onto the paper */}
+        <g transform="rotate(-32 30 4)">
+          <Rough kind="rect" x={-8} y={-8} w={76} h={22} seed={320 + index} opts={{ stroke: 'rgba(17,17,17,0.55)', strokeWidth: 1.6, roughness: 1, fill: 'rgba(228,228,228,0.85)', fillStyle: 'solid' }} />
         </g>
-        <g transform="rotate(30 268 8)">
-          <Rough kind="rect" x={240} y={0} w={56} h={18} seed={330 + index} opts={{ stroke: '#111', strokeWidth: 1.6, roughness: 1, fill: TONE, fillStyle: 'solid' }} />
+        <g transform="rotate(32 278 4)">
+          <Rough kind="rect" x={240} y={-8} w={76} h={22} seed={330 + index} opts={{ stroke: 'rgba(17,17,17,0.55)', strokeWidth: 1.6, roughness: 1, fill: 'rgba(228,228,228,0.85)', fillStyle: 'solid' }} />
         </g>
       </svg>
       <div className="sg-card-body">
