@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion, type Variants } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
-import { ABOUT, ART, CONTACTS, NAME, PROJECT_GROUPS, type Card } from './content';
+import { ABOUT, ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } from './content';
 import type { Study } from './studies';
 import { SignChain } from './chain';
 import { Doodles } from './doodles';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
-import { StickyBoard } from './notes';
+import { IndexCard, StickyBoard } from './notes';
+import { ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
 import type { Plank } from './signpost';
 import './signs.css';
@@ -48,39 +49,47 @@ const plankDir = (p: Plank): Dir => (p.href === '#/contact' ? 'up' : p.dir === '
 
 const FAR = '200';
 const SWIPE = 1.05;
-const TEAR = 1.35;
+const TEAR = 1.6;
 const ease = [0.7, 0, 0.3, 1] as const;
-type Mode = 'swipe' | 'tear';
+type Mode = 'swipe' | 'tear' | 'fade';
 type Move = { dir: Dir; mode: Mode; slow?: number };
 
 /** Torn top edge as a clip polygon: 13 points along the top, torn up to index `upTo`, then the two bottom corners. */
 const TORN = [4.2, 1.2, 5.6, 1.8, 4.9, 0.8, 6.3, 2.3, 3.9, 1.3, 5.3, 2.8, 4.6];
-const tornEdge = (upTo: number) => {
-  const pts = TORN.map((y, i) => `${((i / (TORN.length - 1)) * 100).toFixed(2)}% ${i <= upTo ? y : 0}%`);
+/** Torn from the right corner leftwards: points with index >= from are already torn. */
+const tornEdge = (from: number) => {
+  const pts = TORN.map((y, i) => `${((i / (TORN.length - 1)) * 100).toFixed(2)}% ${i >= from ? y : 0}%`);
   return `polygon(${pts.join(', ')}, 100% 100%, 0% 100%)`;
 };
-const FLAT = tornEdge(-1);
+const FLAT = tornEdge(TORN.length);
 
 const variants: Variants = {
   enter: ({ dir: d, mode }: Move) =>
     mode === 'tear'
-      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, transition: { duration: 0.01 } }
-      : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1 },
-  center: { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, transition: { duration: SWIPE, ease } },
+      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, transition: { duration: 0.01 } }
+      : mode === 'fade'
+        ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 0, '--fold': 0 }
+        : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0 },
+  center: ({ mode }: Move) => ({ x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 1, '--fold': 0, transition: mode === 'fade' ? { duration: 0.5, ease: 'easeOut' } : { duration: SWIPE, ease } }),
   exit: ({ dir: d, mode, slow = 1 }: Move) =>
     mode === 'tear'
       ? {
-          // grab, rip across the top, then the loose sheet flops down and falls away
-          clipPath: [FLAT, tornEdge(3), tornEdge(8), tornEdge(12), tornEdge(12), tornEdge(12)],
-          x: ['0vw', '0.6vw', '-0.4vw', '0.8vw', '2vw', '-8vw'],
-          y: ['0vh', '-1.5vh', '-1vh', '1vh', '10vh', '125vh'],
-          rotate: [0, -0.4, 0.5, -0.6, 2, 9],
-          rotateX: [0, 0, 0, -4, -18, -32],
-          scale: [1, 1, 1, 1, 0.98, 0.9],
+          // the top-right corner is pinched and pulled down-left: the tear runs along the top toward the
+          // left corner while the sheet folds and swings about that corner; once the tear reaches it the
+          // whole sheet drops away
+          clipPath: [FLAT, tornEdge(10), tornEdge(7), tornEdge(4), tornEdge(1), tornEdge(0), tornEdge(0)],
+          rotate: [0, 3, 7, 12, 18, 26, 70],
+          rotateX: [0, -6, -12, -18, -22, -24, -40],
+          x: ['0vw', '0.5vw', '1vw', '1.5vw', '2vw', '2vw', '10vw'],
+          y: ['0vh', '0vh', '0.5vh', '1vh', '2vh', '4vh', '130vh'],
+          scale: [1, 1, 1, 1, 1, 1, 0.9],
+          '--fold': [0, 0.25, 0.45, 0.6, 0.7, 0.75, 0.75],
           zIndex: 5,
-          transition: { duration: TEAR * slow, times: [0, 0.16, 0.3, 0.44, 0.62, 1], ease: ['easeOut', 'linear', 'linear', 'easeIn', 'easeIn'] },
+          transition: { duration: TEAR * slow, times: [0, 0.14, 0.28, 0.42, 0.56, 0.68, 1], ease: ['easeIn', 'linear', 'linear', 'linear', 'easeOut', 'easeIn'] },
         }
-      : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, transition: { duration: SWIPE, ease } },
+      : mode === 'fade'
+        ? { opacity: 0, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, transition: { duration: 0.35, ease: 'easeIn' } }
+        : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0, transition: { duration: SWIPE, ease } },
 };
 
 export default function Signs() {
@@ -116,7 +125,7 @@ export default function Signs() {
         d = next.page === 'contact' ? 'up' : cur.page === 'contact' ? 'down' : depth(next) >= depth(cur) ? 'left' : 'right';
         if (depth(next) > depth(cur)) entered.current[nk] = d;
       }
-      const mode: Mode = next.page === 'home' && !first.current ? pendingMode.current : 'swipe';
+      const mode: Mode = (next.page === 'home' || next.page === 'about') && !first.current ? pendingMode.current : 'swipe';
       pending.current = null;
       pendingMode.current = 'swipe';
       routeRef.current = next;
@@ -140,6 +149,7 @@ export default function Signs() {
   const onPlank = useCallback((p: Plank) => {
     pending.current = plankDir(p);
     if (p.href === '#/') pendingMode.current = 'tear';
+    if (p.href === '#/about') pendingMode.current = 'fade';
   }, []);
   const go = useCallback((hash: string) => {
     window.location.hash = hash;
@@ -174,12 +184,25 @@ export default function Signs() {
           exit="exit"
         >
           <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
-          {route.page === 'home' && <Landing name={NAME} onGo={onPlank} />}
+          {route.page === 'home' && <Landing onGo={onPlank} />}
 
           {route.page === 'art' && !route.section && (
             <div className="sg-wall">
               <BackSign label="Home" onClick={goHome} />
-              <StickyBoard title="my art" onGo={onPlank} notes={ART.map((s) => ({ label: s.label.toLowerCase(), sub: `${s.items.length} pieces`, href: `#/art/${s.id}`, dir: 'right' as const }))} />
+              <StickyBoard
+                title="my art"
+                onGo={onPlank}
+                notes={ART.map((s) => ({ label: s.label.toLowerCase(), sub: `${s.items.length} pieces`, href: `#/art/${s.id}`, dir: 'right' as const }))}
+                footer={
+                  <>
+                    follow me on{' '}
+                    <a href={CONTACTS[0].href} target="_blank" rel="noreferrer">
+                      <ContactIcon id="instagram" size={30} /> instagram {CONTACTS[0].handle}
+                    </a>
+                  </>
+                }
+                aside={<IndexCard title="worked with" items={WORKED_WITH} />}
+              />
             </div>
           )}
 
@@ -190,7 +213,23 @@ export default function Signs() {
           {route.page === 'projects' && !route.group && (
             <div className="sg-wall">
               <BackSign label="Home" onClick={goHome} />
-              <StickyBoard title="my projects" onGo={onPlank} notes={PROJECT_GROUPS.map((g) => ({ label: g.label.toLowerCase(), sub: `${g.cards.length} ${g.cards.length === 1 ? 'project' : 'projects'}`, href: `#/projects/${g.id}`, dir: 'right' as const }))} />
+              <StickyBoard
+                title="my projects"
+                onGo={onPlank}
+                notes={PROJECT_GROUPS.map((g) => ({ label: g.label.toLowerCase(), sub: `${g.cards.length} ${g.cards.length === 1 ? 'project' : 'projects'}`, href: `#/projects/${g.id}`, dir: 'right' as const }))}
+                footer={
+                  <>
+                    follow me on{' '}
+                    <a href={CONTACTS[1].href} target="_blank" rel="noreferrer">
+                      <ContactIcon id="linkedin" size={30} /> linkedin
+                    </a>{' '}
+                    and{' '}
+                    <a href={CONTACTS[2].href} target="_blank" rel="noreferrer">
+                      <ContactIcon id="github" size={30} /> github {CONTACTS[2].handle}
+                    </a>
+                  </>
+                }
+              />
             </div>
           )}
 
@@ -201,6 +240,8 @@ export default function Signs() {
           {route.page === 'about' && <About onBack={goHome} />}
         </motion.section>
       </AnimatePresence>
+
+      <NameTag page={route.page} onHome={goHome} />
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
 
@@ -634,55 +675,85 @@ function CaseStudy({ study }: { study: Study }) {
   );
 }
 
-/* ---------- about page: one big notebook page ---------- */
+/* ---------- the name: big on the landing page, shrinks into the top-left corner on the about page ---------- */
+
+function NameTag({ page, onHome }: { page: Route['page']; onHome: () => void }) {
+  const mode = page === 'home' ? 'home' : page === 'about' ? 'corner' : 'hidden';
+  return (
+    <motion.h1
+      layout
+      className={`nt nt-${mode}`}
+      transition={{ layout: { type: 'spring', stiffness: 120, damping: 18 } }}
+      animate={{ opacity: mode === 'hidden' ? 0 : 1 }}
+      initial={false}
+    >
+      {mode === 'corner' ? (
+        <button type="button" className="nt-btn" onClick={onHome} aria-label="Home">
+          {NAME}
+        </button>
+      ) : (
+        <span>{NAME}</span>
+      )}
+    </motion.h1>
+  );
+}
+
+/* ---------- about page: a line about me, a paragraph, a photo, and where I am ---------- */
 
 function About({ onBack }: { onBack: () => void }) {
   return (
     <div className="sg-wall sg-about">
       <BackSign label="Home" onClick={onBack} />
-      <motion.article className="ab-card" initial={{ y: 40, opacity: 0, rotate: -2 }} animate={{ y: 0, opacity: 1, rotate: -0.6 }} transition={{ type: 'spring', stiffness: 120, damping: 16, delay: 0.5 }}>
-        <span className="ld-tape ld-tape-l" aria-hidden="true" />
-        <span className="ld-tape ld-tape-r" aria-hidden="true" />
-        <h1>{ABOUT.title}</h1>
-        {ABOUT.paragraphs.map((p) => (
-          <p key={p} className="ab-lead">
-            {p}
-          </p>
-        ))}
-        <section>
-          <h2>Education</h2>
-          <ul>
-            {ABOUT.education.map((e) => (
-              <li key={e.school}>
-                {e.degree}, {e.school} — {e.when}
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section>
-          <h2>Skills</h2>
-          <dl className="ab-skills">
-            {ABOUT.skills.map((g) => (
-              <div key={g.group}>
-                <dt>{g.group}</dt>
-                <dd>{g.items.join(' · ')}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-        <section>
-          <h2>Find me</h2>
-          <ul className="ab-links">
-            {CONTACTS.map((c) => (
-              <li key={c.id}>
-                <a href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
-                  {c.label}: {c.handle}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </motion.article>
+      <div className="ab">
+        <motion.div className="ab-text" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease: 'easeOut', delay: 0.45 }}>
+          <p className="ab-tagline">{ABOUT.tagline}</p>
+          {ABOUT.paragraphs.map((p) => (
+            <p key={p} className="ab-para">
+              {p}
+            </p>
+          ))}
+        </motion.div>
+        <motion.figure
+          className="ab-photo"
+          initial={{ y: 40, opacity: 0, rotate: 8 }}
+          animate={{ y: 0, opacity: 1, rotate: 3 }}
+          transition={{ type: 'spring', stiffness: 150, damping: 15, delay: 0.6 }}
+          whileHover={{ rotate: 0, scale: 1.04, y: -6 }}
+        >
+          <span className="ld-tape ld-tape-l" aria-hidden="true" />
+          <span className="ld-tape ld-tape-r" aria-hidden="true" />
+          <span className="ld-photo-pic">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={base() + ABOUT.photo}
+              alt="Nathan"
+              draggable={false}
+              onError={(e) => {
+                const fig = e.currentTarget.closest('figure');
+                if (fig) (fig as HTMLElement).style.display = 'none';
+              }}
+            />
+          </span>
+          <figcaption className="ld-photo-caption">me</figcaption>
+        </motion.figure>
+        <motion.div
+          className="ab-based"
+          initial={{ scale: 0.6, opacity: 0, rotate: 10 }}
+          animate={{ scale: 1, opacity: 1, rotate: 4 }}
+          transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.9 }}
+          whileHover={{ rotate: 0, scale: 1.06 }}
+        >
+          <span className="note-shadow" aria-hidden="true" />
+          <span className="note-paper" aria-hidden="true" />
+          <span className="note-tape" aria-hidden="true" />
+          <span className="ab-based-text">
+            <span className="ab-pin" aria-hidden="true">
+              ⌖
+            </span>
+            {ABOUT.based}
+          </span>
+        </motion.div>
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Board, Ring, Rope } from './ink';
+import { ContactIcon } from './icons';
 
 /**
  * A chain of wooden signs hanging one under the other, tied together with
@@ -61,7 +62,10 @@ function Segment({ items, i, w, seed, delay }: { items: ChainItem[]; i: number; 
         )}
       </svg>
       <div className="ch-content" style={{ left: bx + 14, top: 10, width: bw - 28, height: bh - 26 }}>
-        <span className={it.title ? 'ch-title' : 'ch-big'}>{it.label}</span>
+        <span className={it.title ? 'ch-title' : 'ch-big'}>
+          {!it.title && <ContactIcon id={it.id} size={38} className="ch-icon" />}
+          {it.label}
+        </span>
         {it.sub && <span className="ch-small">{it.sub}</span>}
       </div>
     </>

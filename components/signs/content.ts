@@ -5,22 +5,20 @@ import { STUDIES, type Study } from './studies';
 
 export const NAME = 'Nathan W.';
 
-/** About me: one short paragraph on the landing card, the full page adds education and skills. */
+/** The about page: a one-liner, a paragraph, a photo and where I am. */
 export const ABOUT = {
-  title: 'about me',
+  tagline: 'Chemist by training, builder by habit, product-minded by choice.',
   paragraphs: [
-    "I'm a chemistry student at UC Davis who likes building the software and engineering tools that scientific problems need: a Hartree-Fock engine written from the integrals up, a wind tunnel that runs on a laptop, inverse tools that turn a spectrum or a target property into a molecule. The same hands draw Copic doodles and paint Air Force 1s.",
+    "Hi, I'm Nathan, a senior at UC Davis in Engineering and Chemistry. By 18 I had placed in the top 1% in the nation in organic chemistry, and today I do quantum chemical research at UC Davis.",
+    'I enjoy building in fast-evolving environments: AI, startups, numerical modelling and more.',
   ],
-  education: [{ school: 'UC Davis', degree: 'B.S. Chemistry', when: 'expected graduation year to fill in' }],
-  /** Skills, grouped so they can be read at a glance. */
-  skills: [
-    { group: 'Software', items: ['Python', 'C/C++', 'React', 'Next.js', 'Node.js', 'PostgreSQL'] },
-    { group: 'ML / data', items: ['PyTorch', 'scikit-learn', 'NumPy', 'SciPy', 'pandas'] },
-    { group: 'Chemistry', items: ['NMR', 'mass spectrometry', 'synthesis', 'chromatography'] },
-    { group: 'Computational chemistry', items: ['Gaussian', 'Psi4', 'PySCF', 'RDKit'] },
-    { group: 'Engineering', items: ['AutoCAD', 'CFD', 'GIS', 'sensors / embedded systems'] },
-  ],
+  based: 'based in Davis',
+  /** Drop the portrait at public/about/nathan.jpg; the frame hides itself until it exists. */
+  photo: '/about/nathan.jpg',
 };
+
+/** Commissions and clients, listed on an index card on the art board. */
+export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', 'NewSong School of Music', 'Akers Real Estate'];
 
 export const CONTACTS = [
   { id: 'instagram', label: 'Instagram', handle: '@naze_draws', href: 'https://instagram.com/naze_draws' },

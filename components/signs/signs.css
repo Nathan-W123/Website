@@ -12,7 +12,7 @@
   font-family: var(--hand);
   /* a camera for the torn sheet flopping away */
   perspective: 1400px;
-  perspective-origin: 50% 0%;
+  perspective-origin: 0% 0%;
 }
 /* every page is a sheet of lined paper; the lines scroll with the content */
 .sg-page {
@@ -28,7 +28,19 @@
     linear-gradient(to right, transparent 84px, #bdbdbd 84px, #bdbdbd 86px, transparent 86px),
     repeating-linear-gradient(to bottom, transparent 0 33px, #dcdcdc 33px 35px);
   background-attachment: scroll, scroll, scroll, local, local;
-  transform-origin: 50% 0%;
+  /* the sheet swings about its top-left corner when it is torn off */
+  transform-origin: 0% 0%;
+  --fold: 0;
+}
+/* shading that deepens toward the pulled corner while the sheet is folding */
+.sg-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: var(--fold);
+  background: linear-gradient(112deg, transparent 35%, rgba(0, 0, 0, 0.12) 62%, rgba(0, 0, 0, 0.32) 100%);
 }
 .sg-center {
   min-height: 100%;
@@ -99,19 +111,6 @@
 
 /* ---- landing: pencil name, taped photos, sticky note ---- */
 .ld { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 36px 16px 40px; gap: 18px; }
-.ld-name {
-  margin: 0;
-  font-family: var(--hand);
-  font-weight: 400;
-  font-size: clamp(56px, 8vw, 104px);
-  line-height: 1;
-  color: #4b4b4b;
-  letter-spacing: 0.02em;
-  transform: rotate(-2deg);
-  filter: url(#pencil-wobble);
-  text-shadow: 0.5px 0.5px 0 #8a8a8a;
-}
-.ld-name span { background: linear-gradient(#3f3f3f, #6a6a6a 60%, #4a4a4a); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .ld-row { display: flex; flex-wrap: nowrap; justify-content: center; align-items: flex-start; gap: clamp(40px, 12vw, 200px); margin-top: 8px; }
 /* staggered: the second photo hangs lower */
 .ld-row .ld-photo:nth-child(2) { margin-top: clamp(30px, 7vh, 70px); }
@@ -225,7 +224,7 @@
 /* ---- sticky-note boards (art sections, project groups) ---- */
 .nb { display: flex; flex-direction: column; align-items: center; gap: 34px; padding: 84px 16px 40px; }
 .nb-title { margin: 0; font-family: var(--hand); font-weight: 400; font-size: clamp(48px, 7vw, 84px); line-height: 1; color: #4b4b4b; text-shadow: 0.5px 0.5px 0 #8a8a8a; filter: url(#pencil-wobble); transform: rotate(-2deg); }
-.nb-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 44px 56px; max-width: 1100px; }
+.nb-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 56px clamp(56px, 8vw, 130px); max-width: 1200px; }
 .nb-row > .nb-note:nth-child(2n) { margin-top: 36px; }
 .nb-note {
   position: relative;
@@ -245,9 +244,34 @@
 .nb-note:hover .note-shadow { transform: translate(12px, 14px); }
 .nb-note:hover .note-tape { transform: translateX(-50%) rotate(2deg) translateY(-3px); }
 .nb-note:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
+.nb-footer { margin: 10px 0 0; font-family: var(--hand); font-size: 24px; color: #333; }
+.nb-footer a { color: inherit; text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 2px; white-space: nowrap; }
+.nb-footer .ci { margin: -6px 2px -4px 0; }
+.nb-footer a:hover { background: #fff59b; }
+/* the taped index card in the corner */
+.nb-card {
+  position: absolute;
+  left: 4%;
+  bottom: 6%;
+  width: 300px;
+  padding: 22px 22px 18px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 8px 9px 0 var(--ink);
+  background-image: repeating-linear-gradient(to bottom, transparent 0 28px, #e4e4e4 28px 30px);
+  background-position: 0 48px;
+  font-family: var(--hand);
+}
+.nb-card h2 { margin: 0 0 6px; font-family: var(--hand); font-weight: 400; font-size: 30px; line-height: 1; color: #4b4b4b; text-shadow: 0.5px 0.5px 0 #8a8a8a; }
+.nb-card ul { margin: 0; padding-left: 20px; font-size: 20px; line-height: 30px; }
+.sg-wall:has(.nb-card) .nb { padding-bottom: 40px; }
 @media (max-width: 720px) {
   .nb { padding: 70px 12px 30px; gap: 26px; }
-  .nb-row { gap: 26px 20px; }
+  .nb-row { gap: 30px 26px; }
+  .nb-footer { font-size: 19px; text-align: center; }
+  .nb-card { position: relative; left: auto; bottom: auto; width: min(300px, 88vw); margin-top: 20px; padding: 16px 16px 14px; background-position: 0 40px; background-image: repeating-linear-gradient(to bottom, transparent 0 25px, #e4e4e4 25px 27px); }
+  .nb-card h2 { font-size: 26px; }
+  .nb-card ul { font-size: 17px; line-height: 27px; }
   .nb-row > .nb-note:nth-child(2n) { margin-top: 24px; }
   .nb-note { width: 158px; height: 158px; padding: 26px 16px 16px; }
   .nb-label { font-size: 28px; }
@@ -255,37 +279,47 @@
   .nb-go { right: 40px; bottom: 18px; font-size: 30px; }
 }
 
-/* ---- about page ---- */
-.sg-about { display: flex; justify-content: center; padding: 90px 16px 60px; }
-.ab-card {
-  position: relative;
-  width: min(760px, 94vw);
-  padding: 34px 40px 36px;
-  background: #fff;
-  border: 3px solid var(--ink);
-  box-shadow: 10px 11px 0 var(--ink);
-  background-image: repeating-linear-gradient(to bottom, transparent 0 30px, #e6e6e6 30px 32px);
-  background-position: 0 70px;
+/* ---- the name tag (root layer) ---- */
+.nt {
+  position: absolute;
+  z-index: 12;
+  margin: 0;
   font-family: var(--hand);
+  font-weight: 400;
+  line-height: 1;
+  color: #4b4b4b;
+  letter-spacing: 0.02em;
+  text-shadow: 0.5px 0.5px 0 #8a8a8a;
+  pointer-events: none;
+  white-space: nowrap;
 }
-.ab-card h1 { margin: 0 0 14px; font-family: var(--hand); font-weight: 400; font-size: 54px; line-height: 1; color: #4b4b4b; text-shadow: 0.5px 0.5px 0 #8a8a8a; filter: url(#pencil-wobble); }
-.ab-card .ab-lead { margin: 0 0 8px; font-size: 21px; line-height: 32px; }
-.ab-card section { margin-top: 22px; }
-.ab-card h2 { display: inline-block; margin: 0 0 6px; font-family: var(--sign); font-size: 24px; letter-spacing: 0.06em; line-height: 1; border-bottom: 3px solid var(--ink); padding-bottom: 2px; transform: rotate(-1deg); }
-.ab-card ul { margin: 0; padding-left: 22px; font-size: 19px; line-height: 32px; }
-.ab-skills { margin: 0; display: grid; grid-template-columns: max-content 1fr; column-gap: 18px; row-gap: 2px; font-size: 19px; line-height: 32px; }
-.ab-skills div { display: contents; }
-.ab-skills dt { font-family: var(--sign); font-size: 19px; letter-spacing: 0.05em; }
-.ab-skills dd { margin: 0; }
-.ab-card .ab-links { list-style: none; padding: 0; }
-.ab-card .ab-links a { color: inherit; text-decoration: underline; text-underline-offset: 4px; }
+.nt-home { top: 36px; left: 50%; transform: translateX(-50%) rotate(-2deg); font-size: clamp(56px, 8vw, 104px); }
+.nt-corner { top: 16px; left: 22px; transform: rotate(-2deg); font-size: clamp(30px, 3.4vw, 42px); pointer-events: auto; }
+.nt-hidden { top: 36px; left: 50%; transform: translateX(-50%); font-size: clamp(56px, 8vw, 104px); }
+.nt span, .nt-btn { filter: url(#pencil-wobble); }
+.nt-btn { border: 0; padding: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; text-shadow: inherit; }
+.nt-btn:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
+.ld-name-space { height: clamp(56px, 8vw, 104px); }
+
+/* ---- about page ---- */
+.sg-about { display: block; padding: 0; }
+.sg-about .sg-back { left: auto; right: 10px; transform-origin: top right; }
+.ab { position: relative; min-height: 100%; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); align-items: center; gap: 40px; padding: 120px 10% 120px 15%; }
+.ab-text { max-width: 640px; }
+.ab-tagline { margin: 0 0 22px; font-family: var(--hand); font-size: clamp(34px, 3.6vw, 52px); line-height: 1.15; color: #333; }
+.ab-para { margin: 0 0 14px; font-family: var(--hand); font-size: 21px; line-height: 1.5; }
+.ab-photo { position: relative; justify-self: center; margin: 0; width: min(320px, 34vw); padding: 12px 12px 14px; background: #fff; border: 3px solid var(--ink); box-shadow: 9px 10px 0 var(--ink); }
+.ab-photo .ld-photo-pic img { max-height: min(460px, 52vh); }
+.ab-based { position: absolute; right: 6%; bottom: 8%; width: 210px; min-height: 150px; display: flex; align-items: center; justify-content: center; padding: 22px 20px 26px; font-family: var(--hand); }
+.ab-based-text { position: relative; font-size: 30px; line-height: 1.15; text-align: center; }
+.ab-pin { display: block; font-size: 34px; line-height: 1; margin-bottom: 4px; }
 @media (max-width: 720px) {
-  .sg-about { padding: 70px 12px 40px; }
-  .ab-card { padding: 22px 20px 24px; background-position: 0 56px; background-image: repeating-linear-gradient(to bottom, transparent 0 26px, #e6e6e6 26px 28px); }
-  .ab-card h1 { font-size: 42px; }
-  .ab-card .ab-lead { font-size: 18px; line-height: 28px; }
-  .ab-card ul { font-size: 17px; line-height: 28px; }
-  .ab-skills { grid-template-columns: 1fr; font-size: 17px; line-height: 26px; row-gap: 6px; }
+  .ab { grid-template-columns: 1fr; gap: 26px; padding: 84px 6% 60px; align-items: start; }
+  .ab-tagline { font-size: 30px; }
+  .ab-para { font-size: 18px; }
+  .ab-photo { width: min(260px, 70vw); }
+  .ab-based { position: relative; right: auto; bottom: auto; justify-self: end; width: 180px; min-height: 130px; }
+  .nt-corner { top: 12px; left: 14px; font-size: 28px; }
 }
 
 /* ---- margin doodles ---- */
@@ -318,7 +352,9 @@
 .ch-board { position: absolute; left: 0; top: 0; overflow: visible; }
 .ch-content { position: absolute; display: grid; place-items: center; align-content: center; gap: 2px; text-align: center; pointer-events: none; }
 .ch-title { font-family: var(--sign); font-size: 44px; letter-spacing: 0.06em; line-height: 1; }
-.ch-big { font-family: var(--sign); font-size: 42px; letter-spacing: 0.06em; line-height: 1; }
+.ch-big { display: inline-flex; align-items: center; gap: 12px; font-family: var(--sign); font-size: 42px; letter-spacing: 0.06em; line-height: 1; }
+.ci { display: inline-block; vertical-align: middle; overflow: visible; }
+.ch-icon { flex: 0 0 auto; }
 .ch-small { font-family: var(--hand); font-size: 22px; line-height: 1.1; }
 a.ch-sign { cursor: pointer; }
 a.ch-sign:hover, a.ch-sign:focus-visible { animation: ch-swing 1s ease-out; }
@@ -461,7 +497,18 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .note-shadow, .note-paper { position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%); pointer-events: none; }
 .note-shadow { background: var(--ink); transform: translate(7px, 8px); transition: transform 0.25s ease; }
 .note-paper { background: #fff59b; }
-.note-paper::after { content: ''; position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; background: linear-gradient(135deg, transparent 50%, #e2d36e 50%); }
+/* the bottom-right corner is folded up over the front: a curled flap with its own little shadow */
+.note-paper::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.18) 50%, rgba(0, 0, 0, 0.06) 62%, transparent 70%), linear-gradient(315deg, #f7e86c 0 46%, #e6d35a 50%, #d9c44f 100%);
+  clip-path: polygon(0 100%, 100% 0, 100% 100%);
+  filter: drop-shadow(-2px -2px 2px rgba(0, 0, 0, 0.22));
+}
 .note-tape { position: absolute; left: 50%; top: -9px; width: 92px; height: 22px; transform: translateX(-50%) rotate(-2deg); background: rgba(255, 255, 255, 0.45); border: 2px solid rgba(17, 17, 17, 0.4); box-shadow: 1px 1px 0 rgba(17, 17, 17, 0.2); transition: transform 0.25s ease; }
 .sg-materials {
   flex: 0 0 250px;

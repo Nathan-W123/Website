@@ -60,16 +60,14 @@ function Photo({ title, pool, href, tilt, delay, onGo, plank }: { title: string;
   );
 }
 
-export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void }) {
+export function Landing({ onGo }: { onGo: (p: Plank) => void }) {
   // a fresh random pair next time the landing page is shown
   useEffect(() => () => picks.clear(), []);
   return (
     <div className="ld">
       <PencilDefs />
-      {/* the name, written in pencil: the reveal sweeps left to right like a hand writing it */}
-      <motion.h1 className="ld-name" initial={{ clipPath: 'inset(0 100% 0 0)' }} animate={{ clipPath: 'inset(0 0% 0 0)' }} transition={{ duration: 1.3, ease: 'easeInOut', delay: 0.2 }}>
-        <span>{name}</span>
-      </motion.h1>
+      {/* the name itself lives at the root (NameTag) so it can travel to the corner on the about page */}
+      <div className="ld-name-space" aria-hidden="true" />
       <div className="ld-row">
         <Photo title="my art" pool={ART_POOL} href="#/art" tilt={-4} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
         <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={3} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
@@ -79,6 +77,7 @@ export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void
         className="ld-tapelink"
         href="#/about"
         onClick={() => onGo({ label: 'About me', dir: 'right', href: '#/about' })}
+        data-mode="fade"
         initial={{ y: 20, opacity: 0, rotate: -9 }}
         animate={{ y: 0, opacity: 1, rotate: -4 }}
         transition={{ type: 'spring', stiffness: 160, damping: 15, delay: 0.85 }}
