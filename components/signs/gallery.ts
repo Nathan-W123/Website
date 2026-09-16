@@ -74,6 +74,10 @@ export const GALLERY: Record<string, Shot[]> = {
   "sasd-hfml": [
     { src: "/projects/sasd-hfml/3.webp", caption: "Five-phase pipeline diagram with trace detail" },
     { src: "/projects/sasd-hfml/1.webp", caption: "Streamlit control panel after a full Run All" },
-    { src: "/projects/sasd-hfml/2.webp", caption: "Phase 4 upstream trace log, per-HFML counts" },
+  ],
+  'hackdavis': [
+    { src: '/projects/hackdavis/1.webp', caption: "Popup: idle, and mid-session enhancing 720p to 4K" },
+    { src: '/projects/hackdavis/2.webp', caption: "Before and after the three shader passes" },
+    { src: '/projects/hackdavis/3.webp', caption: "Icon set and the toggle injected into YouTube" },
   ],
 };

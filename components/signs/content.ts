@@ -81,7 +81,7 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
   {
     id: 'general',
     label: 'General',
-    cards: pick(['nonstandard']).map(toCard),
+    cards: pick(['nonstandard', 'hackdavis']).map(toCard),
   },
   {
     id: 'numerical',

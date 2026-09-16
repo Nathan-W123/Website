@@ -45,13 +45,13 @@ function draw(shape: Shape, opts: Options): Drawable {
 }
 
 /** Renders one hand-drawn shape as SVG paths. Deterministic per seed so server and client agree. */
-export function Rough({ seed, opts, className, ...shape }: Shape & { seed: number; opts?: Options; className?: string }) {
+export function Rough({ seed, opts, className, pathLength, ...shape }: Shape & { seed: number; opts?: Options; className?: string; pathLength?: number }) {
   // Two decimals: keeps server and client path strings identical despite tiny trig differences between engines.
   const paths = generator.toPaths(draw(shape, { ...base, ...opts, seed })).map((p) => ({ ...p, d: p.d.replace(/(\d+\.\d{2})\d+/g, '$1') }));
   return (
     <g className={className}>
       {paths.map((p, i) => (
-        <path key={i} d={p.d} stroke={p.stroke} strokeWidth={p.strokeWidth} fill={p.fill === 'none' ? 'none' : p.fill} strokeLinecap="round" strokeLinejoin="round" />
+        <path key={i} d={p.d} stroke={p.stroke} strokeWidth={p.strokeWidth} fill={p.fill === 'none' ? 'none' : p.fill} strokeLinecap="round" strokeLinejoin="round" pathLength={pathLength} />
       ))}
     </g>
   );

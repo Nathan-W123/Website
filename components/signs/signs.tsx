@@ -54,45 +54,47 @@ const ease = [0.7, 0, 0.3, 1] as const;
 type Mode = 'swipe' | 'tear' | 'fade';
 type Move = { dir: Dir; mode: Mode; slow?: number };
 
-/** Torn top edge as a clip polygon: 13 points along the top, torn up to index `upTo`, then the two bottom corners. */
+/** A jagged top edge as an SVG mask (static: applied once when the sheet starts tearing, so no repaints). */
 const TORN = [4.2, 1.2, 5.6, 1.8, 4.9, 0.8, 6.3, 2.3, 3.9, 1.3, 5.3, 2.8, 4.6];
-/** Torn from the right corner leftwards: points with index >= from are already torn. */
-const tornEdge = (from: number) => {
-  const pts = TORN.map((y, i) => `${((i / (TORN.length - 1)) * 100).toFixed(2)}% ${i >= from ? y : 0}%`);
-  return `polygon(${pts.join(', ')}, 100% 100%, 0% 100%)`;
-};
-const FLAT = tornEdge(TORN.length);
+const TORN_MASK = `url("data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><polygon fill='black' points='${TORN.map((y, i) => `${((i / (TORN.length - 1)) * 100).toFixed(2)},${y}`).join(' ')} 100,100 0,100'/></svg>`,
+)}")`;
+const NO_MASK = 'none';
 
 const variants: Variants = {
   enter: ({ dir: d, mode }: Move) =>
     mode === 'tear'
-      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, filter: 'none', transition: { duration: 0.01 } }
+      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, opacity: 1, zIndex: 0, maskImage: NO_MASK, WebkitMaskImage: NO_MASK, transition: { duration: 0.01 } }
       : mode === 'fade'
-        ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 0, '--fold': 0, filter: 'none' }
-        : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0, filter: 'none' },
-  center: ({ mode }: Move) => ({ x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, opacity: 1, '--fold': 0, filter: 'none', transition: mode === 'fade' ? { duration: 0.5, ease: 'easeOut' } : { duration: SWIPE, ease } }),
+        ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, zIndex: 1, opacity: 0, maskImage: NO_MASK, WebkitMaskImage: NO_MASK }
+        : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, rotateY: 0, opacity: 1, zIndex: 1, maskImage: NO_MASK, WebkitMaskImage: NO_MASK },
+  center: ({ mode }: Move) => ({ x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, zIndex: 1, opacity: 1, maskImage: NO_MASK, WebkitMaskImage: NO_MASK, transition: mode === 'fade' ? { duration: 0.5, ease: 'easeOut' } : { duration: SWIPE, ease } }),
   exit: ({ dir: d, mode, slow = 1 }: Move) =>
     mode === 'tear'
       ? {
-          // the top-right corner is pinched and pulled down-left: the tear runs along the top toward the
-          // left corner while the sheet folds and swings about that corner; once the tear reaches it the
-          // whole sheet drops away
-          // the paper itself bends: a displacement filter (sg-curl, driven by SMIL from the same moment)
-          // curls the pulled corner in while the tear runs; the rigid swing is now only a small part of it
-          clipPath: [FLAT, tornEdge(10), tornEdge(7), tornEdge(4), tornEdge(1), tornEdge(0), tornEdge(0)],
-          rotate: [0, 1, 3, 6, 9, 12, 50],
-          rotateX: [0, -3, -6, -9, -12, -14, -35],
-          x: ['0vw', '0.3vw', '0.6vw', '1vw', '1.4vw', '1.6vw', '8vw'],
-          y: ['0vh', '0vh', '0.3vh', '0.6vh', '1.2vh', '2.5vh', '130vh'],
-          scale: [1, 1, 1, 1, 1, 1, 0.9],
-          '--fold': [0, 0.3, 0.5, 0.65, 0.75, 0.8, 0.8],
-          filter: 'url(#sg-curl)',
+          // the top-right corner is pinched: the sheet twists and bends over from that corner, swinging
+          // about the top-left one, then the whole thing drops. Transforms only, so it stays at 60 fps.
+          maskImage: TORN_MASK,
+          WebkitMaskImage: TORN_MASK,
+          rotate: [0, 2, 5, 9, 14, 20, 26, 62],
+          rotateX: [0, -4, -9, -15, -22, -28, -32, -44],
+          rotateY: [0, 4, 9, 14, 18, 20, 20, 24],
+          x: ['0vw', '0.3vw', '0.8vw', '1.4vw', '2vw', '2.6vw', '3vw', '10vw'],
+          y: ['0vh', '0vh', '0.3vh', '0.8vh', '1.5vh', '2.6vh', '4vh', '130vh'],
+          scale: [1, 1, 1, 1, 1, 1, 1, 0.9],
+          opacity: [1, 1, 1, 1, 1, 1, 1, 0.85],
           zIndex: 5,
-          transition: { duration: TEAR * slow, times: [0, 0.14, 0.28, 0.42, 0.56, 0.68, 1], ease: ['easeIn', 'linear', 'linear', 'linear', 'easeOut', 'easeIn'] },
+          transition: { duration: TEAR * slow, times: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.62, 1], ease: 'easeIn' },
         }
       : mode === 'fade'
-        ? { opacity: 0, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, '--fold': 0, filter: 'none', transition: { duration: 0.35, ease: 'easeIn' } }
-        : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, '--fold': 0, filter: 'none', transition: { duration: SWIPE, ease } },
+        ? { opacity: 0, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, zIndex: 0, maskImage: NO_MASK, WebkitMaskImage: NO_MASK, transition: { duration: 0.35, ease: 'easeIn' } }
+        : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, rotateY: 0, opacity: 1, zIndex: 1, maskImage: NO_MASK, WebkitMaskImage: NO_MASK, transition: { duration: SWIPE, ease } },
+};
+/** Fold shading on the torn sheet: its own layer, opacity only. */
+const foldVariants: Variants = {
+  enter: { opacity: 0 },
+  center: { opacity: 0 },
+  exit: ({ mode }: Move) => (mode === 'tear' ? { opacity: [0, 0.35, 0.6, 0.8, 0.85], transition: { duration: TEAR * 0.7, ease: 'easeOut' } } : { opacity: 0 }),
 };
 
 export default function Signs() {
@@ -141,7 +143,6 @@ export default function Signs() {
       setMove({ dir: d, mode, slow: (window as unknown as { __SLOW?: number }).__SLOW || 1 });
       setRoute(next);
       if (mode === 'tear') {
-        (document.getElementById('sg-curl-anim') as SVGAnimateElement | null)?.beginElement();
         setNameHold(true);
         window.setTimeout(() => setNameHold(false), TEAR * 1000 * ((window as unknown as { __SLOW?: number }).__SLOW || 1) - 150);
         setTearing(true);
@@ -199,7 +200,9 @@ export default function Signs() {
           exit="exit"
           onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 120)}
         >
-          <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} sparse={route.page === 'home'} />
+          <motion.div className="sg-fold" variants={foldVariants} aria-hidden="true" />
+          {route.page === 'home' && move.mode === 'tear' && <TornRemnant />}
+          <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
           {route.page === 'home' && <Landing onGo={onPlank} onOpenProject={setProject} onOpenArt={setLightbox} />}
 
           {route.page === 'art' && !route.section && (
@@ -257,7 +260,6 @@ export default function Signs() {
         </motion.section>
       </AnimatePresence>
 
-      <CurlDefs />
       <NameTag page={(route.page === 'home' && scrolled) || nameHold ? 'art' : route.page} onHome={goHome} />
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
@@ -693,26 +695,16 @@ function CaseStudy({ study }: { study: Study }) {
   );
 }
 
-/* ---------- curl filter: a smooth displacement map that bends the pulled corner of a torn sheet down and in ---------- */
+/* ---------- torn remnant: the strip left under the rings when the sheet above is ripped away, drawn right to left ---------- */
 
-const CURL_MAP =
-  "data:image/svg+xml," +
-  encodeURIComponent(
-    "<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><defs><linearGradient id='g' x1='1' y1='0' x2='0.25' y2='0.9'><stop offset='0' stop-color='rgb(30,215,128)'/><stop offset='0.55' stop-color='rgb(128,128,128)'/><stop offset='1' stop-color='rgb(128,128,128)'/></linearGradient></defs><rect width='100' height='100' fill='url(#g)'/></svg>",
-  );
-
-function CurlDefs() {
+function TornRemnant() {
+  const pts = TORN.map((y, i) => `${((i / (TORN.length - 1)) * 100).toFixed(2)},${(y * 8).toFixed(1)}`).join(' ');
   return (
-    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
-      <defs>
-        <filter id="sg-curl" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
-          <feImage href={CURL_MAP} preserveAspectRatio="none" x="0%" y="0%" width="100%" height="100%" result="map" />
-          <feDisplacementMap in="SourceGraphic" in2="map" scale="0" xChannelSelector="R" yChannelSelector="G">
-            <animate id="sg-curl-anim" attributeName="scale" from="0" to="260" dur="0.6s" begin="indefinite" fill="freeze" calcMode="spline" keySplines="0.35 0 0.7 1" />
-          </feDisplacementMap>
-        </filter>
-      </defs>
-    </svg>
+    <motion.div className="sg-remnant" aria-hidden="true" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: TEAR * 0.55, ease: 'linear' }}>
+      <svg viewBox="0 0 100 60" preserveAspectRatio="none">
+        <polygon points={`0,0 100,0 ${pts}`} fill="#fff" stroke="#111" strokeWidth="0.35" vectorEffect="non-scaling-stroke" />
+      </svg>
+    </motion.div>
   );
 }
 

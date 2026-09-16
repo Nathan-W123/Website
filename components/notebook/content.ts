@@ -209,6 +209,14 @@ export const CHAPTERS: Chapter[] = [
         notes: ['Five phases from database query to exported map, run from one Streamlit screen', 'Upsert sync into ArcGIS attribute tables and a recursive upstream trace of mains, laterals and parcels', 'Built for analysts with ArcGIS Pro on their own Windows machines'],
         href: 'https://github.com/Nathan-W123/SASD-HFML-Project',
       }),
+      project('make', 'umber', {
+        id: 'hackdavis',
+        name: 'Green Giant',
+        tagline: 'A Chrome extension that cleans up low-bitrate YouTube video on the GPU in real time, built at HackDavis 2026.',
+        stack: 'JavaScript · WebGL shaders · ONNX Runtime Web · Chrome extension',
+        notes: ['Three fragment-shader passes on every frame: deblock and deband, contrast-adaptive sharpening, an Anime4K-style edge restore', 'A performance guard that backs off when frame rate drops, and a popup that tallies the energy not spent streaming 4K', 'An experimental ONNX super-resolution path running in the background worker'],
+        href: 'https://github.com/Nathan-W123/HackDavis26',
+      }),
       project('make', 'chem', {
         id: 'nonstandard',
         name: 'Nonstandard Conditions',
