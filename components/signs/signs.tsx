@@ -1,10 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion, type Variants } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
 import { ART, CONTACTS, NAME, PROJECT_GROUPS, type Card } from './content';
+import type { Study } from './studies';
 import { SignChain } from './chain';
+import { Doodles } from './doodles';
 import { HangingSign } from './hanging';
 import { TONE, TONE_DARK, outline, shadow, tone } from './ink';
 import { Signpost, type Plank } from './signpost';
@@ -54,7 +56,7 @@ export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
   const [dir, setDir] = useState<Dir>('left');
   const [swipe, setSwipe] = useState<{ id: number; dir: Dir } | null>(null);
-  const [lightbox, setLightbox] = useState<{ image: string; caption: string } | null>(null);
+  const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
   // the direction a plank was clicked in, consumed by the next hash change
   const pending = useRef<Dir | null>(null);
@@ -131,6 +133,7 @@ export default function Signs() {
           exit="exit"
           transition={{ duration: SWIPE, ease }}
         >
+          <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
           {route.page === 'home' && (
             <div className="sg-center">
               <Signpost
@@ -192,9 +195,21 @@ export default function Signs() {
         {lightbox && (
           <motion.div className="sg-lightbox" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLightbox(null)}>
             <motion.figure initial={{ scale: 0.7, rotate: -3 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0.8 }} transition={{ type: 'spring', stiffness: 220, damping: 22 }} onClick={(e) => e.stopPropagation()}>
-              <div className="sg-lightbox-frame">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={base() + lightbox.image} alt={lightbox.caption} />
+              <div className="sg-lb-row">
+                <div className="sg-lightbox-frame">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={base() + lightbox.image} alt={lightbox.caption} />
+                </div>
+                {lightbox.materials && lightbox.materials.length > 0 && (
+                  <aside className="sg-materials">
+                    <h3>Materials</h3>
+                    <ul>
+                      {lightbox.materials.map((m) => (
+                        <li key={m}>{m}</li>
+                      ))}
+                    </ul>
+                  </aside>
+                )}
               </div>
               <figcaption>{lightbox.caption}</figcaption>
               <button type="button" className="sg-close" onClick={() => setLightbox(null)} aria-label="Close">×</button>
@@ -256,24 +271,98 @@ function BackSign({ label, onClick }: { label: string; onClick: () => void }) {
   );
 }
 
-function ArtWall({ section, onOpen, onBack }: { section: string; onOpen: (v: { image: string; caption: string }) => void; onBack: () => void }) {
+function ArtWall({ section, onOpen, onBack }: { section: string; onOpen: (v: { image: string; caption: string; materials?: string[] }) => void; onBack: () => void }) {
   const s = ART.find((x) => x.id === section);
+  const items = s?.items ?? [];
+  // the row drifts along by itself; the pictures are laid out twice so it can loop without a seam
+  const loop = items.length > 2;
+  const row = useAutoScroll(loop, section);
   if (!s) return null;
+  const shown = loop ? [...items, ...items] : items;
   return (
     <div className="sg-wall">
       <BackSign label="My art" onClick={onBack} />
       <h1 className="sg-wall-title">{s.label}</h1>
-      <div className="sg-frames sg-frames-row">
-        {s.items.map((it, i) => (
-          <HangingSign key={it.image} index={i} w={270} ratio={it.ratio} string={110 + (i % 3) * 46} seed={100 + i * 7} onClick={() => onOpen({ image: it.image, caption: it.caption })} className="hg-frame">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={base() + it.image} alt={it.caption} loading="lazy" draggable={false} />
-            <span className="hg-caption">{it.caption}</span>
-          </HangingSign>
-        ))}
+      <div className={`sg-frames sg-frames-row${loop ? ' sg-frames-loop' : ''}`} ref={row}>
+        {shown.map((it, k) => {
+          const i = k % items.length;
+          return (
+            <HangingSign key={`${it.image}-${k}`} index={i} w={300} ratio={it.ratio} string={170 + (i % 3) * 58} seed={100 + i * 7} onClick={() => onOpen({ image: it.image, caption: it.caption, materials: it.materials })} className="hg-frame">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={base() + it.image} alt={it.caption} loading="lazy" draggable={false} />
+              <span className="hg-caption">{it.caption}</span>
+            </HangingSign>
+          );
+        })}
       </div>
     </div>
   );
+}
+
+/**
+ * Slowly scrolls a row forever (about 38 px/s), wrapping at the halfway point
+ * of the doubled content so the loop is seamless. Pauses while the pointer is
+ * over it or a finger is on it, and does nothing under prefers-reduced-motion.
+ */
+function useAutoScroll(enabled: boolean, key: string) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !enabled) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let raf = 0;
+    let last = performance.now();
+    let carry = 0;
+    let paused = false;
+    let resume = 0;
+    const tick = (t: number) => {
+      const dt = Math.min(0.05, (t - last) / 1000);
+      last = t;
+      if (!paused && el.scrollWidth > el.clientWidth + 10) {
+        carry += 38 * dt;
+        const step = Math.floor(carry);
+        if (step) {
+          carry -= step;
+          const half = el.scrollWidth / 2;
+          const next = el.scrollLeft + step;
+          el.scrollLeft = next >= half ? next - half : next;
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    const hold = () => {
+      paused = true;
+      window.clearTimeout(resume);
+    };
+    const release = (after = 0) => {
+      window.clearTimeout(resume);
+      resume = window.setTimeout(() => {
+        paused = false;
+        last = performance.now();
+      }, after);
+    };
+    const onEnter = () => hold();
+    const onLeave = () => release(400);
+    const onTouchStart = () => hold();
+    const onTouchEnd = () => release(2500);
+    el.addEventListener('pointerenter', onEnter);
+    el.addEventListener('pointerleave', onLeave);
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    raf = requestAnimationFrame((t) => {
+      last = t;
+      tick(t);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(resume);
+      el.removeEventListener('pointerenter', onEnter);
+      el.removeEventListener('pointerleave', onLeave);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [enabled, key]);
+  return ref;
 }
 
 function Contact({ onBack }: { onBack: () => void }) {
@@ -432,18 +521,24 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
         <div className="sg-pv-text">
           <h2>{card.title}</h2>
           <p className="sg-pv-line">{card.line}</p>
-          {card.notes.length > 0 && (
-            <ul className="sg-pv-notes">
-              {card.notes.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
+          {card.study ? (
+            <CaseStudy study={card.study} />
+          ) : (
+            <>
+              {card.notes.length > 0 && (
+                <ul className="sg-pv-notes">
+                  {card.notes.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              )}
+              <ul className="sg-chips">
+                {card.stack.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </>
           )}
-          <ul className="sg-chips">
-            {card.stack.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
           {card.href && (
             <a className="sg-pv-link" href={card.href} target="_blank" rel="noreferrer">
               Open project ↗
@@ -455,5 +550,68 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
         </button>
       </motion.article>
     </motion.div>
+  );
+}
+
+/* ---------- case study: problem, what I built, how, my part, challenges, results, tech ---------- */
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="sg-cs">
+      <h3>{title}</h3>
+      {children}
+    </section>
+  );
+}
+
+function CaseStudy({ study }: { study: Study }) {
+  return (
+    <div className="sg-study">
+      <Section title="Problem">
+        <p>{study.problem}</p>
+      </Section>
+      <Section title="What I built">
+        <p>{study.built}</p>
+      </Section>
+      <Section title="How it works">
+        <ul>
+          {study.how.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+        {study.snippet && (
+          <figure className="sg-code">
+            <pre>
+              <code>{study.snippet.code}</code>
+            </pre>
+            <figcaption>{study.snippet.note}</figcaption>
+          </figure>
+        )}
+      </Section>
+      <Section title="My contribution">
+        <p>{study.contribution}</p>
+      </Section>
+      <Section title="Technical challenges">
+        <ul>
+          {study.challenges.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      </Section>
+      <Section title="Results">
+        <ul className="sg-cs-results">
+          {study.results.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      </Section>
+      <Section title="Tech">
+        <ul className="sg-chips">
+          {study.tech.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      </Section>
+    </div>
   );
 }
