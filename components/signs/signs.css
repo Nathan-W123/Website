@@ -10,6 +10,9 @@
   background: var(--paper);
   color: var(--ink);
   font-family: var(--hand);
+  /* a camera for the torn sheet flopping away */
+  perspective: 1400px;
+  perspective-origin: 50% 0%;
 }
 /* every page is a sheet of lined paper; the lines scroll with the content */
 .sg-page {
@@ -25,7 +28,7 @@
     linear-gradient(to right, transparent 84px, #bdbdbd 84px, #bdbdbd 86px, transparent 86px),
     repeating-linear-gradient(to bottom, transparent 0 33px, #dcdcdc 33px 35px);
   background-attachment: scroll, scroll, scroll, local, local;
-  transform-origin: 50% 50%;
+  transform-origin: 50% 0%;
 }
 .sg-center {
   min-height: 100%;

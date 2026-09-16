@@ -48,21 +48,51 @@ const plankDir = (p: Plank): Dir => (p.href === '#/contact' ? 'up' : p.dir === '
 
 const FAR = '200';
 const SWIPE = 1.05;
+const TEAR = 1.35;
 const ease = [0.7, 0, 0.3, 1] as const;
+type Mode = 'swipe' | 'tear';
+type Move = { dir: Dir; mode: Mode; slow?: number };
+
+/** Torn top edge as a clip polygon: 13 points along the top, torn up to index `upTo`, then the two bottom corners. */
+const TORN = [4.2, 1.2, 5.6, 1.8, 4.9, 0.8, 6.3, 2.3, 3.9, 1.3, 5.3, 2.8, 4.6];
+const tornEdge = (upTo: number) => {
+  const pts = TORN.map((y, i) => `${((i / (TORN.length - 1)) * 100).toFixed(2)}% ${i <= upTo ? y : 0}%`);
+  return `polygon(${pts.join(', ')}, 100% 100%, 0% 100%)`;
+};
+const FLAT = tornEdge(-1);
+
 const variants: Variants = {
-  enter: (d: Dir) => ({ x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9 }),
-  center: { x: 0, y: 0, scale: 1 },
-  exit: (d: Dir) => ({ x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9 }),
+  enter: ({ dir: d, mode }: Move) =>
+    mode === 'tear'
+      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 0, transition: { duration: 0.01 } }
+      : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1 },
+  center: { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, transition: { duration: SWIPE, ease } },
+  exit: ({ dir: d, mode, slow = 1 }: Move) =>
+    mode === 'tear'
+      ? {
+          // grab, rip across the top, then the loose sheet flops down and falls away
+          clipPath: [FLAT, tornEdge(3), tornEdge(8), tornEdge(12), tornEdge(12), tornEdge(12)],
+          x: ['0vw', '0.6vw', '-0.4vw', '0.8vw', '2vw', '-8vw'],
+          y: ['0vh', '-1.5vh', '-1vh', '1vh', '10vh', '125vh'],
+          rotate: [0, -0.4, 0.5, -0.6, 2, 9],
+          rotateX: [0, 0, 0, -4, -18, -32],
+          scale: [1, 1, 1, 1, 0.98, 0.9],
+          zIndex: 5,
+          transition: { duration: TEAR * slow, times: [0, 0.16, 0.3, 0.44, 0.62, 1], ease: ['easeOut', 'linear', 'linear', 'easeIn', 'easeIn'] },
+        }
+      : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, clipPath: FLAT, zIndex: 1, transition: { duration: SWIPE, ease } },
 };
 
 export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
-  const [dir, setDir] = useState<Dir>('left');
+  const [move, setMove] = useState<Move>({ dir: 'left', mode: 'swipe' });
   const [swipe, setSwipe] = useState<{ id: number; dir: Dir } | null>(null);
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
   // the direction a plank was clicked in, consumed by the next hash change
   const pending = useRef<Dir | null>(null);
+  // set by any Home control: the next trip home tears the sheet off instead of swiping
+  const pendingMode = useRef<Mode>('swipe');
   // how each route was entered, so going back reverses it
   const entered = useRef<Record<string, Dir>>({});
   const swipes = useRef(0);
@@ -86,11 +116,14 @@ export default function Signs() {
         d = next.page === 'contact' ? 'up' : cur.page === 'contact' ? 'down' : depth(next) >= depth(cur) ? 'left' : 'right';
         if (depth(next) > depth(cur)) entered.current[nk] = d;
       }
+      const mode: Mode = next.page === 'home' && !first.current ? pendingMode.current : 'swipe';
       pending.current = null;
+      pendingMode.current = 'swipe';
       routeRef.current = next;
-      setDir(d);
+      // debug: window.__SLOW = 6 plays the tear in slow motion
+      setMove({ dir: d, mode, slow: (window as unknown as { __SLOW?: number }).__SLOW || 1 });
       setRoute(next);
-      if (!first.current) setSwipe({ id: ++swipes.current, dir: d });
+      if (!first.current && mode === 'swipe') setSwipe({ id: ++swipes.current, dir: d });
       first.current = false;
     };
     apply();
@@ -106,9 +139,14 @@ export default function Signs() {
 
   const onPlank = useCallback((p: Plank) => {
     pending.current = plankDir(p);
+    if (p.href === '#/') pendingMode.current = 'tear';
   }, []);
   const go = useCallback((hash: string) => {
     window.location.hash = hash;
+  }, []);
+  const goHome = useCallback(() => {
+    pendingMode.current = 'tear';
+    window.location.hash = '#/';
   }, []);
 
   useEffect(() => {
@@ -125,23 +163,22 @@ export default function Signs() {
 
   return (
     <div className="sg-root">
-      <AnimatePresence mode="sync" custom={dir} initial={false}>
+      <AnimatePresence mode="sync" custom={move} initial={false}>
         <motion.section
           key={routeKey(route)}
           className="sg-page"
-          custom={dir}
+          custom={move}
           variants={variants}
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: SWIPE, ease }}
         >
           <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
           {route.page === 'home' && <Landing name={NAME} onGo={onPlank} />}
 
           {route.page === 'art' && !route.section && (
             <div className="sg-wall">
-              <BackSign label="Home" onClick={() => go('#/')} />
+              <BackSign label="Home" onClick={goHome} />
               <StickyBoard title="my art" onGo={onPlank} notes={ART.map((s) => ({ label: s.label.toLowerCase(), sub: `${s.items.length} pieces`, href: `#/art/${s.id}`, dir: 'right' as const }))} />
             </div>
           )}
@@ -152,16 +189,16 @@ export default function Signs() {
 
           {route.page === 'projects' && !route.group && (
             <div className="sg-wall">
-              <BackSign label="Home" onClick={() => go('#/')} />
+              <BackSign label="Home" onClick={goHome} />
               <StickyBoard title="my projects" onGo={onPlank} notes={PROJECT_GROUPS.map((g) => ({ label: g.label.toLowerCase(), sub: `${g.cards.length} ${g.cards.length === 1 ? 'project' : 'projects'}`, href: `#/projects/${g.id}`, dir: 'right' as const }))} />
             </div>
           )}
 
           {route.page === 'projects' && route.group && <Cards group={route.group} onBack={() => go('#/projects')} onOpen={setProject} />}
 
-          {route.page === 'contact' && <Contact onBack={() => go('#/')} />}
+          {route.page === 'contact' && <Contact onBack={goHome} />}
 
-          {route.page === 'about' && <About onBack={() => go('#/')} />}
+          {route.page === 'about' && <About onBack={goHome} />}
         </motion.section>
       </AnimatePresence>
 
