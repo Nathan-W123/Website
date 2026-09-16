@@ -95,7 +95,7 @@
 .sg-plank:active > g { transform: translate(6px, 8px); }
 
 /* ---- landing: pencil name, taped photos, sticky note ---- */
-.ld { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 56px 16px 40px; gap: 26px; }
+.ld { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 36px 16px 40px; gap: 18px; }
 .ld-name {
   margin: 0;
   font-family: var(--hand);
@@ -111,12 +111,12 @@
 .ld-name span { background: linear-gradient(#3f3f3f, #6a6a6a 60%, #4a4a4a); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .ld-row { display: flex; flex-wrap: nowrap; justify-content: center; align-items: flex-start; gap: clamp(40px, 12vw, 200px); margin-top: 8px; }
 /* staggered: the second photo hangs lower */
-.ld-row .ld-photo:nth-child(2) { margin-top: clamp(40px, 9vh, 96px); }
+.ld-row .ld-photo:nth-child(2) { margin-top: clamp(30px, 7vh, 70px); }
 .ld-photo {
   position: relative;
   display: block;
-  width: min(340px, 40vw);
-  padding: 14px 14px 18px;
+  width: min(300px, 36vw);
+  padding: 12px 12px 14px;
   transition: box-shadow 0.25s ease;
   background: #fff;
   border: 3px solid var(--ink);
@@ -137,6 +137,25 @@
 .ld-tape { position: absolute; top: -14px; width: 92px; height: 26px; background: rgba(230, 230, 230, 0.85); border: 2px solid rgba(17, 17, 17, 0.45); box-shadow: 2px 2px 0 rgba(17, 17, 17, 0.25); }
 .ld-tape-l { left: -26px; transform: rotate(-32deg); }
 .ld-tape-r { right: -26px; transform: rotate(30deg); }
+/* about me: a ruled index card */
+.ld-about {
+  position: relative;
+  width: min(560px, 92vw);
+  margin: 6px 0 0;
+  padding: 22px 26px 20px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 8px 9px 0 var(--ink);
+  background-image: repeating-linear-gradient(to bottom, transparent 0 26px, #e4e4e4 26px 28px);
+  background-position: 0 52px;
+  font-family: var(--hand);
+}
+.ld-about h2 { margin: 0 0 4px; font-family: var(--hand); font-weight: 400; font-size: 34px; line-height: 1; color: #4b4b4b; text-shadow: 0.5px 0.5px 0 #8a8a8a; filter: url(#pencil-wobble); }
+.ld-about p { margin: 0 0 4px; font-size: 18px; line-height: 28px; }
+.ld-tape-top { left: 50%; top: -14px; transform: translateX(-50%) rotate(-3deg); width: 110px; }
+@media (min-width: 1100px) {
+  .ld-about { align-self: flex-start; margin: 10px 0 0 9%; width: 460px; }
+}
 .ld-sticky {
   position: absolute;
   right: 5%;
@@ -164,7 +183,10 @@
   .ld-tape { width: 64px; height: 20px; top: -10px; }
   .ld-tape-l { left: -18px; }
   .ld-tape-r { right: -18px; }
-  .ld-sticky { width: 190px; min-height: 140px; padding: 20px 16px 20px; right: 4%; bottom: 5%; }
+  .ld-about { padding: 16px 18px 14px; background-position: 0 46px; background-image: repeating-linear-gradient(to bottom, transparent 0 25px, #e4e4e4 25px 27px); }
+  .ld-about h2 { font-size: 32px; }
+  .ld-about p { font-size: 17px; line-height: 27px; }
+  .ld-sticky { position: relative; right: auto; bottom: auto; align-self: flex-end; margin: 10px 5% 0 0; width: 190px; min-height: 140px; padding: 20px 16px 20px; }
   .ld-sticky-text { font-size: 30px; }
   .ld-sticky-sub { font-size: 16px; }
 }

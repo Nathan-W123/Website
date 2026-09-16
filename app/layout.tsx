@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   title: 'Nathan W.',
   description: 'Nathan Ward: art, machine learning and numerical modelling projects, and how to get in touch. Follow the signpost.',
   alternates: { canonical: '/' },
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }, { url: '/favicon.ico', sizes: '32x32' }],
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
     title: 'Nathan W.',
     description: 'Art, ML / AI and numerical modelling projects. Follow the signpost.',

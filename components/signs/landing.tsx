@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import { PencilDefs } from '@/components/sketch/rough';
 import { useEffect, useSyncExternalStore, type CSSProperties } from 'react';
-import { ART } from './content';
+import { ABOUT, ART } from './content';
 import { GALLERY } from './gallery';
 import type { Plank } from './signpost';
 
@@ -74,6 +74,14 @@ export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void
         <Photo title="my art" pool={ART_POOL} href="#/art" tilt={-4} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
         <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={3} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
       </div>
+      {/* about me: an index card taped under the photos */}
+      <motion.section className="ld-about" initial={{ y: 30, opacity: 0, rotate: -3 }} animate={{ y: 0, opacity: 1, rotate: -1.5 }} transition={{ type: 'spring', stiffness: 140, damping: 16, delay: 0.85 }}>
+        <span className="ld-tape ld-tape-top" aria-hidden="true" />
+        <h2>{ABOUT.title}</h2>
+        {ABOUT.paragraphs.map((p) => (
+          <p key={p}>{p}</p>
+        ))}
+      </motion.section>
       <motion.a
         className="ld-sticky"
         href="#/contact"

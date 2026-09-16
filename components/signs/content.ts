@@ -5,6 +5,15 @@ import { STUDIES, type Study } from './studies';
 
 export const NAME = 'Nathan W.';
 
+/** The about-me card on the landing page. */
+export const ABOUT = {
+  title: 'about me',
+  paragraphs: [
+    "Hi, I'm Nathan, at UC Davis. I like building things that compute: a Hartree-Fock engine written from the integrals up, a lattice-Boltzmann wind tunnel, a black-hole ray tracer, a chess net that plays bullet on Lichess, and the backend that lets teams of coding agents share one repo.",
+    'Away from the keyboard I draw: Copic doodles, pencil animals and hand-painted Air Force 1s. The signs and photos on this site are how I like to show it.',
+  ],
+};
+
 export const CONTACTS = [
   { id: 'instagram', label: 'Instagram', handle: '@naze_draws', href: 'https://instagram.com/naze_draws' },
   { id: 'linkedin', label: 'LinkedIn', handle: 'linkedin.com/in/nathan-ward', href: 'https://www.linkedin.com/in/nathan-ward' },
