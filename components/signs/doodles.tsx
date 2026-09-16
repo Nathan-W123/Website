@@ -162,7 +162,7 @@ export function Doodles({ seed = 1 }: { seed?: number }) {
         <Star seed={seed + 11} delay={1.1} s={0.9} />
       </At>
       {/* right margin */}
-      <At right="4%" top="8%" w={104}>
+      <At right="4%" top="8%" w={104} className="dd-wide">
         <Sun seed={seed + 15} />
       </At>
       <At right="6%" top="34%" w={104} className="dd-wide">

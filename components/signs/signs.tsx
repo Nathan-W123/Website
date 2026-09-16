@@ -8,6 +8,7 @@ import type { Study } from './studies';
 import { SignChain } from './chain';
 import { Doodles } from './doodles';
 import { HangingSign } from './hanging';
+import { Landing } from './landing';
 import { TONE, TONE_DARK, outline, shadow, tone } from './ink';
 import { Signpost, type Plank } from './signpost';
 import './signs.css';
@@ -134,20 +135,7 @@ export default function Signs() {
           transition={{ duration: SWIPE, ease }}
         >
           <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
-          {route.page === 'home' && (
-            <div className="sg-center">
-              <Signpost
-                title={NAME}
-                seed={1}
-                onPlank={onPlank}
-                planks={[
-                  { label: 'Contact me', dir: 'left', href: '#/contact' },
-                  { label: 'My art', dir: 'right', href: '#/art' },
-                  { label: 'My projects', dir: 'left', href: '#/projects' },
-                ]}
-              />
-            </div>
-          )}
+          {route.page === 'home' && <Landing name={NAME} onGo={onPlank} />}
 
           {route.page === 'art' && !route.section && (
             <div className="sg-center">
