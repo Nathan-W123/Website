@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import { PencilDefs } from '@/components/sketch/rough';
 import { useEffect, useSyncExternalStore, type CSSProperties } from 'react';
-import { ABOUT, ART } from './content';
+import { ART } from './content';
 import { GALLERY } from './gallery';
 import type { Plank } from './signpost';
 
@@ -74,21 +74,18 @@ export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void
         <Photo title="my art" pool={ART_POOL} href="#/art" tilt={-4} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
         <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={3} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
       </div>
-      {/* about me: an index card taped under the photos */}
+      {/* about me: a strip of tape stuck to the page that opens the about page */}
       <motion.a
-        className="ld-about"
+        className="ld-tapelink"
         href="#/about"
         onClick={() => onGo({ label: 'About me', dir: 'right', href: '#/about' })}
-        initial={{ y: 30, opacity: 0, rotate: -3 }}
-        animate={{ y: 0, opacity: 1, rotate: -1.5 }}
-        transition={{ type: 'spring', stiffness: 140, damping: 16, delay: 0.85 }}
-        whileHover={{ rotate: 0, scale: 1.03, y: -6, transition: { type: 'spring', stiffness: 300, damping: 14 } }}
-        whileTap={{ scale: 0.98 }}
+        initial={{ y: 20, opacity: 0, rotate: -9 }}
+        animate={{ y: 0, opacity: 1, rotate: -4 }}
+        transition={{ type: 'spring', stiffness: 160, damping: 15, delay: 0.85 }}
+        whileHover={{ rotate: -1, scale: 1.08, y: -4, transition: { type: 'spring', stiffness: 320, damping: 12 } }}
+        whileTap={{ scale: 0.97 }}
       >
-        <span className="ld-tape ld-tape-top" aria-hidden="true" />
-        <h2>{ABOUT.title}</h2>
-        <p>{ABOUT.paragraphs[0]}</p>
-        <span className="ld-about-more">read more →</span>
+        about me
       </motion.a>
       <motion.a
         className="ld-sticky"
@@ -104,7 +101,6 @@ export function Landing({ name, onGo }: { name: string; onGo: (p: Plank) => void
         <span className="note-paper" aria-hidden="true" />
         <span className="note-tape" aria-hidden="true" />
         <span className="ld-sticky-text">contact me</span>
-        <span className="ld-sticky-sub">insta · linkedin · github · email →</span>
       </motion.a>
     </div>
   );
