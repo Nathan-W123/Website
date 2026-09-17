@@ -86,7 +86,7 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
   {
     id: 'numerical',
     label: 'Numerical models',
-    cards: pick(['black-hole', 'aero', 'hf-scf', 'quantize', 'formulate']).map(toCard),
+    cards: pick(['aether6', 'ignis', 'sparlab', 'black-hole', 'aero', 'hf-scf', 'quantize', 'formulate']).map(toCard),
   },
   {
     id: 'gis',

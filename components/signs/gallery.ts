@@ -80,4 +80,22 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: '/projects/hackdavis/2.webp', caption: "Before and after the three shader passes" },
     { src: '/projects/hackdavis/3.webp', caption: "Icon set and the toggle injected into YouTube" },
   ],
+  "aether6": [
+    { src: "/projects/aether6/1.webp", caption: "Closed-loop 3-D flight path: six waypoints, two laps, flown on the EKF estimate in wind" },
+    { src: "/projects/aether6/2.webp", caption: "Ground track and cross-track error: 11.8 m RMS on the nominal mission" },
+    { src: "/projects/aether6/3.webp", caption: "The 18-state EKF converging in flight: position, velocity, attitude, gyro bias, baro bias" },
+    { src: "/projects/aether6/4.webp", caption: "256-trial Monte Carlo: 248 completed, the 8 failures in the heavy, low-lift corner" },
+  ],
+  "ignis": [
+    { src: "/projects/ignis/1.webp", caption: "The Ignis-M1 bell nozzle coloured by Mach number: M = 1 at the throat, 3.46 at the exit" },
+    { src: "/projects/ignis/2.webp", caption: "Equilibrium chamber composition against mixture ratio, LOX/CH4 at 5.5 MPa" },
+    { src: "/projects/ignis/3.webp", caption: "Cooling-channel design space: peak wall temperature and jacket pressure drop" },
+    { src: "/projects/ignis/4.webp", caption: "Sensitivity ranking: the Bartz correlation alone drives wall temperature (SRC 0.994)" },
+  ],
+  "sparlab": [
+    { src: "/projects/sparlab/1.webp", caption: "A two-bolt bracket going from solid plate to truss over the first 162 SIMP iterations" },
+    { src: "/projects/sparlab/2.webp", caption: "The bracket density field and its interpretation as solid material at density ≥ 0.5" },
+    { src: "/projects/sparlab/3.webp", caption: "Wing rib at 40 % volume: spar pads and skin flanges forced solid, the rest optimised" },
+    { src: "/projects/sparlab/4.webp", caption: "Mass–stiffness trade and first natural frequency across the volume-fraction sweep" },
+  ],
 };
