@@ -93,9 +93,9 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: "/projects/ignis/4.webp", caption: "Sensitivity ranking: the Bartz correlation alone drives wall temperature (SRC 0.994)" },
   ],
   "sparlab": [
-    { src: "/projects/sparlab/1.webp", caption: "A two-bolt bracket going from solid plate to truss over the first 162 SIMP iterations" },
-    { src: "/projects/sparlab/2.webp", caption: "The bracket density field and its interpretation as solid material at density ≥ 0.5" },
-    { src: "/projects/sparlab/3.webp", caption: "Wing rib at 40 % volume: spar pads and skin flanges forced solid, the rest optimised" },
-    { src: "/projects/sparlab/4.webp", caption: "Mass–stiffness trade and first natural frequency across the volume-fraction sweep" },
+    { src: "/projects/sparlab/1.webp", caption: "An engine mount optimised in 3-D, under its 12 kN vertical pin load" },
+    { src: "/projects/sparlab/2.webp", caption: "The same part before and after: a CAD solid meshed in Gmsh, 25 % of the material kept" },
+    { src: "/projects/sparlab/3.webp", caption: "A two-bolt bracket in plane, carrying the stress field of its own optimised topology" },
+    { src: "/projects/sparlab/4.webp", caption: "What a stress constraint buys: the re-entrant corner rounded, peak stress down 25 %" },
   ],
 };

@@ -158,9 +158,9 @@ export const CHAPTERS: Chapter[] = [
       project('simulate', 'umber', {
         id: 'sparlab',
         name: "SparLab",
-        tagline: "A 2-D finite-element solver with SIMP topology optimisation, built for lightweight aerospace parts and verified against exact answers.",
-        stack: "C++17 · Eigen sparse · Q4 finite elements · SIMP · optimality criteria · modal analysis",
-        notes: ["Bilinear quad elements, exact Dirichlet partitioning, sparse Cholesky", "Analytical sensitivities checked against central differences to 2e-8", "A bracket 41 % higher in first frequency than a plate of equal mass"],
+        tagline: "A 2-D and 3-D finite-element solver with SIMP topology optimisation, built for lightweight aerospace parts and cross-validated against CalculiX.",
+        stack: "C++17 · Eigen sparse · Hex8 / Tet10 solids · SIMP · algebraic multigrid · stress and buckling constraints",
+        notes: ["One dimension-generic core: plates, solids and CAD parts meshed in Gmsh", "Multigrid CG solves a million degrees of freedom in three seconds", "A 3-D bracket 25.7 % higher in first frequency at 30 % of the mass"],
         href: "https://github.com/Nathan-W123/SparLab",
       }),
     ],
