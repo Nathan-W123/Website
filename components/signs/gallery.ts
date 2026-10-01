@@ -75,10 +75,6 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: "/projects/high-risk-roads/3.webp", caption: "Crash share by hour: 22% fall in the 4-6 PM peak" },
     { src: "/projects/high-risk-roads/4.webp", caption: "Crash rate vs critical rate, road by road" },
   ],
-  "sasd-hfml": [
-    { src: "/projects/sasd-hfml/3.webp", caption: "Five-phase pipeline diagram with trace detail" },
-    { src: "/projects/sasd-hfml/1.webp", caption: "Streamlit control panel after a full Run All" },
-  ],
   'hackdavis': [
     { src: '/projects/hackdavis/1.webp', caption: "Popup: idle, and mid-session enhancing 720p to 4K" },
     { src: '/projects/hackdavis/2.webp', caption: "Before and after the three shader passes" },

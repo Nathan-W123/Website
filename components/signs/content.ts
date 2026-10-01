@@ -91,6 +91,6 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
   {
     id: 'gis',
     label: 'GIS',
-    cards: pick(['high-risk-roads', 'sasd-hfml']).map(toCard),
+    cards: pick(['high-risk-roads']).map(toCard),
   },
 ];
