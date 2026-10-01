@@ -597,6 +597,7 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [step]);
   const shot = card.images[i];
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const drag = useRef<number | null>(null);
   const ref = useDialog<HTMLElement>();
   return (
@@ -634,8 +635,15 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
                 exit={{ x: -dir * 80, opacity: 0 }}
                 transition={{ duration: 0.22, ease: 'easeOut' }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={base() + shot.src} alt={shot.caption} draggable={false} />
+                {shot.video ? (
+                  <video poster={base() + shot.src} aria-label={shot.caption} muted loop playsInline autoPlay={!reducedMotion} controls={reducedMotion} preload="metadata">
+                    <source src={base() + shot.video + '.webm'} type="video/webm" />
+                    <source src={base() + shot.video + '.mp4'} type="video/mp4" />
+                  </video>
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={base() + shot.src} alt={shot.caption} draggable={false} />
+                )}
                 <figcaption>
                   {shot.caption}
                   {shot.credit && !shot.credit.startsWith('own') && (

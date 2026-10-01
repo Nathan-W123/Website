@@ -94,12 +94,12 @@ export const CHAPTERS: Chapter[] = [
       project('simulate', 'fluid', {
         id: 'aero',
         name: 'Aero',
-        tagline: 'A lattice-Boltzmann wind-tunnel simulator for 2D and 3D flows.',
-        stack: 'Python · NumPy · lattice Boltzmann · STL voxelization',
+        tagline: 'A lattice-Boltzmann wind tunnel for 2D and 3D flows, with a browser UI that renders the flow as live smoke.',
+        stack: 'Python · Numba · lattice Boltzmann · WebGL2 volume rendering',
         notes: [
-          'D2Q9 and D3Q19 solvers with multiple collision models',
-          'Analytic geometry and STL voxelization workflows',
-          'Lift, drag, scalar, thermal, and force observables',
+          'D2Q9, D3Q19 and D3Q27 with BGK, TRT, MRT and regularized collision',
+          'Drag with a 95 % interval, a blockage correction and a grid study',
+          'Sphere drag within 1.9 % of Schiller–Naumann once the tunnel walls are removed',
         ],
         href: 'https://github.com/Nathan-W123/Aero',
       }),
@@ -150,9 +150,9 @@ export const CHAPTERS: Chapter[] = [
       project('simulate', 'fluid', {
         id: 'ignis',
         name: "Ignis",
-        tagline: "A thermochemical liquid-rocket engine simulator: equilibrium combustion, quasi-1D nozzle flow, regenerative cooling, start-up transients, optimisation and Monte Carlo.",
-        stack: "C++17 · Eigen · Gibbs minimisation · quasi-1D nozzle · Bartz cooling · Nelder–Mead",
-        notes: ["Agrees with NASA CEA to 0.18 % on flame temperature over 156 cases", "Every balance reported as a residual, not assumed", "Deterministic Monte Carlo, byte-identical at any thread count"],
+        tagline: "A thermochemical liquid-rocket engine simulator, from equilibrium combustion through the boundary layer, regenerative cooling and the turbopump cycle, with a desktop Explorer that opens on the RS-25.",
+        stack: "C++17 · Eigen · Gibbs minimisation · integral boundary layer · turbopump cycles · PySide6 / OpenGL",
+        notes: ["Agrees with NASA CEA to 0.18 % on flame temperature over 156 cases", "Heat transfer checked against two 1965 experiments; the RS-25 within 1 % on vacuum Isp", "Exhaust plume marched live and drawn as a GPU volume inside NASA's model of the bell"],
         href: "https://github.com/Nathan-W123/Ignis",
       }),
       project('simulate', 'umber', {

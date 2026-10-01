@@ -655,7 +655,8 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 .sg-pv-frame { position: relative; aspect-ratio: 16 / 10; max-height: 62vh; border: 3px solid var(--ink); background: #f4f4f4; overflow: visible; touch-action: pan-y; user-select: none; }
 .sg-pv-frame figure { position: absolute; inset: 0; margin: 0; overflow: hidden; }
-.sg-pv-frame img { width: 100%; height: 100%; object-fit: contain; display: block; background: #fff; }
+.sg-pv-frame img,
+.sg-pv-frame video { width: 100%; height: 100%; object-fit: contain; display: block; background: #fff; }
 .sg-pv-frame figcaption {
   position: absolute;
   left: 50%;

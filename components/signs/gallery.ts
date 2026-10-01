@@ -1,9 +1,12 @@
 /**
  * Gallery images per project, shown in the project viewer (arrows step through
  * them); the first is the card cover. Paths are under public/. Credits are only
- * kept for images that are not Nathan's own screenshots or plots.
+ * kept for images that are not Nathan's own screenshots or plots. A shot with a
+ * `video` plays it as a muted loop in the viewer, with `src` as its poster (and
+ * as the still wherever a card shows the shot). `video` is the path without its
+ * extension: a .webm (VP9) and an .mp4 (H.264) sit side by side under it.
  */
-export type Shot = { src: string; caption: string; credit?: string };
+export type Shot = { src: string; caption: string; credit?: string; video?: string };
 
 export const GALLERY: Record<string, Shot[]> = {
   'gambit': [
@@ -42,10 +45,11 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: '/projects/black-hole/4.webp', caption: 'Precessing 3D timelike geodesics' },
   ],
   'aero': [
-    { src: '/projects/aero/1.webp', caption: 'Kármán vortex street, cylinder at Re 150' },
-    { src: '/projects/aero/2.webp', caption: 'Aero CFD Studio desktop GUI, 2D case' },
-    { src: '/projects/aero/3.webp', caption: 'STL airplane voxelized onto D3Q19 lattice' },
-    { src: '/projects/aero/4.webp', caption: '3D sphere wind tunnel with streamlets' },
+    { src: '/projects/aero/1.webp', video: '/projects/aero/1', caption: 'An STL aircraft in the 3D tunnel: the wake |u − U∞| replayed as a time-lapse while the camera orbits' },
+    { src: '/projects/aero/2.webp', video: '/projects/aero/2', caption: 'The browser UI on a cylinder at Re 100: smoke advected on the GPU through the solved flow' },
+    { src: '/projects/aero/3.webp', caption: 'The same UI in 3D: case properties, live checks, coefficients with 95 % intervals, convergence' },
+    { src: '/projects/aero/4.webp', caption: 'Sphere drag against Schiller–Naumann: tunnel confinement, grid bias and local refinement' },
+    { src: '/projects/aero/5.webp', caption: 'CPU throughput before and after the tiled, fused Numba kernels' },
   ],
   'hf-scf': [
     { src: '/projects/hf-scf/1.webp', caption: 'Water RHF/STO-3G converged with 3D ball-and-stick model' },
@@ -87,10 +91,13 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: "/projects/aether6/4.webp", caption: "256-trial Monte Carlo: 248 completed, the 8 failures in the heavy, low-lift corner" },
   ],
   "ignis": [
-    { src: "/projects/ignis/1.webp", caption: "The Ignis-M1 bell nozzle coloured by Mach number: M = 1 at the throat, 3.46 at the exit" },
-    { src: "/projects/ignis/2.webp", caption: "Equilibrium chamber composition against mixture ratio, LOX/CH4 at 5.5 MPa" },
-    { src: "/projects/ignis/3.webp", caption: "Cooling-channel design space: peak wall temperature and jacket pressure drop" },
-    { src: "/projects/ignis/4.webp", caption: "Sensitivity ranking: the Bartz correlation alone drives wall temperature (SRC 0.994)" },
+    { src: "/projects/ignis/1.webp", video: "/projects/ignis/1", caption: "The RS-25's plume marched from rest and drawn as a GPU volume inside NASA's model of the bell" },
+    { src: "/projects/ignis/2.webp", video: "/projects/ignis/2", caption: "The Engine Explorer's Flow tab: the RS-25 at 6 km, 21 ms of flow, beside Rocketdyne's numbers" },
+    { src: "/projects/ignis/3.webp", caption: "The Explorer's thermal tab: integral boundary layer, live constraint checks, the real engine alongside" },
+    { src: "/projects/ignis/4.webp", caption: "Ignis-M1 wall temperature: Bartz, the integral boundary layer, and the 3 % fuel film that fixed it" },
+    { src: "/projects/ignis/5.webp", caption: "Gas-side heat transfer against a JPL air nozzle and a NASA hydrogen-oxygen rocket" },
+    { src: "/projects/ignis/6.webp", caption: "The RS-25 against Rocketdyne's published engine and turbopump figures" },
+    { src: "/projects/ignis/7.webp", caption: "Monte Carlo on the M1: 118 of 2,000 samples over the wall limit, down from 973" },
   ],
   "sparlab": [
     { src: "/projects/sparlab/1.webp", caption: "An engine mount optimised in 3-D, under its 12 kN vertical pin load" },

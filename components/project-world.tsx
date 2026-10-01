@@ -97,9 +97,9 @@ const PROJECTS: Project[] = [
   {
     id: 'aero', number: '06', location: 'Gale Works', projectName: 'Aero', category: 'FLUID DYNAMICS · PYTHON',
     href: 'https://github.com/Nathan-W123/Aero', area: 'Gale Coast', accent: '#65bccc',
-    tagline: 'A lattice-Boltzmann wind-tunnel simulator for 2D and 3D flows.',
+    tagline: 'A lattice-Boltzmann wind tunnel for 2D and 3D flows, with a browser UI that renders the flow as live smoke.',
     image: 'projects/aero.webp',
-    details: ['D2Q9 and D3Q19 solvers with multiple collision models', 'Analytic geometry and STL voxelization workflows', 'Lift, drag, scalar, thermal, and force observables'],
+    details: ['D2Q9, D3Q19 and D3Q27 with BGK, TRT, MRT and regularized collision', 'STL bodies voxelized in milliseconds, previewed before the run', 'Drag with a 95 % interval, a blockage correction and a grid study'],
     landmark: { x: 1370, y: 169 }, approach: { x: 1402, y: 228 }, building: { x: 1352, y: 124, w: 116, h: 78 },
   },
   {
