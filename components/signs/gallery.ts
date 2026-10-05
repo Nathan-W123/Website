@@ -9,12 +9,6 @@
 export type Shot = { src: string; caption: string; credit?: string; video?: string };
 
 export const GALLERY: Record<string, Shot[]> = {
-  'gambit': [
-    { src: '/projects/gambit/1.webp', caption: 'Alpha-beta over the net finds mate in 2' },
-    { src: '/projects/gambit/2.webp', caption: 'Training curves: 42.8% to 48.2% move agreement' },
-    { src: '/projects/gambit/3.webp', caption: 'Policy head opening preferences, no search' },
-    { src: '/projects/gambit/4.webp', caption: 'Tactics sanity check, 4 of 4 found' },
-  ],
   'siege': [
     { src: '/projects/siege/1.webp', caption: 'Clash Royale arena mid-battle (official Supercell screenshot)', credit: 'https://apps.apple.com/us/app/clash-royale/id1053012308' },
     { src: '/projects/siege/2.webp', caption: 'Live WebGL viewer of the policy network mid-match' },
@@ -26,17 +20,6 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: '/projects/kumi/2.webp', caption: 'Task overview: brief, access, Codex results' },
     { src: '/projects/kumi/3.webp', caption: 'Team chat with the Codex composer' },
     { src: '/projects/kumi/4.webp', caption: 'Task lifecycle states from the architecture reference' },
-  ],
-  'voice-agents': [
-    { src: '/projects/voice-agents/1.webp', caption: 'Clip app: projects, listening, checklist detail' },
-    { src: '/projects/voice-agents/2.webp', caption: 'Voice capture flow from tap to listening' },
-    { src: '/projects/voice-agents/3.webp', caption: 'Data collection notes, history, create sheet' },
-  ],
-  'nonstandard': [
-    { src: '/projects/nonstandard/1.webp', caption: 'Title screen with wizard and owl' },
-    { src: '/projects/nonstandard/2.webp', caption: 'Isometric workshop with three-station bench' },
-    { src: '/projects/nonstandard/3.webp', caption: 'Shop with RDKit-drawn chemical structures' },
-    { src: '/projects/nonstandard/4.webp', caption: 'Grimoire reaction page with electron-pushing mechanism' },
   ],
   'black-hole': [
     { src: '/projects/black-hole/1.webp', caption: 'Lensed accretion disk at 80° inclination' },
@@ -51,17 +34,17 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: '/projects/aero/4.webp', caption: 'Sphere drag against Schiller–Naumann: tunnel confinement, grid bias and local refinement' },
     { src: '/projects/aero/5.webp', caption: 'CPU throughput before and after the tiled, fused Numba kernels' },
   ],
-  'hf-scf': [
-    { src: '/projects/hf-scf/1.webp', caption: 'Water RHF/STO-3G converged with 3D ball-and-stick model' },
-    { src: '/projects/hf-scf/2.webp', caption: 'Water HOMO isosurface rendered in the 3Dmol viewer' },
-    { src: '/projects/hf-scf/3.webp', caption: 'Formaldehyde 6-31G* pi-star LUMO orbital lobes' },
-    { src: '/projects/hf-scf/4.webp', caption: 'Energies, dipole, orbital table and time estimate' },
+  "hf-scf": [
+    { src: "/projects/hf-scf/1.webp", caption: "The redesigned engine after a converged run: case setup, 3-D viewport and results in one window" },
+    { src: "/projects/hf-scf/2.webp", caption: "Water's frontier orbitals, HOMO-3 up to LUMO+2, drawn from the cube the solver returns" },
+    { src: "/projects/hf-scf/3.webp", caption: "The orbital table: occupancy and energy in Hartree and eV for every molecular orbital" },
+    { src: "/projects/hf-scf/4.webp", caption: "The same app in its light theme, with the HOMO-3 isosurface in the viewport" },
   ],
-  'quantize': [
-    { src: '/projects/quantize/1.webp', caption: 'RMS bond-length error: theory vs spectroscopy vs hybrid' },
-    { src: '/projects/quantize/2.webp', caption: 'Systematic C–F bias in theory, removed by data' },
-    { src: '/projects/quantize/3.webp', caption: 'Per-bond signed error for all three molecules' },
-    { src: '/projects/quantize/4.webp', caption: 'SVD rank vs structural degrees of freedom' },
+  "quantize": [
+    { src: "/projects/quantize/1.webp", caption: "Nine molecules, three methods: the hybrid against theory alone and against mixed estimation" },
+    { src: "/projects/quantize/2.webp", caption: "It improves with the level of theory, and predicts isotopologues it never saw" },
+    { src: "/projects/quantize/3.webp", caption: "Are the quoted error bars honest? 90 % coverage where 68 % would be ideal" },
+    { src: "/projects/quantize/4.webp", caption: "The joint objective: a spectroscopic chi-square and the quantum energy, minimised together" },
   ],
   'formulate': [
     { src: '/projects/formulate/1.webp', caption: 'Pareto frontier of a coating-solvent design run' },
@@ -74,11 +57,6 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: "/projects/high-risk-roads/2.webp", caption: "Every 2023 crash on the flagged roads" },
     { src: "/projects/high-risk-roads/3.webp", caption: "Crash share by hour: 22% fall in the 4-6 PM peak" },
     { src: "/projects/high-risk-roads/4.webp", caption: "Crash rate vs critical rate, road by road" },
-  ],
-  'hackdavis': [
-    { src: '/projects/hackdavis/1.webp', caption: "Popup: idle, and mid-session enhancing 720p to 4K" },
-    { src: '/projects/hackdavis/2.webp', caption: "Before and after the three shader passes" },
-    { src: '/projects/hackdavis/3.webp', caption: "Icon set and the toggle injected into YouTube" },
   ],
   "aether6": [
     { src: "/projects/aether6/1.webp", caption: "Closed-loop 3-D flight path: six waypoints, two laps, flown on the EKF estimate in wind" },
@@ -100,5 +78,11 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: "/projects/sparlab/2.webp", caption: "The same part before and after: a CAD solid meshed in Gmsh, 25 % of the material kept" },
     { src: "/projects/sparlab/3.webp", caption: "A two-bolt bracket in plane, carrying the stress field of its own optimised topology" },
     { src: "/projects/sparlab/4.webp", caption: "What a stress constraint buys: the re-entrant corner rounded, peak stress down 25 %" },
+  ],
+  "machina": [
+    { src: "/projects/machina/1.webp", caption: "Shape error over a formed part, before and after correction: the best and a typical case" },
+    { src: "/projects/machina/2.webp", caption: "Four ways to form the part: 0.300 mm of error uncorrected, 0.189 mm with the edge pass and ML" },
+    { src: "/projects/machina/3.webp", caption: "Per part across the eight held-out shapes; it beats the plain ML first shot on seven" },
+    { src: "/projects/machina/4.webp", caption: "The forming solver against published measurements of a deep-drawn benchmark" },
   ],
 };

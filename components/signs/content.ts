@@ -76,12 +76,7 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
   {
     id: 'ml-ai',
     label: 'ML / AI',
-    cards: pick(['gambit', 'siege', 'kumi', 'voice-agents']).map(toCard),
-  },
-  {
-    id: 'general',
-    label: 'General',
-    cards: pick(['nonstandard', 'hackdavis']).map(toCard),
+    cards: pick(['machina', 'siege', 'kumi']).map(toCard),
   },
   {
     id: 'numerical',

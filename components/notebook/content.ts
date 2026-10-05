@@ -173,18 +173,6 @@ export const CHAPTERS: Chapter[] = [
       'Agents that learn a game by playing it, where the rules are exact and the score cannot be argued with. One plays bullet chess against people on Lichess; the other learns Clash Royale against copies of itself in a simulator built for the purpose.',
     projects: [
       project('learn', 'umber', {
-        id: 'gambit',
-        name: 'Gambit',
-        tagline: 'A chess neural network that plays bullet games on Lichess through the bot API.',
-        stack: 'Python · residual CNN · alpha-beta search · ONNX',
-        notes: [
-          'Policy-and-value residual convolutional network',
-          'Alpha-beta search tuned for bullet time controls',
-          'ONNX inference and legal-move masking',
-        ],
-        href: 'https://github.com/Nathan-W123/Gambit',
-      }),
-      project('learn', 'umber', {
         id: 'siege',
         name: 'Siege',
         tagline: 'A reinforcement-learning agent that learns Clash Royale strategy inside a custom simulator.',
@@ -195,6 +183,14 @@ export const CHAPTERS: Chapter[] = [
           'Training reports and a live WebGL network viewer',
         ],
         href: 'https://github.com/Nathan-W123/Siege',
+      }),
+      project('learn', 'umber', {
+        id: 'machina',
+        name: "Machina",
+        tagline: "A forming simulator and ML surrogate that predicts how a sheet-metal part springs back, and forms a corrected shape so the first part lands on target.",
+        stack: "C++17 · Eigen · contact and plasticity FE · scikit-learn / PyTorch surrogates · Bayesian optimisation",
+        notes: ["A C++ forming solver: moving rigid tools, frictional contact, Hill48 / Chaboche plasticity", "ML surrogates with uncertainty, an out-of-distribution check and a transfer model", "37 % less shape error than no correction, in one forming run instead of two"],
+        href: "https://github.com/Nathan-W123/springback-precomp",
       }),
     ],
   },
@@ -224,39 +220,6 @@ export const CHAPTERS: Chapter[] = [
         stack: 'R · tidyverse · Leaflet · OpenStreetMap',
         notes: ['2023 collision records joined to AADT counts and OpenStreetMap road lengths', 'Crash rate per 10 million vehicle-miles tested against a critical rate; 11 corridors flagged', 'Final project for ECI 016 at UC Davis, written up as a 16-page report'],
         href: '/docs/high-risk-roads-sacramento.pdf',
-      }),
-      project('make', 'umber', {
-        id: 'hackdavis',
-        name: 'Green Giant',
-        tagline: 'A Chrome extension that cleans up low-bitrate YouTube video on the GPU in real time, built at HackDavis 2026.',
-        stack: 'JavaScript · WebGL shaders · ONNX Runtime Web · Chrome extension',
-        notes: ['Three fragment-shader passes on every frame: deblock and deband, contrast-adaptive sharpening, an Anime4K-style edge restore', 'A performance guard that backs off when frame rate drops, and a popup that tallies the energy not spent streaming 4K', 'An experimental ONNX super-resolution path running in the background worker'],
-        href: 'https://github.com/Nathan-W123/HackDavis26',
-      }),
-      project('make', 'chem', {
-        id: 'nonstandard',
-        name: 'Nonstandard Conditions',
-        tagline:
-          'A single-player organic-chemistry workshop: buy materials, run a real three-station lab, fulfil commissions.',
-        stack: 'React · Three.js · Rapier · RDKit',
-        notes: [
-          'Real molecular transforms with an RDKit backend that owns chemistry, inventory and saves',
-          'Explorable 3D laboratory built with React, Three.js and Rapier',
-          'Built with Ethan Truong during OpenAI build week; playable at nsc.up.railway.app',
-        ],
-        href: 'https://github.com/EthanVTruong/nonstandardconditions',
-      }),
-      project('make', 'fluid', {
-        id: 'voice-agents',
-        name: 'Voice Agents',
-        tagline: 'A real-time voice-capture app built at a YC hackathon.',
-        stack: 'TypeScript · Expo / React Native · Python · Supabase',
-        notes: [
-          'Expo / React Native app with a native iOS target',
-          'Python backend with Supabase storage for captures',
-          'Built in a weekend at a YC hackathon',
-        ],
-        href: 'https://github.com/Nathan-W123/YCHackVoiceAgents',
       }),
       project('make', 'umber', {
         id: 'website',
