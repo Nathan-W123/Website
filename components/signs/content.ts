@@ -23,9 +23,9 @@ export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', '
 /** The bench: things just finished or in progress, shown under the landing page. */
 export type Recent = { kind: 'project'; id: string; status: string } | { kind: 'art'; section: string; image: string; title: string; status: string };
 export const RECENT: Recent[] = [
-  { kind: 'project', id: 'kumi', status: 'building now' },
-  { kind: 'project', id: 'quantize', status: 'just finished' },
-  { kind: 'project', id: 'formulate', status: 'just finished' },
+  { kind: 'project', id: 'quantize', status: 'building now' },
+  { kind: 'project', id: 'machina', status: 'building now' },
+  { kind: 'project', id: 'aero', status: 'just finished' },
   { kind: 'art', section: 'shoes', image: '/art/shoes/purple-monster.webp', title: 'Gengar shoes', status: 'just finished' },
 ];
 
@@ -81,7 +81,7 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
   {
     id: 'numerical',
     label: 'Numerical models',
-    cards: pick(['aether6', 'ignis', 'sparlab', 'black-hole', 'aero', 'hf-scf', 'quantize', 'formulate']).map(toCard),
+    cards: pick(['ignis', 'sparlab', 'aether6', 'quantize', 'aero', 'formulate', 'black-hole', 'hf-scf']).map(toCard),
   },
   {
     id: 'gis',
