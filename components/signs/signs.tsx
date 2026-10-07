@@ -10,6 +10,7 @@ import { Scribble } from './scribble';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
 import { About } from './about';
+import { TopBar } from './topbar';
 import { IndexCard, StickyBoard } from './notes';
 import { ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
@@ -41,7 +42,7 @@ const parse = (hash: string): Route => {
 };
 const routeKey = (r: Route) => (r.page === 'art' ? `art/${r.section ?? ''}` : r.page === 'projects' ? `projects/${r.group ?? ''}` : r.page);
 /** The pages in the new, plain language: no paper, no pencil, no tag. */
-const plain = (r: Route) => r.page === 'home' || r.page === 'about';
+const plain = (r: Route) => r.page === 'home' || r.page === 'about' || r.page === 'contact';
 export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
@@ -210,34 +211,45 @@ function useDialog<T extends HTMLElement>() {
 }
 
 function Lightbox({ item, onClose }: { item: { image: string; caption: string; materials?: string[] }; onClose: () => void }) {
-  const ref = useDialog<HTMLElement>();
-  const lightbox = item;
-  // a real <dialog> would need showModal() for its top layer, which fights the motion transitions; the role plus useDialog does the same job
+  const ref = useDialog<HTMLDivElement>();
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  // A piece of art gets the page to itself: the picture, and nothing to read.
   return (
-    // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-    <motion.figure ref={ref} role="dialog" aria-modal="true" aria-labelledby="sg-lb-caption" tabIndex={-1} initial={{ scale: 0.7, rotate: -3 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0.8, transition: { duration: 0.2, ease: 'easeIn' } }} transition={{ type: 'spring', stiffness: 220, damping: 22 }} onClick={(e) => e.stopPropagation()}>
-              <div className="sg-lb-row">
-                <div className="sg-lightbox-frame">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={base() + lightbox.image} alt={lightbox.caption} />
-                </div>
-                {lightbox.materials && lightbox.materials.length > 0 && (
-                  <aside className="sg-materials">
-                    <span className="note-shadow" aria-hidden="true" />
-                    <span className="note-paper" aria-hidden="true" />
-                    <span className="note-tape" aria-hidden="true" />
-                    <h3>Materials</h3>
-                    <ul>
-                      {lightbox.materials.map((m) => (
-                        <li key={m}>{m}</li>
-                      ))}
-                    </ul>
-                  </aside>
-                )}
-              </div>
-              <figcaption id="sg-lb-caption">{lightbox.caption}</figcaption>
-              <button type="button" className="sg-close" onClick={onClose} aria-label="Close">×</button>
-            </motion.figure>
+    <motion.div
+      className="lb-scrim"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.18 } }}
+      onClick={onClose}
+    >
+      {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
+      <motion.div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-label={item.caption}
+        tabIndex={-1}
+        className="lb"
+        initial={{ opacity: 0, scale: 0.97, y: 14 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.34, ease: [0.22, 1, 0.3, 1] }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={base() + item.image} alt={item.caption} draggable={false} />
+      </motion.div>
+      <button type="button" className="pv-close" onClick={onClose} aria-label="Close">
+        Close
+      </button>
+    </motion.div>
   );
 }
 
@@ -352,14 +364,38 @@ function useAutoScroll(enabled: boolean, key: string) {
   return ref;
 }
 
+/** What each way of reaching me is for, under its name. */
+const CONTACT_SUB: Record<string, string> = {
+  email: 'the surest way to reach me',
+  instagram: 'the art, as it gets made',
+  linkedin: 'the professional side',
+  github: 'everything here, in source',
+};
+
 function Contact({ onBack }: { onBack: () => void }) {
+  // email first and across the full width: it is the one that actually gets read
+  const email = CONTACTS.find((c) => c.id === 'email');
+  const rest = CONTACTS.filter((c) => c.id !== 'email');
+  const row = (c: (typeof CONTACTS)[number]) => (
+    <a key={c.id} className="ct-row" href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
+      <span className="ct-icon" aria-hidden="true">
+        <ContactIcon id={c.id} size={26} />
+      </span>
+      <span className="ct-text">
+        <span className="ct-name">{c.label}</span>
+        <span className="ct-sub">{c.id === 'email' ? c.handle : CONTACT_SUB[c.id]}</span>
+      </span>
+    </a>
+  );
   return (
-    <div className="sg-wall sg-contact">
-      <BackSign label="Home" onClick={onBack} />
-      <SignChain
-        seed={200}
-        items={[{ id: 'title', label: 'Contact me', title: true }, ...CONTACTS.map((c) => ({ id: c.id, label: c.label, sub: c.handle, href: c.href }))]}
-      />
+    <div className="hm ct">
+      <TopBar onHome={onBack} here="about" />
+      <div className="ct-card">
+        <h1 className="ct-title">Say hi</h1>
+        <p className="ct-line">Happy to talk simulation, machine learning, commissions and anything else.</p>
+        {email && row(email)}
+        <div className="ct-pair">{rest.map(row)}</div>
+      </div>
     </div>
   );
 }
