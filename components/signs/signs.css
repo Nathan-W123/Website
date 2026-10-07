@@ -29,29 +29,7 @@
     linear-gradient(to right, transparent 84px, #bdbdbd 84px, #bdbdbd 86px, transparent 86px),
     repeating-linear-gradient(to bottom, transparent 0 33px, #dcdcdc 33px 35px);
   background-attachment: scroll, scroll, scroll, local, local;
-  /* the sheet swings about its top-left corner when it is torn off */
-  transform-origin: 0% 0%;
-  mask-size: 100% 100%;
-  -webkit-mask-size: 100% 100%;
-  mask-repeat: no-repeat;
-  -webkit-mask-repeat: no-repeat;
 }
-/* tear performance: the torn sheet stops painting its doodles and gets a compositor hint */
-.sg-tearing .sg-page { will-change: transform; }
-.sg-tearing .sg-page .sg-doodles { display: none; }
-/* shading that deepens toward the pulled corner while the sheet is folding (its own compositor layer) */
-.sg-fold {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 40;
-  opacity: 0;
-  will-change: opacity;
-  background: linear-gradient(112deg, transparent 30%, rgba(0, 0, 0, 0.14) 60%, rgba(0, 0, 0, 0.36) 100%);
-}
-/* the torn strip left behind at the top of the sheet underneath */
-.sg-remnant { position: absolute; left: 0; right: 0; top: 0; height: 34px; z-index: 3; pointer-events: none; transform-origin: 100% 50%; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25)); }
-.sg-remnant svg { width: 100%; height: 100%; display: block; }
 .sg-center {
   min-height: 100%;
   display: grid;

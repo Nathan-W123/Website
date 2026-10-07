@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
 import { ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } from './content';
 import { SignChain } from './chain';
@@ -45,6 +45,7 @@ const routeKey = (r: Route) => (r.page === 'art' ? `art/${r.section ?? ''}` : r.
 const plain = (r: Route) => r.page === 'home' || r.page === 'about' || r.page === 'contact';
 export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
+  const reduce = useReducedMotion();
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
 
@@ -95,7 +96,15 @@ export default function Signs() {
   return (
     <div className="sg-root">
       <div className="sg-stage" inert={!!(project || lightbox)}>
-      <section className={`sg-page${plain(route) ? ' sg-page--plain' : ''}`}>
+      <AnimatePresence mode="sync" initial={false}>
+        <motion.section
+          key={routeKey(route)}
+          className={`sg-page${plain(route) ? ' sg-page--plain' : ''}`}
+          initial={reduce ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12, transition: { duration: 0.22, ease: 'easeIn' } }}
+          transition={{ duration: reduce ? 0.01 : 0.36, ease: [0.22, 1, 0.3, 1] }}
+        >
           {plain(route) || <Scribble />}
           {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
           {route.page === 'home' && <Landing onOpenProject={setProject} onOpenArt={setLightbox} />}
@@ -150,7 +159,8 @@ export default function Signs() {
           {route.page === 'contact' && <Contact onBack={goHome} />}
 
           {route.page === 'about' && <About onHome={goHome} />}
-      </section>
+        </motion.section>
+      </AnimatePresence>
 
       <NameTag page={plain(route) ? 'art' : route.page} onHome={goHome} />
 
@@ -390,12 +400,17 @@ function Contact({ onBack }: { onBack: () => void }) {
   return (
     <div className="hm ct">
       <TopBar onHome={onBack} here="about" />
-      <div className="ct-card">
+      <motion.div
+        className="ct-card"
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.3, 1], delay: 0.12 }}
+      >
         <h1 className="ct-title">Say hi</h1>
         <p className="ct-line">Happy to talk simulation, machine learning, commissions and anything else.</p>
         {email && row(email)}
         <div className="ct-pair">{rest.map(row)}</div>
-      </div>
+      </motion.div>
     </div>
   );
 }
