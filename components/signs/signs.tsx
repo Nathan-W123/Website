@@ -457,6 +457,24 @@ function ProjectCard({ card, index, onOpen }: { card: Card; index: number; onOpe
 
 /* ---------- project viewer: a framed photo you can page through, with the write-up under it ---------- */
 
+/**
+ * The text a project page carries besides its brief, in the order it is worth
+ * reading. Each one is set beside or under a picture rather than stacked at the
+ * top, so the page reads as a spread.
+ */
+function notesOf(card: Card): { h: string; t: string }[] {
+  const st = card.study;
+  if (!st) return card.notes.map((t, i) => ({ h: i === 0 ? 'Notes' : '', t }));
+  const out: { h: string; t: string }[] = [
+    { h: 'The problem', t: st.problem },
+    ...st.how.slice(0, 2).map((t, i) => ({ h: i === 0 ? 'How it works' : '', t })),
+    ...st.challenges.slice(0, 2).map((t, i) => ({ h: i === 0 ? 'What was hard' : '', t })),
+    ...st.results.slice(0, 2).map((t, i) => ({ h: i === 0 ? 'Results' : '', t })),
+    { h: 'My part', t: st.contribution },
+  ];
+  return out.filter((n) => n.t);
+}
+
 function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
   const ref = useDialog<HTMLDivElement>();
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -468,6 +486,15 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
+
+  // one picture, then one piece of text, alternating sides down the page
+  const notes = notesOf(card);
+  const flow: ({ kind: 'shot'; i: number } | { kind: 'note'; i: number })[] = [];
+  const n = Math.max(card.images.length, notes.length);
+  for (let i = 0; i < n; i++) {
+    if (i < card.images.length) flow.push({ kind: 'shot', i });
+    if (i < notes.length) flow.push({ kind: 'note', i });
+  }
 
   return (
     <motion.div className="pv-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.18 } }}>
@@ -486,42 +513,51 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
         <button type="button" className="pv-close" onClick={onClose} aria-label="Close">
           Close
         </button>
-        <h2 id="pv-title" className="pv-title">
-          {card.title}
-        </h2>
-        <p className="pv-brief">{card.study?.brief ?? card.line}</p>
 
-        {/* two to a row, with every third running the full width */}
-        <div className="pv-shots">
-          {card.images.map((shot, i) => (
-            <figure key={shot.src} className={`pv-shot${i % 3 === 2 ? ' is-wide' : ''}`}>
-              {shot.video ? (
-                <video
-                  poster={base() + shot.src}
-                  aria-label={shot.caption}
-                  muted
-                  loop
-                  playsInline
-                  autoPlay={!reducedMotion}
-                  controls={reducedMotion}
-                  preload="metadata"
-                >
-                  <source src={base() + shot.video + '.webm'} type="video/webm" />
-                  <source src={base() + shot.video + '.mp4'} type="video/mp4" />
-                </video>
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={base() + shot.src} alt={shot.caption} loading={i < 2 ? undefined : 'lazy'} draggable={false} />
-              )}
-              {shot.credit && !shot.credit.startsWith('own') && (
-                <figcaption>
-                  <a href={shot.credit} target="_blank" rel="noreferrer">
-                    Image source
-                  </a>
-                </figcaption>
-              )}
-            </figure>
-          ))}
+        <header className="pv-head">
+          <h2 id="pv-title" className="pv-title">
+            {card.title}
+          </h2>
+          <p className="pv-brief">{card.study?.brief ?? card.line}</p>
+        </header>
+
+        <div className="pv-flow">
+          {flow.map((item) =>
+            item.kind === 'shot' ? (
+              <figure key={`s${item.i}`} className={`pv-shot ${item.i % 2 ? 'is-right' : 'is-left'}`}>
+                {card.images[item.i].video ? (
+                  <video
+                    poster={base() + card.images[item.i].src}
+                    aria-label={card.images[item.i].caption}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay={!reducedMotion}
+                    controls={reducedMotion}
+                    preload="metadata"
+                  >
+                    <source src={base() + card.images[item.i].video + '.webm'} type="video/webm" />
+                    <source src={base() + card.images[item.i].video + '.mp4'} type="video/mp4" />
+                  </video>
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={base() + card.images[item.i].src} alt={card.images[item.i].caption} loading={item.i < 2 ? undefined : 'lazy'} draggable={false} />
+                )}
+                {card.images[item.i].credit && !card.images[item.i].credit!.startsWith('own') && (
+                  <figcaption>
+                    <a href={card.images[item.i].credit} target="_blank" rel="noreferrer">
+                      Image source
+                    </a>
+                  </figcaption>
+                )}
+              </figure>
+            ) : (
+              <div key={`n${item.i}`} className={`pv-note ${item.i % 2 ? 'is-left' : 'is-right'}`}>
+                {notes[item.i].h && <h3>{notes[item.i].h}</h3>}
+                <p>{notes[item.i].t}</p>
+              </div>
+            ),
+          )}
         </div>
 
         <ul className="pv-chips">
@@ -538,12 +574,6 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
     </motion.div>
   );
 }
-
-
-/* ---------- torn remnant: the strip left under the rings when the sheet above is ripped away, drawn right to left ---------- */
-
-
-/* ---------- the name: big on the landing page, shrinks into the top-left corner on the about page ---------- */
 
 function NameTag({ page, onHome }: { page: Route['page']; onHome: () => void }) {
   const mode = page === 'home' ? 'home' : page === 'about' ? 'corner' : 'hidden';

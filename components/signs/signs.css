@@ -1136,29 +1136,44 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 .pv-close:hover { background: var(--ink); color: var(--cream, #f7f6f1); }
 .pv-close:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* the name and the lede, side by side rather than stacked and centred */
+.pv-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(14px, 2.4vw, 42px);
+  align-items: end;
+  text-align: left;
+}
 .pv-title {
   margin: 0;
   font-family: var(--disp);
   font-weight: 700;
   font-size: clamp(2rem, 6.2vw, 4.6rem);
-  line-height: 1;
+  line-height: 0.98;
   letter-spacing: -0.022em;
   text-transform: uppercase;
   text-wrap: balance;
 }
 .pv-brief {
-  max-width: 48ch;
-  margin: clamp(16px, 2.6vh, 26px) auto 0;
-  font-size: clamp(14px, 1.15vw, 16px);
-  line-height: 1.6;
+  margin: 0 0 0.35em;
+  font-size: clamp(14px, 1.1vw, 15.5px);
+  line-height: 1.65;
   color: var(--ink-soft);
   text-wrap: pretty;
 }
-.pv-shots {
+
+/* Pictures and text down one column, each pulled to its own side, so the page
+   reads as a spread instead of a stack with a paragraph nailed to the top. */
+.pv-flow {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(16px, 2.2vw, 30px);
-  margin: clamp(42px, 7vh, 82px) 0 0;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(34px, 6vh, 72px) clamp(20px, 2.6vw, 38px);
+  margin: clamp(44px, 8vh, 92px) 0 0;
+  align-items: start;
+  /* the spans leave a gutter free beside each picture; dense lets the piece of
+     text that follows it drop into that gutter instead of onto its own row */
+  grid-auto-flow: row dense;
+  text-align: left;
 }
 .pv-shot {
   margin: 0;
@@ -1167,16 +1182,35 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   background: #fff;
   box-shadow: 0 16px 34px -24px rgba(0, 0, 0, 0.42);
 }
-.pv-shot.is-wide { grid-column: 1 / -1; }
+.pv-shot.is-left { grid-column: 1 / 8; }
+.pv-shot.is-right { grid-column: 6 / 13; }
 .pv-shot img,
 .pv-shot video { display: block; width: 100%; height: auto; }
 .pv-shot figcaption {
   padding: 9px 14px;
   font-size: 12px;
   color: var(--ink-soft);
-  text-align: left;
 }
 .pv-shot figcaption a { color: inherit; }
+.pv-note { align-self: center; }
+.pv-note.is-right { grid-column: 8 / 13; }
+.pv-note.is-left { grid-column: 1 / 6; }
+.pv-note h3 {
+  margin: 0 0 9px;
+  font-family: var(--disp);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.pv-note p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.68;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
 .pv-chips {
   display: flex;
   flex-wrap: wrap;
@@ -1208,8 +1242,12 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 
 @media (max-width: 640px) {
   .pv { padding-left: 18px; padding-right: 18px; }
-  .pv-shots { grid-template-columns: 1fr; }
-  .pv-shot.is-wide { grid-column: auto; }
+  .pv-head { grid-template-columns: 1fr; gap: 16px; align-items: start; }
+  .pv-flow { gap: 26px; }
+  .pv-shot.is-left,
+  .pv-shot.is-right,
+  .pv-note.is-left,
+  .pv-note.is-right { grid-column: 1 / -1; }
 }
 
 /* ------------------------------------------------------- Art lightbox ----
