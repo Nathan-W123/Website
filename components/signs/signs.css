@@ -876,7 +876,7 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-fan {
   --cw: clamp(140px, 16.5vw, 212px);
   position: relative;
-  height: calc(var(--cw) * 1.56);
+  height: calc(var(--cw) * 1.46);
   margin: clamp(0px, 0.6vw, 10px) auto clamp(4px, 1vw, 18px);
 }
 .hm-fan-seat {

@@ -25,10 +25,10 @@ type Side = 'engineering' | 'art';
  * screen size.
  */
 const SEATS = [
-  { w: 0.86, dx: -0.98, dy: 0.2, tilt: -10, z: 2, from: { x: '-95vw', y: '24vh', r: -38 } },
-  { w: 1.1, dx: -0.33, dy: -0.04, tilt: -3, z: 4, from: { x: '18vw', y: '-78vh', r: 22 } },
-  { w: 0.92, dx: 0.34, dy: 0.17, tilt: 5, z: 3, from: { x: '-26vw', y: '82vh', r: -16 } },
-  { w: 1.02, dx: 0.98, dy: -0.14, tilt: 10, z: 1, from: { x: '96vw', y: '-30vh', r: 34 } },
+  { w: 0.92, dx: -0.97, dy: 0.1, tilt: -7, z: 2, from: { x: '-95vw', y: '24vh', r: -38 } },
+  { w: 1.06, dx: -0.33, dy: -0.02, tilt: -2.5, z: 4, from: { x: '18vw', y: '-78vh', r: 22 } },
+  { w: 0.95, dx: 0.33, dy: 0.08, tilt: 3.5, z: 3, from: { x: '-26vw', y: '82vh', r: -16 } },
+  { w: 1.01, dx: 0.97, dy: -0.07, tilt: 7, z: 1, from: { x: '96vw', y: '-30vh', r: 34 } },
 ]
 
 /** Four of whichever side you are looking at, cropped to 4:5 and tonally matched
