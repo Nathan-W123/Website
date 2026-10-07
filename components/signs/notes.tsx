@@ -2,20 +2,18 @@
 
 import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
-import type { Plank } from './signpost';
 
 /**
  * A board of sticky notes: one note per section, stuck to the paper at
  * slightly different angles. Replaces the second-level signposts (the art
  * sections and the project groups). Each note is a link; the swipe direction
- * is passed on through `onGo` like a signpost plank.
  */
 
 export type Note = { label: string; sub?: string; href: string; dir: 'left' | 'right' };
 
 const TILTS = [-4, 3, -2, 4, -3, 2];
 
-export function StickyBoard({ title, notes, onGo, footer, aside }: { title: string; notes: Note[]; onGo: (p: Plank) => void; footer?: ReactNode; aside?: ReactNode }) {
+export function StickyBoard({ title, notes, footer, aside }: { title: string; notes: Note[]; footer?: ReactNode; aside?: ReactNode }) {
   return (
     <div className="nb">
       <h1 className="nb-title">{title}</h1>
@@ -28,7 +26,6 @@ export function StickyBoard({ title, notes, onGo, footer, aside }: { title: stri
               className="nb-note"
               href={n.href}
               style={{ ['--tilt' as string]: `${tilt}deg` } as CSSProperties}
-              onClick={() => onGo({ label: n.label, dir: n.dir, href: n.href })}
               initial={{ y: -40, opacity: 0, rotate: tilt - 8, scale: 0.9 }}
               animate={{ y: 0, opacity: 1, rotate: tilt, scale: 1 }}
               transition={{ type: 'spring', stiffness: 170, damping: 14, delay: 0.55 + i * 0.1 }}

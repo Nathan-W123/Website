@@ -99,10 +99,29 @@ export function Landing({
   onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void;
 }) {
   const [side, setSide] = useState<Side>('engineering');
+  // mid-shuffle the four cards are squared into one deck; the pictures change
+  // underneath while they are stacked, then the deck is dealt back out
+  const [stacked, setStacked] = useState(false);
+  const shuffleTimers = useRef<number[]>([]);
   const reduce = useReducedMotion();
   const fan = useRef<HTMLDivElement>(null);
   // the cards fly in from off the edges on load and again on the way back up
   const fanIn = useInView(fan, { amount: 0.35 });
+
+  const flip = () => {
+    if (stacked) return;
+    const other: Side = side === 'art' ? 'engineering' : 'art';
+    if (reduce) {
+      setSide(other);
+      return;
+    }
+    setStacked(true);
+    shuffleTimers.current.push(
+      window.setTimeout(() => setSide(other), 330),
+      window.setTimeout(() => setStacked(false), 430),
+    );
+  };
+  useEffect(() => () => shuffleTimers.current.forEach((t) => window.clearTimeout(t)), []);
 
   // Gallery, pressed from another page, routes home and leaves a note behind
   useEffect(() => {
@@ -138,11 +157,19 @@ export function Landing({
               style={{ zIndex: seat.z, '--w': seat.w, '--dx': seat.dx, '--dy': seat.dy } as CSSProperties}
               initial={reduce ? false : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }}
               animate={
-                reduce || fanIn
-                  ? { opacity: 1, scale: 1, rotate: seat.tilt, x: 0, y: 0 }
-                  : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }
+                !reduce && !fanIn
+                  ? { opacity: 0, scale: 0.8, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }
+                  : stacked
+                    ? // squared up into a deck: the offsets its seat gives it, cancelled,
+                      // and every card scaled to the same width whatever size it is
+                      { opacity: 1, x: `${(-seat.dx / seat.w) * 100}%`, y: `${(-seat.dy / seat.w) * 100}%`, rotate: (i - 1.5) * 1.5, scale: 0.98 / seat.w }
+                    : { opacity: 1, scale: 1, rotate: seat.tilt, x: 0, y: 0 }
               }
-              transition={{ ...spring, delay: reduce || !fanIn ? 0 : 0.08 + i * 0.09 }}
+              transition={
+                stacked
+                  ? { type: 'spring', stiffness: 460, damping: 38 }
+                  : { ...spring, delay: reduce || !fanIn ? 0 : 0.05 + i * 0.07 }
+              }
             >
               {/* nudgeable: it gives a little under the cursor and springs back */}
               <motion.div
@@ -164,8 +191,8 @@ export function Landing({
                     draggable={false}
                     initial={reduce ? false : { opacity: 0, scale: 1.07 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, transition: { duration: reduce ? 0.01 : 0.24 } }}
-                    transition={{ duration: reduce ? 0.01 : 0.4, ease: 'easeOut', delay: reduce ? 0 : i * 0.05 }}
+                    exit={{ opacity: 0, transition: { duration: reduce ? 0.01 : 0.14 } }}
+                    transition={{ duration: reduce ? 0.01 : 0.2, ease: 'easeOut' }}
                   />
                 </AnimatePresence>
               </motion.div>
@@ -198,7 +225,7 @@ export function Landing({
           role="switch"
           aria-checked={side === 'art'}
           aria-label={side === 'art' ? 'Showing art. Switch to engineering.' : 'Showing engineering. Switch to art.'}
-          onClick={() => setSide((s) => (s === 'art' ? 'engineering' : 'art'))}
+          onClick={flip}
         >
           <span className="hm-switch-knob" aria-hidden="true" />
         </button>
@@ -219,7 +246,7 @@ export function Landing({
           {side === 'engineering'
             ? ALL_PROJECTS.map((c, i) => (
                 /* the square tile, not the wide figure the case study uses */
-                <Tile key={c.id} i={i} image={`/tiles/${c.id}.webp`} label={c.title} line={c.line} onOpen={() => onOpenProject(c)} />
+                <Tile key={c.id} i={i} image={`/tiles/${c.id}.webp`} label={c.title} line={c.tag} onOpen={() => onOpenProject(c)} />
               ))
             : ALL_ART.map((a, i) => (
                 <Tile

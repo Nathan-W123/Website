@@ -1,10 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { AnimatePresence, motion, type Variants } from 'motion/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
-import { ABOUT, ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } from './content';
-import type { Study } from './studies';
+import { ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } from './content';
 import { SignChain } from './chain';
 import { Doodles } from './doodles';
 import { Scribble } from './scribble';
@@ -14,7 +13,6 @@ import { About } from './about';
 import { IndexCard, StickyBoard } from './notes';
 import { ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
-import type { Plank } from './signpost';
 import './signs.css';
 
 declare global {
@@ -44,79 +42,10 @@ const parse = (hash: string): Route => {
 const routeKey = (r: Route) => (r.page === 'art' ? `art/${r.section ?? ''}` : r.page === 'projects' ? `projects/${r.group ?? ''}` : r.page);
 /** The pages in the new, plain language: no paper, no pencil, no tag. */
 const plain = (r: Route) => r.page === 'home' || r.page === 'about';
-const depth = (r: Route) => (r.page === 'home' ? 0 : (r.page === 'art' && r.section) || (r.page === 'projects' && r.group) ? 2 : 1);
-
-/** Which way the world moves during a swipe. A plank pointing right sends the world left. */
-type Dir = 'left' | 'right' | 'up' | 'down';
-const reverse = (d: Dir): Dir => (d === 'left' ? 'right' : d === 'right' ? 'left' : d === 'up' ? 'down' : 'up');
-const plankDir = (p: Plank): Dir => (p.href === '#/contact' ? 'up' : p.dir === 'right' ? 'left' : 'right');
-
-const FAR = '200';
-const SWIPE = 1.05;
-const TEAR = 1.0;
-const ease = [0.7, 0, 0.3, 1] as const;
-type Mode = 'swipe' | 'tear' | 'fade';
-type Move = { dir: Dir; mode: Mode; slow?: number };
-
-/** A jagged top edge as an SVG mask (static: applied once when the sheet starts tearing, so no repaints). */
-const TORN = [4.2, 1.2, 5.6, 1.8, 4.9, 0.8, 6.3, 2.3, 3.9, 1.3, 5.3, 2.8, 4.6];
-const TORN_MASK = `url("data:image/svg+xml,${encodeURIComponent(
-  `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><polygon fill='black' points='${TORN.map((y, i) => `${((i / (TORN.length - 1)) * 100).toFixed(2)},${y}`).join(' ')} 100,100 0,100'/></svg>`,
-)}")`;
-const NO_MASK = 'none';
-
-const variants: Variants = {
-  enter: ({ dir: d, mode }: Move) =>
-    mode === 'tear'
-      ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, opacity: 1, zIndex: 0, maskImage: NO_MASK, WebkitMaskImage: NO_MASK, transition: { duration: 0.01 } }
-      : mode === 'fade'
-        ? { x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, zIndex: 1, opacity: 0, maskImage: NO_MASK, WebkitMaskImage: NO_MASK }
-        : { x: d === 'left' ? `${FAR}vw` : d === 'right' ? `-${FAR}vw` : 0, y: d === 'up' ? `${FAR}vh` : d === 'down' ? `-${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, rotateY: 0, opacity: 1, zIndex: 1, maskImage: NO_MASK, WebkitMaskImage: NO_MASK },
-  center: ({ mode }: Move) => ({ x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, zIndex: 1, opacity: 1, maskImage: NO_MASK, WebkitMaskImage: NO_MASK, transition: mode === 'fade' ? { duration: 0.5, ease: 'easeOut' } : { duration: SWIPE, ease } }),
-  exit: ({ dir: d, mode, slow = 1 }: Move) =>
-    mode === 'tear'
-      ? {
-          // the top-right corner is pinched: the sheet twists and bends over from that corner, swinging
-          // about the top-left one, then the whole thing drops. Transforms only, so it stays at 60 fps.
-          maskImage: TORN_MASK,
-          WebkitMaskImage: TORN_MASK,
-          rotate: [0, 2, 5, 9, 14, 20, 26, 62],
-          rotateX: [0, -4, -9, -15, -22, -28, -32, -44],
-          rotateY: [0, 4, 9, 14, 18, 20, 20, 24],
-          x: ['0vw', '0.3vw', '0.8vw', '1.4vw', '2vw', '2.6vw', '3vw', '10vw'],
-          y: ['0vh', '0vh', '0.3vh', '0.8vh', '1.5vh', '2.6vh', '4vh', '130vh'],
-          scale: [1, 1, 1, 1, 1, 1, 1, 0.9],
-          opacity: [1, 1, 1, 1, 1, 1, 1, 0.85],
-          zIndex: 5,
-          transition: { duration: TEAR * slow, times: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.62, 1], ease: 'easeIn' },
-        }
-      : mode === 'fade'
-        ? { opacity: 0, x: 0, y: 0, scale: 1, rotate: 0, rotateX: 0, rotateY: 0, zIndex: 0, maskImage: NO_MASK, WebkitMaskImage: NO_MASK, transition: { duration: 0.35, ease: 'easeIn' } }
-        : { x: d === 'left' ? `-${FAR}vw` : d === 'right' ? `${FAR}vw` : 0, y: d === 'up' ? `-${FAR}vh` : d === 'down' ? `${FAR}vh` : 0, scale: 0.9, rotate: 0, rotateX: 0, rotateY: 0, opacity: 1, zIndex: 1, maskImage: NO_MASK, WebkitMaskImage: NO_MASK, transition: { duration: SWIPE, ease } },
-};
-/** Fold shading on the torn sheet: its own layer, opacity only. */
-const foldVariants: Variants = {
-  enter: { opacity: 0 },
-  center: { opacity: 0 },
-  exit: ({ mode }: Move) => (mode === 'tear' ? { opacity: [0, 0.35, 0.6, 0.8, 0.85], transition: { duration: TEAR * 0.7, ease: 'easeOut' } } : { opacity: 0 }),
-};
-
 export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
-  const [move, setMove] = useState<Move>({ dir: 'left', mode: 'swipe' });
-  const [swipe, setSwipe] = useState<{ id: number; dir: Dir } | null>(null);
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
-  // while a sheet is being torn off, the name waits underneath until the tear is done
-  const [nameHold, setNameHold] = useState(false);
-  const [tearing, setTearing] = useState(false);
-  // the direction a plank was clicked in, consumed by the next hash change
-  const pending = useRef<Dir | null>(null);
-  // set by any Home control: the next trip home tears the sheet off instead of swiping
-  const pendingMode = useRef<Mode>('swipe');
-  // how each route was entered, so going back reverses it
-  const entered = useRef<Record<string, Dir>>({});
-  const swipes = useRef(0);
 
   const routeRef = useRef<Route>({ page: 'home' });
   const first = useRef(true);
@@ -125,32 +54,9 @@ export default function Signs() {
     const apply = () => {
       const cur = routeRef.current;
       const next = parse(window.location.hash);
-      const ck = routeKey(cur), nk = routeKey(next);
-      if (ck === nk && !first.current) return;
-      let d: Dir;
-      if (pending.current) {
-        d = pending.current;
-        entered.current[nk] = d;
-      } else if (entered.current[ck] && depth(next) < depth(cur)) {
-        d = reverse(entered.current[ck]);
-      } else {
-        d = next.page === 'contact' ? 'up' : cur.page === 'contact' ? 'down' : depth(next) >= depth(cur) ? 'left' : 'right';
-        if (depth(next) > depth(cur)) entered.current[nk] = d;
-      }
-      const mode: Mode = (next.page === 'home' || next.page === 'about') && !first.current ? pendingMode.current : 'swipe';
-      pending.current = null;
-      pendingMode.current = 'swipe';
+      if (routeKey(cur) === routeKey(next) && !first.current) return;
       routeRef.current = next;
-      // debug: window.__SLOW = 6 plays the tear in slow motion
-      setMove({ dir: d, mode, slow: (window as unknown as { __SLOW?: number }).__SLOW || 1 });
       setRoute(next);
-      if (mode === 'tear') {
-        setNameHold(true);
-        window.setTimeout(() => setNameHold(false), TEAR * 1000 * ((window as unknown as { __SLOW?: number }).__SLOW || 1) - 150);
-        setTearing(true);
-        window.setTimeout(() => setTearing(false), TEAR * 1000 * ((window as unknown as { __SLOW?: number }).__SLOW || 1) + 50);
-      }
-      if (!first.current && mode === 'swipe') setSwipe({ id: ++swipes.current, dir: d });
       first.current = false;
     };
     apply();
@@ -166,22 +72,10 @@ export default function Signs() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!swipe) return;
-    const t = window.setTimeout(() => setSwipe(null), SWIPE * 1000 + 100);
-    return () => window.clearTimeout(t);
-  }, [swipe]);
-
-  const onPlank = useCallback((p: Plank) => {
-    pending.current = plankDir(p);
-    if (p.href === '#/') pendingMode.current = 'tear';
-    if (p.href === '#/about') pendingMode.current = 'fade';
-  }, []);
   const go = useCallback((hash: string) => {
     window.location.hash = hash;
   }, []);
   const goHome = useCallback(() => {
-    pendingMode.current = 'tear';
     window.location.hash = '#/';
   }, []);
 
@@ -198,21 +92,10 @@ export default function Signs() {
   }, [lightbox, project, route]);
 
   return (
-    <div className={`sg-root${tearing ? ' sg-tearing' : ''}`}>
+    <div className="sg-root">
       <div className="sg-stage" inert={!!(project || lightbox)}>
-      <AnimatePresence mode="sync" custom={move} initial={false}>
-        <motion.section
-          key={routeKey(route)}
-          className={`sg-page${plain(route) ? ' sg-page--plain' : ''}`}
-          custom={move}
-          variants={variants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-        >
+      <section className={`sg-page${plain(route) ? ' sg-page--plain' : ''}`}>
           {plain(route) || <Scribble />}
-          <motion.div className="sg-fold" variants={foldVariants} aria-hidden="true" />
-          {route.page === 'home' && move.mode === 'tear' && <TornRemnant />}
           {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
           {route.page === 'home' && <Landing onOpenProject={setProject} onOpenArt={setLightbox} />}
 
@@ -221,7 +104,6 @@ export default function Signs() {
               <BackSign label="Home" onClick={goHome} />
               <StickyBoard
                 title="my art"
-                onGo={onPlank}
                 notes={ART.map((s) => ({ label: s.label.toLowerCase(), sub: `${s.items.length} pieces`, href: `#/art/${s.id}`, dir: 'right' as const }))}
                 footer={
                   <>
@@ -245,7 +127,6 @@ export default function Signs() {
               <BackSign label="Home" onClick={goHome} />
               <StickyBoard
                 title="my projects"
-                onGo={onPlank}
                 notes={PROJECT_GROUPS.map((g) => ({ label: g.label.toLowerCase(), sub: `${g.cards.length} ${g.cards.length === 1 ? 'project' : 'projects'}`, href: `#/projects/${g.id}`, dir: 'right' as const }))}
                 footer={
                   <>
@@ -268,12 +149,10 @@ export default function Signs() {
           {route.page === 'contact' && <Contact onBack={goHome} />}
 
           {route.page === 'about' && <About onHome={goHome} />}
-        </motion.section>
-      </AnimatePresence>
+      </section>
 
-      <NameTag page={plain(route) || nameHold ? 'art' : route.page} onHome={goHome} />
+      <NameTag page={plain(route) ? 'art' : route.page} onHome={goHome} />
 
-      {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
       </div>
 
       <AnimatePresence>{project && <ProjectView key={project.id} card={project} onClose={() => setProject(null)} />}</AnimatePresence>
@@ -359,40 +238,6 @@ function Lightbox({ item, onClose }: { item: { image: string; caption: string; m
               <figcaption id="sg-lb-caption">{lightbox.caption}</figcaption>
               <button type="button" className="sg-close" onClick={onClose} aria-label="Close">×</button>
             </motion.figure>
-  );
-}
-
-/* ---------- swipe dashes: cartoon speed lines streaking past ---------- */
-
-const rnd = (i: number, k: number) => {
-  const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
-  return x - Math.floor(x);
-};
-
-function Dashes({ dir }: { dir: Dir }) {
-  const horizontal = dir === 'left' || dir === 'right';
-  const sign = dir === 'left' || dir === 'up' ? -1 : 1;
-  return (
-    <div className="sg-dashes" aria-hidden="true">
-      {Array.from({ length: 26 }, (_, i) => {
-        const pos = 4 + rnd(i, 1) * 92;
-        const len = 70 + rnd(i, 2) * 260;
-        const thick = 5 + Math.round(rnd(i, 3) * 4);
-        const dur = 0.45 + rnd(i, 4) * 0.35;
-        const delay = 0.1 + rnd(i, 5) * 0.35;
-        const from = -sign * 130, to = sign * 130;
-        return (
-          <motion.span
-            key={i}
-            className="sg-dash"
-            style={horizontal ? { top: `${pos}%`, left: `-${len}px`, width: len, height: thick } : { left: `${pos}%`, top: `-${len}px`, height: len, width: thick }}
-            initial={horizontal ? { x: `${from}vw`, opacity: 0 } : { y: `${from}vh`, opacity: 0 }}
-            animate={horizontal ? { x: [`${from}vw`, `${to}vw`], opacity: [0, 1, 1, 0] } : { y: [`${from}vh`, `${to}vh`], opacity: [0, 1, 1, 0] }}
-            transition={{ duration: dur, ease: 'linear', delay }}
-          />
-        );
-      })}
-    </div>
   );
 }
 
@@ -658,79 +503,9 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="sg-cs">
-      <h3>{title}</h3>
-      {children}
-    </section>
-  );
-}
-
-function CaseStudy({ study }: { study: Study }) {
-  return (
-    <div className="sg-study">
-      <Section title="Problem">
-        <p>{study.problem}</p>
-      </Section>
-      <Section title="What I built">
-        <p>{study.built}</p>
-      </Section>
-      <Section title="How it works">
-        <ul>
-          {study.how.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-        {study.snippet && (
-          <figure className="sg-code">
-            <pre>
-              <code>{study.snippet.code}</code>
-            </pre>
-            <figcaption>{study.snippet.note}</figcaption>
-          </figure>
-        )}
-      </Section>
-      <Section title="My contribution">
-        <p>{study.contribution}</p>
-      </Section>
-      <Section title="Technical challenges">
-        <ul>
-          {study.challenges.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-      </Section>
-      <Section title="Results">
-        <ul className="sg-cs-results">
-          {study.results.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-      </Section>
-      <Section title="Tech">
-        <ul className="sg-chips">
-          {study.tech.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-      </Section>
-    </div>
-  );
-}
 
 /* ---------- torn remnant: the strip left under the rings when the sheet above is ripped away, drawn right to left ---------- */
 
-function TornRemnant() {
-  const pts = TORN.map((y, i) => `${((i / (TORN.length - 1)) * 100).toFixed(2)},${(y * 8).toFixed(1)}`).join(' ');
-  return (
-    <motion.div className="sg-remnant" aria-hidden="true" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: TEAR * 0.55, ease: 'linear' }}>
-      <svg viewBox="0 0 100 60" preserveAspectRatio="none">
-        <polygon points={`0,0 100,0 ${pts}`} fill="#fff" stroke="#111" strokeWidth="0.35" vectorEffect="non-scaling-stroke" />
-      </svg>
-    </motion.div>
-  );
-}
 
 /* ---------- the name: big on the landing page, shrinks into the top-left corner on the about page ---------- */
 

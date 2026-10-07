@@ -65,12 +65,28 @@ export const ART = [
 const all: NotebookProject[] = CHAPTERS.flatMap((c) => c.projects);
 const pick = (ids: string[]) => ids.map((id) => all.find((p) => p.id === id)).filter((p): p is NotebookProject => !!p);
 
-export type Card = { id: string; title: string; line: string; stack: string[]; href?: string; image?: string; notes: string[]; images: Shot[]; study?: Study };
+export type Card = { id: string; title: string; line: string; tag: string; stack: string[]; href?: string; image?: string; notes: string[]; images: Shot[]; study?: Study };
 
 /** Gallery images come from ./gallery (1-4 per project); the first one is the card cover. */
+/** Two or three words under a tile on the home page: what the thing is, nothing more. */
+const TAGS: Record<string, string> = {
+  machina: 'Sheet-forming solver',
+  siege: 'Reinforcement-learning agent',
+  kumi: 'Multi-agent Git coordination',
+  ignis: 'Rocket propulsion engine',
+  sparlab: 'Finite-element solver',
+  aether6: 'Fixed-wing flight simulator',
+  quantize: 'Molecular geometry fitting',
+  aero: 'Lattice-Boltzmann CFD',
+  formulate: 'Formulation search',
+  'black-hole': 'Relativistic ray tracer',
+  'hf-scf': 'Hartree-Fock engine',
+  'high-risk-roads': 'Traffic safety analysis',
+};
+
 const toCard = (p: NotebookProject): Card => {
   const images = GALLERY[p.id] ?? (p.image ? [{ src: p.image, caption: p.name }] : []);
-  return { id: p.id, title: p.name, line: p.tagline, stack: p.stack.split(' · '), href: p.href, image: images[0]?.src ?? p.image, notes: p.notes, images, study: STUDIES[p.id] };
+  return { id: p.id, title: p.name, line: p.tagline, tag: TAGS[p.id] ?? p.tagline, stack: p.stack.split(' · '), href: p.href, image: images[0]?.src ?? p.image, notes: p.notes, images, study: STUDIES[p.id] };
 };
 
 export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
