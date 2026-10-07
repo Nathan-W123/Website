@@ -1,9 +1,22 @@
 import type { Metadata } from 'next';
-import { Architects_Daughter, Cabin_Sketch } from 'next/font/google';
+import localFont from 'next/font/local';
 import SketchPortfolio from '@/components/sketch/sketch';
 
-const cabinSketch = Cabin_Sketch({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-cabin-sketch' });
-const architects = Architects_Daughter({ weight: '400', subsets: ['latin'], variable: '--font-architects' });
+// shipped with the repo rather than fetched at build time; see app/page.tsx
+const cabinSketch = localFont({
+  src: [
+    { path: '../fonts/cabin-sketch-400.woff2', weight: '400', style: 'normal' },
+    { path: '../fonts/cabin-sketch-700.woff2', weight: '700', style: 'normal' },
+  ],
+  display: 'swap',
+  variable: '--font-cabin-sketch',
+});
+const architects = localFont({
+  src: '../fonts/architects-daughter-400.woff2',
+  weight: '400',
+  display: 'swap',
+  variable: '--font-architects',
+});
 
 export const metadata: Metadata = {
   title: 'Nathan W. — Portfolio',

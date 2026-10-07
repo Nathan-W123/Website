@@ -1,10 +1,32 @@
 import type { Metadata } from 'next';
-import { Baloo_2, Caveat, Nunito } from 'next/font/google';
+import localFont from 'next/font/local';
 import LofiRoom from '@/components/lofi/lofi';
 
-const baloo = Baloo_2({ weight: ['700', '800'], subsets: ['latin'], variable: '--font-baloo' });
-const nunito = Nunito({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-nunito' });
-const caveat = Caveat({ weight: ['500', '700'], subsets: ['latin'], variable: '--font-caveat' });
+// shipped with the repo rather than fetched at build time; see app/page.tsx
+const baloo = localFont({
+  src: [
+    { path: '../fonts/baloo2-700.woff2', weight: '700', style: 'normal' },
+    { path: '../fonts/baloo2-800.woff2', weight: '800', style: 'normal' },
+  ],
+  display: 'swap',
+  variable: '--font-baloo',
+});
+const nunito = localFont({
+  src: [
+    { path: '../fonts/nunito-400.woff2', weight: '400', style: 'normal' },
+    { path: '../fonts/nunito-700.woff2', weight: '700', style: 'normal' },
+  ],
+  display: 'swap',
+  variable: '--font-nunito',
+});
+const caveat = localFont({
+  src: [
+    { path: '../fonts/caveat-500.woff2', weight: '500', style: 'normal' },
+    { path: '../fonts/caveat-700.woff2', weight: '700', style: 'normal' },
+  ],
+  display: 'swap',
+  variable: '--font-caveat',
+});
 
 export const metadata: Metadata = {
   title: 'Nathan W. — art & engineering',
