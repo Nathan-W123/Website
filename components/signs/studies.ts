@@ -6,6 +6,8 @@
  */
 export type Snippet = { lang: string; code: string; note: string };
 export type Study = {
+  /** Two sentences for the project page: what it is, and the number that matters. */
+  brief: string;
   problem: string;
   built: string;
   how: string[];
@@ -18,6 +20,7 @@ export type Study = {
 
 export const STUDIES: Record<string, Study> = {
   "siege": {
+    brief: "A Clash Royale battle simulator with 180 cards, a PPO self-play trainer with a league of past checkpoints, and a WebGL viewer that shows the policy network firing live. On the live-legal observation tier it wins 95 to 100 per cent against five scripted archetype bots over 100 matches each.",
     problem: "Can a policy learn Clash Royale strategy — which card to play and where, every half second, on an elixir budget — using only what a human player can see? I had no simulator to train in, so the game had to be built first, and the scripted opponents had to be good enough that beating them meant something.",
     built: "A config-driven battle simulator with 180 playable cards (117 base cards, 41 evolutions, 22 hero-slot cards including the 8 Champions), 70 ladder decks and 44 named meta archetypes; a PPO self-play trainer with a league of past checkpoints and five frozen scripted archetype bots as the benchmark; a WebGL viewer that shows the policy network firing live (photo 2); and a screen-capture bridge that lets a trained checkpoint tap cards in the real Windows client.",
     how: [
@@ -54,6 +57,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "kumi": {
+    brief: "A control plane that lets several people and their own coding agents work on one Git repository at once, with leases, scope enforcement and compare-and-swap promotion. Against a real Codex agent on a twelve-file library the coordinated arm integrated three tasks in three attempts, where the uncoordinated arm needed five and rebuilt twice, every run.",
     problem: "Put two coding agents on one repository and each patches the same file; one patch is lost. With ten agents that is the normal outcome, and git worktrees only move the collision to merge time. The hard part is letting several people, each running their own agent on their own laptop, edit one codebase at once without silent overwrites, and without paying a model call for coordination on every task.",
     built: "The backend is a TypeScript control plane that holds the canonical bare Git repository and a task queue with leases, plan admission, scope enforcement and compare-and-swap promotion, behind a versioned HTTP and WebSocket API, with SQLite or PostgreSQL behind one store interface. A worker on each teammate's desktop polls it every 5 s, runs that person's own vendor CLI (Claude Code, Codex, Cursor, Gemini, Copilot, Kiro or a generic CLI) in an isolated checkout, and sends back a changeset. Photos 1 to 3 show the team workspace my teammate built on top; photo 4 is the lifecycle diagram from the architecture reference.",
     how: [
@@ -90,6 +94,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "black-hole": {
+    brief: "A ray tracer that integrates null geodesics around a Schwarzschild black hole and draws the shadow, the photon ring, the far side of the disk arched over the hole, and a starfield bent into arcs. Thirty-eight physics tests check it against closed-form values.",
     problem: "I wanted to render what a Schwarzschild black hole with a thin accretion disk looks like from a camera placed anywhere near it, by integrating the real geodesic equations rather than using a lensing shortcut. It is hard because light near the hole can loop the photon sphere, hit the far side of the disk from below, or fall in, and because there is no reference image to compare against, so every stage has to be checked against exact Schwarzschild results.",
     built: "A Python package (blackhole/, 1,167 lines in six modules) plus six example scripts. examples/05_composite.py traces 520 × 325 rays from a camera 45 M out at 80° inclination and produces photo 1: an opaque disk, the black shadow, a thin photon ring, the far side of the disk arched over and mirrored under the hole, and a starfield bent into arcs. A 38-test pytest suite, most of it checking the physics against closed-form Schwarzschild values, backs it.",
     how: [
@@ -128,6 +133,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "aero": {
+    brief: "A lattice-Boltzmann CFD package — D2Q9, D3Q19 and D3Q27, four collision operators — with a browser UI laid out like a desktop package: ribbon, property grid, a WebGL2 viewport that ray-marches the flow as a volume, and live convergence. A cylinder at Re 100 runs 24,000 steps in 64 seconds on four cores, about 29 MLUPS.",
     problem: "I wanted a wind tunnel that runs on a laptop: put a shape (a cylinder, a sphere, an STL of an aircraft) in a flow at a chosen Reynolds number and read off its drag, lift and wake, and know how far to trust the number. The lattice Boltzmann method makes the first part tractable; the second is the hard part. A small tunnel inflates drag through confinement, a coarse grid inflates it again, BGK goes unstable near the relaxation limit a high Reynolds number pushes you to, and a single wrong normalisation can make a result agree with the literature for the wrong reason.",
     built: "A Python lattice-Boltzmann package (D2Q9, D3Q19 and D3Q27 lattices; BGK, TRT, MRT and regularized collision) with three front ends: command-line solvers for 2D, 3D and MPI runs, the original PySide6 desktop app, and a new browser UI (webui.py) that needs nothing beyond NumPy and Matplotlib, so it runs over SSH or in a container. The browser UI is laid out like a desktop CFD package: a ribbon (Run, Grid study, Blockage study, views, replay, export), a case property grid, a WebGL2 viewport that ray-marches the flow as a volume, a results strip of coefficients with 95 % intervals beside live pre-run checks, and a convergence chart over velocity, vorticity and pressure plots (photos 2 and 3). About 21,100 lines of Python in the package and 8,900 lines of tests (567 test functions in 50 files).",
     how: [
@@ -168,6 +174,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "hf-scf": {
+    brief: "Restricted Hartree-Fock written from scratch in NumPy and Numba, behind a FastAPI backend with two front ends. Paste an XYZ geometry, pick a basis set, and get orbital energies, a dipole and a 3Dmol isosurface of any orbital from HOMO-3 to LUMO+3.",
     problem: "Hartree-Fock is the base method of quantum chemistry: given nuclear positions and a Gaussian basis set, find the orbitals that minimise the electronic energy self-consistently. The hard parts are the two-electron integrals (N^4 six-dimensional integrals, slow in Python) and getting the iteration to converge. I wanted to write all of it myself instead of calling PySCF.",
     built: "A FastAPI backend that runs restricted Hartree-Fock from scratch in NumPy and Numba, plus two front ends: a React app and a single-file HTML page served by the backend (the one in the photos). Paste an XYZ geometry, pick a basis set (21 in the React app, 10 in the HTML page), and get the total energy, orbital energies, a dipole and a 3Dmol isosurface of any orbital from HOMO-3 to LUMO+3. Results go into SQLite; the backend is packaged as a Docker image for Railway and the React app for Vercel.",
     how: [
@@ -201,6 +208,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "quantize": {
+    brief: "Fits a molecular geometry to measured rotational constants across isotopologues, and hands the directions the data cannot see to a quantum-chemistry gradient and Hessian. With all isotopologues the hybrid reaches 6.6 mA RMS bond error on fluoroethane, against 15.0 for theory alone and 6.9 for spectroscopy alone.",
     problem: "Microwave spectroscopy gives three rotational constants per isotopologue, and a seven-atom molecule has fifteen structural parameters, so the geometry stays underdetermined even with every usable published isotopologue. Quantum chemistry gives a complete structure with a systematic bias: RHF/6-31G puts every C-F bond in this set 27-31 mÅ too long. I wanted to know whether combining the two beats either one alone, on measured constants rather than ones back-calculated from a structure.",
     built: "A Python library and CLI (`python -m cli run config.yaml`) that fits a molecular geometry to measured A/B/C constants across isotopologues, hands the directions the data cannot see to a quantum-chemistry gradient and Hessian (PySCF, Psi4 or ORCA), and writes a run directory with a Markdown/HTML report, residuals, final geometry, an internal-coordinate uncertainty table and Kraitchman substitution coordinates. Alongside it is a benchmark harness that runs theory, spectroscopy-only and two hybrids against three published structures and builds a 10-page PDF in which every number is read from the run's JSON.",
     how: [
@@ -237,6 +245,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "formulate": {
+    brief: "Reads a formulation target in YAML, searches by retrieval and evolution, and scores every candidate through a panel of seventeen property experts, returning a ranked Pareto frontier with uncertainties and a diagnosis of which constraint eliminated what. A coating-solvent run evaluated 140 candidates over seven rounds and found a three-compound frontier.",
     problem: "I wanted to ask for a material by its behaviour (a boiling-point window, low surface tension, easy to synthesise) and get back molecules, polymers or blends that meet it. That is hard because there is no inverse of a property model: the map is many-to-many, may have no answer at all, and every predictor has a domain outside which it should refuse rather than guess.",
     built: "A Python package and CLI. `formulate run spec.yaml` reads a YAML target with units, searches by retrieval and evolution, scores every candidate through a panel of 17 property experts, and prints a ranked Pareto frontier with uncertainties, constraint violations, and a diagnosis of which constraint eliminated what when nothing is feasible. `formulate calibrate` reports each expert's accuracy and whether its error bar is honest against 50 reference compounds.",
     how: [
@@ -273,6 +282,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "high-risk-roads": {
+    brief: "Reduces 2023 Sacramento collision records to a crash rate per road and compares each one to a critical rate at 95 per cent confidence. Of the fourteen roads that passed the thirty-crash screen, eleven sit above their critical rate and are flagged for engineering attention.",
     problem: "Which Sacramento city streets (not freeways) are actually dangerous, as opposed to just busy or long? Raw crash counts reward high-volume, high-mileage roads, so separating a road-design problem from plain exposure needs traffic volume, road length and a statistical threshold, and none of those live in the same dataset as the crashes.",
     built: "A 16-page final report for ECI 016 at UC Davis (March 2026) backed by R scripts that reduce 2023 Sacramento collision records to a crash rate per road, compare each rate to a critical rate at 95% confidence, and flag 11 corridors that need engineering attention. It ships with Leaflet maps of the flagged corridors and their crashes, an hourly and a day-of-week crash distribution, and a results table.",
     how: [
@@ -308,6 +318,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "aether6": {
+    brief: "A six-degree-of-freedom fixed-wing flight simulator in C++17: trim, LQR autopilots, waypoint guidance, simulated avionics and an error-state EKF, closed on its own estimate. 102 test cases and 33,906 assertions cover conservation, convergence order, trim residuals and determinism.",
     problem: "I wanted a flight simulator where the autopilot is genuinely flying blind: it should see only what a real avionics stack would give it, not the true state. That means a full nonlinear 6-DOF aircraft, simulated sensors at their own rates, a navigation filter good enough to close the loop on, and a way to find out where the whole thing breaks before trusting a number from it.",
     built: "Aether-6: about 11,000 lines of C++17 across 65 files, four command-line tools (aether_sim, aether_trim, aether_mc, aether_integrators), YAML airframe and scenario files, and a Python package that turns the logs into 15 figures and a 3-D attitude animation. The nominal mission is a six-waypoint 3.54 km circuit flown twice in 300 s with altitude changes from 110 to 150 m (photo 1). ./scripts/run_all.sh rebuilds, tests, trims, flies four scenarios, runs the Monte Carlo campaign and draws every figure in about four minutes.",
     how: [
@@ -349,6 +360,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "ignis": {
+    brief: "A thermochemical liquid-rocket engine simulator in C++17, with a desktop Explorer that marches the exhaust plume and draws it as a GPU volume inside NASA's model of the RS-25 bell. Against Rocketdyne's published numbers it reads vacuum thrust 4.8 per cent high and Isp 1.0 per cent high, and reproduces all four turbine powers to within 4.5 per cent.",
     problem: "I wanted to compute what a liquid rocket engine does from the propellants up, and to know how far to trust each number. Off-the-shelf tools give a flame temperature and an Isp; I wanted the equilibrium chemistry, the nozzle, the boundary layer, the regenerative cooling, the turbopump cycle and the uncertainty in one code that reports the residual of every balance it claims to close, and that is checked against NASA CEA, Cantera, measured heat flux and a real engine's published numbers rather than asserted correct.",
     built: "Ignis: about 15,700 lines of C++17 in thirteen modules with no I/O in the physics, six command-line tools, thirteen shipped YAML scenarios, cited species, propellant and coolant data, a Python figure package, and the Engine Explorer, a PySide6 desktop application. The Explorer has a ribbon, a model tree and property grid, five chart tabs, a results column with performance cards, six live constraint checks and an 'Against the real engine' panel (photo 3), and a Flow tab that marches the exhaust plume and draws it as a GPU volume inside NASA's 3-D model of the RS-25 bell (photos 1 and 2). It opens on the RS-25, the Space Shuttle Main Engine, solved from Rocketdyne's published geometry and operating point; three invented engines run through everything else: the Ignis-M1 (LOX/methane booster), H1 (LOX/hydrogen upper stage) and K1 (LOX/RP-1).",
     how: [
@@ -391,6 +403,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "sparlab": {
+    brief: "A 2-D and 3-D finite-element solver with SIMP topology optimisation, built on one dimension-generic core: plane elements, hexahedra, and linear or curved quadratic tetrahedra. Patch tests hold to 1e-14, analytical gradients match central differences to 1e-8, and the results cross-validate against CalculiX.",
     problem: "I wanted to see what topology optimisation actually does to a real aerospace part, with a solver I could verify line by line: give it a design domain, bolt holes, load cases and a mass budget, and it should work out where the material goes. The hard part is not the optimiser loop. It is being able to trust every number it prints, and then getting from a flat test case to a solid part meshed from CAD without the answer quietly changing meaning.",
     built: "SparLab: about 35,400 lines of C++17 on Eigen sparse across 117 files, four tools (sparlab_solve, sparlab_topopt, sparlab_verify, sparlab_bench), JSON input decks, and a Python package that reads only what the solver writes. It works in 2-D and 3-D through one dimension-generic core: plane stress and plane strain on quads and triangles, solids on hexahedra and linear or curved quadratic tetrahedra. Fifteen benchmark cases, a 41-run design study, a verification suite that fails the build on a missed tolerance, and cross-validation against CalculiX and scikit-fem. Photos 1 and 2 are an engine mount drawn in CAD, meshed in Gmsh and optimised as a solid; photo 3 is the plane bracket it grew out of.",
     how: [
@@ -436,6 +449,7 @@ export const STUDIES: Record<string, Study> = {
     ],
   },
   "machina": {
+    brief: "A C++17 sheet-forming solver with frictional contact and Hill48 / Chaboche plasticity, a pipeline that compensates for springback, and an ML surrogate trained on those simulations. On eight held-out parts the mean vertical RMS shape error falls from 0.300 mm uncorrected to 0.189 mm.",
     problem: "In robotic incremental sheet forming a tool pushes a clamped sheet into shape contour by contour, and when the tool leaves and the clamp comes off the part springs back: shallower and bent, away from the shape you asked for. The usual fix is trial and error — form, scan, correct the tool path, form again. I wanted to replace those loops with computation, so that the first part comes out right.",
     built: "Three pieces that work together. A C++17 forming solver (sparlab_form) with moving rigid tools, frictional contact and Hill48 / Chaboche plasticity at finite strain, which runs the whole cycle: form, unload, release onto supports. A Python pipeline (precomp) that turns a target part into tool paths, runs the solver, and applies displacement-adjustment compensation. And a surrogate layer (precomp.ml) of MLP and gradient-boosted ensembles trained on those simulations, carrying uncertainty, an out-of-distribution check, a transfer model for a new process, and an optimiser that searches for the corrected shape on the surrogate instead of on the solver.",
     how: [

@@ -577,139 +577,86 @@ function ProjectCard({ card, index, onOpen }: { card: Card; index: number; onOpe
 /* ---------- project viewer: a framed photo you can page through, with the write-up under it ---------- */
 
 function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
-  const [i, setI] = useState(0);
-  const [dir, setDir] = useState(1);
-  const n = card.images.length;
-  const step = useCallback(
-    (d: number) => {
-      if (n < 2) return;
-      setDir(d);
-      setI((k) => (k + d + n) % n);
-    },
-    [n],
-  );
+  const ref = useDialog<HTMLDivElement>();
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') step(1);
-      else if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [step]);
-  const shot = card.images[i];
-  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const drag = useRef<number | null>(null);
-  const ref = useDialog<HTMLElement>();
+  }, [onClose]);
+
   return (
-    <motion.div className="sg-lightbox sg-project" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
-      {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
-      <motion.article role="dialog"
+    <motion.div className="pv-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.18 } }}>
+      <motion.div
+        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
+        role="dialog"
         ref={ref}
         aria-modal="true"
-        aria-labelledby="sg-pv-title"
+        aria-labelledby="pv-title"
         tabIndex={-1}
-        className="sg-pv"
-        initial={{ scale: 0.8, rotate: -2, y: 30 }}
-        animate={{ scale: 1, rotate: 0, y: 0 }}
-        exit={{ scale: 0.85, opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } }}
-        transition={{ type: 'spring', stiffness: 220, damping: 22 }}
-        onClick={(e) => e.stopPropagation()}
+        className="pv"
+        initial={{ opacity: 0, y: 26 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.34, ease: [0.22, 1, 0.3, 1] }}
       >
-        <div
-          className="sg-pv-frame"
-          onPointerDown={(e) => {
-            drag.current = e.clientX;
-          }}
-          onPointerUp={(e) => {
-            if (drag.current !== null && Math.abs(e.clientX - drag.current) > 40) step(e.clientX < drag.current ? 1 : -1);
-            drag.current = null;
-          }}
-        >
-          <AnimatePresence mode="wait" initial={false} custom={dir}>
-            {shot ? (
-              <motion.figure
-                key={shot.src}
-                custom={dir}
-                initial={{ x: dir * 80, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -dir * 80, opacity: 0 }}
-                transition={{ duration: 0.22, ease: 'easeOut' }}
-              >
-                {shot.video ? (
-                  <video poster={base() + shot.src} aria-label={shot.caption} muted loop playsInline autoPlay={!reducedMotion} controls={reducedMotion} preload="metadata">
-                    <source src={base() + shot.video + '.webm'} type="video/webm" />
-                    <source src={base() + shot.video + '.mp4'} type="video/mp4" />
-                  </video>
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={base() + shot.src} alt={shot.caption} draggable={false} />
-                )}
-                <figcaption>
-                  {shot.caption}
-                  {shot.credit && !shot.credit.startsWith('own') && (
-                    <>
-                      {' '}
-                      <a href={shot.credit} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
-                        (source)
-                      </a>
-                    </>
-                  )}
-                </figcaption>
-              </motion.figure>
-            ) : (
-              <p className="sg-pv-empty">No photos yet</p>
-            )}
-          </AnimatePresence>
-          {n > 1 && (
-            <>
-              <button type="button" className="sg-pv-arrow sg-pv-prev" onClick={() => step(-1)} aria-label="Previous photo">
-                ‹
-              </button>
-              <button type="button" className="sg-pv-arrow sg-pv-next" onClick={() => step(1)} aria-label="Next photo">
-                ›
-              </button>
-              <span className="sg-pv-count">
-                {i + 1} / {n}
-              </span>
-            </>
-          )}
-        </div>
-        <div className="sg-pv-text">
-          <h2 id="sg-pv-title">{card.title}</h2>
-          <p className="sg-pv-line">{card.line}</p>
-          {card.study ? (
-            <CaseStudy study={card.study} />
-          ) : (
-            <>
-              {card.notes.length > 0 && (
-                <ul className="sg-pv-notes">
-                  {card.notes.map((t) => (
-                    <li key={t}>{t}</li>
-                  ))}
-                </ul>
-              )}
-              <ul className="sg-chips">
-                {card.stack.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            </>
-          )}
-          {card.href && (
-            <a className="sg-pv-link" href={card.href} target="_blank" rel="noreferrer">
-              Open project ↗
-            </a>
-          )}
-        </div>
-        <button type="button" className="sg-close" onClick={onClose} aria-label="Close">
-          ×
+        <button type="button" className="pv-close" onClick={onClose} aria-label="Close">
+          Close
         </button>
-      </motion.article>
+        <h2 id="pv-title" className="pv-title">
+          {card.title}
+        </h2>
+        <p className="pv-brief">{card.study?.brief ?? card.line}</p>
+
+        {/* two to a row, with every third running the full width */}
+        <div className="pv-shots">
+          {card.images.map((shot, i) => (
+            <figure key={shot.src} className={`pv-shot${i % 3 === 2 ? ' is-wide' : ''}`}>
+              {shot.video ? (
+                <video
+                  poster={base() + shot.src}
+                  aria-label={shot.caption}
+                  muted
+                  loop
+                  playsInline
+                  autoPlay={!reducedMotion}
+                  controls={reducedMotion}
+                  preload="metadata"
+                >
+                  <source src={base() + shot.video + '.webm'} type="video/webm" />
+                  <source src={base() + shot.video + '.mp4'} type="video/mp4" />
+                </video>
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={base() + shot.src} alt={shot.caption} loading={i < 2 ? undefined : 'lazy'} draggable={false} />
+              )}
+              {shot.credit && !shot.credit.startsWith('own') && (
+                <figcaption>
+                  <a href={shot.credit} target="_blank" rel="noreferrer">
+                    Image source
+                  </a>
+                </figcaption>
+              )}
+            </figure>
+          ))}
+        </div>
+
+        <ul className="pv-chips">
+          {card.stack.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+        {card.href && (
+          <a className="pv-link" href={card.href} target="_blank" rel="noreferrer">
+            Open project ↗
+          </a>
+        )}
+      </motion.div>
     </motion.div>
   );
 }
-
-/* ---------- case study: problem, what I built, how, my part, challenges, results, tech ---------- */
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
