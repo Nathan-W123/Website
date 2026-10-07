@@ -9,7 +9,8 @@ export const NAME = 'Nathan W.';
 export const ABOUT = {
   tagline: 'Learning by building.',
   paragraphs: [
-    "Hi, I'm Nathan, a senior at UC Davis studying civil engineering and chemistry. I do quantum chemistry research and run an art business, creating custom pieces for individuals and organizations.",
+    "Hi, I'm Nathan, a senior at UC Davis studying civil engineering and chemistry.",
+    'I do quantum chemistry research and run an art business, creating custom pieces for individuals and organizations.',
     'Outside of academia I spend my time playing volleyball, speed-cubing, and weightlifting.',
   ],
   based: 'based in Davis',

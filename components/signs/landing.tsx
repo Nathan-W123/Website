@@ -1,8 +1,9 @@
 'use client';
 
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
-import { Fragment, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ART, CONTACTS, PROJECT_GROUPS, type ArtItem, type Card } from './content';
+import { TopBar } from './topbar';
 
 /**
  * Home: the name set large, four pieces of work fanned out under it, and a
@@ -15,13 +16,19 @@ const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 
 type Side = 'engineering' | 'art';
 
-/** The fan, matched to the reference: near-level, heavily overlapped, gently turned,
- *  stacked left to right. x and y are percentages of a card's own width. */
+/**
+ * The fan. Each card is a different size and sits at its own height, so the
+ * group reads as a pile someone dropped rather than a row. `w` is a multiple of
+ * the base card width and `dx`/`dy` place the card's centre in those same
+ * units, which keeps the spacing honest when the widths differ. `from` is where
+ * the card flies in from, in viewport units, so it starts off the edge at any
+ * screen size.
+ */
 const SEATS = [
-  { tilt: -7.5, x: -84, y: 14, z: 1, from: { x: -760, y: 150, r: -42 } },
-  { tilt: -3, x: -28, y: 4, z: 2, from: { x: 120, y: -340, r: 26 } },
-  { tilt: 2.5, x: 28, y: -4, z: 3, from: { x: -180, y: 370, r: -19 } },
-  { tilt: 7, x: 84, y: -14, z: 4, from: { x: 830, y: -120, r: 38 } },
+  { w: 0.86, dx: -0.98, dy: 0.2, tilt: -10, z: 2, from: { x: '-95vw', y: '24vh', r: -38 } },
+  { w: 1.1, dx: -0.33, dy: -0.04, tilt: -3, z: 4, from: { x: '18vw', y: '-78vh', r: 22 } },
+  { w: 0.92, dx: 0.34, dy: 0.17, tilt: 5, z: 3, from: { x: '-26vw', y: '82vh', r: -16 } },
+  { w: 1.02, dx: 0.98, dy: -0.14, tilt: 10, z: 1, from: { x: '96vw', y: '-30vh', r: 34 } },
 ]
 
 /** Four of whichever side you are looking at, cropped to 4:5 and tonally matched
@@ -93,10 +100,17 @@ export function Landing({
 }) {
   const [side, setSide] = useState<Side>('engineering');
   const reduce = useReducedMotion();
-  const work = useRef<HTMLElement>(null);
   const fan = useRef<HTMLDivElement>(null);
   // the cards fly in from off the edges on load and again on the way back up
   const fanIn = useInView(fan, { amount: 0.35 });
+
+  // Gallery, pressed from another page, routes home and leaves a note behind
+  useEffect(() => {
+    if (window.sessionStorage.getItem('signs:to-work') !== '1') return;
+    window.sessionStorage.removeItem('signs:to-work');
+    const t = window.setTimeout(() => document.querySelector('.hm-work')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 420);
+    return () => window.clearTimeout(t);
+  }, []);
 
   // the fan settles into place once, with a little overshoot, unless motion is unwanted
   const spring = useMemo(
@@ -106,13 +120,7 @@ export function Landing({
 
   return (
     <div className="hm">
-      <nav className="hm-bar" aria-label="Sections">
-        <a href="#/about">About</a>
-        <button type="button" onClick={() => work.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
-          Gallery
-        </button>
-        <a href="#/contact">Contact</a>
-      </nav>
+      <TopBar onHome={() => undefined} here="home" />
 
       <header className="hm-hero">
         <p className="hm-meta">
@@ -127,14 +135,12 @@ export function Landing({
             <motion.div
               key={i}
               className="hm-fan-seat"
-              style={{ zIndex: seat.z } as CSSProperties}
-              initial={
-                reduce ? false : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: `${seat.from.x}%`, y: `${seat.from.y}%` }
-              }
+              style={{ zIndex: seat.z, '--w': seat.w, '--dx': seat.dx, '--dy': seat.dy } as CSSProperties}
+              initial={reduce ? false : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }}
               animate={
                 reduce || fanIn
-                  ? { opacity: 1, scale: 1, rotate: seat.tilt, x: `${seat.x}%`, y: `${seat.y}%` }
-                  : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: `${seat.from.x}%`, y: `${seat.from.y}%` }
+                  ? { opacity: 1, scale: 1, rotate: seat.tilt, x: 0, y: 0 }
+                  : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }
               }
               transition={{ ...spring, delay: reduce || !fanIn ? 0 : 0.08 + i * 0.09 }}
             >
@@ -146,7 +152,7 @@ export function Landing({
                 dragElastic={0.22}
                 dragSnapToOrigin
                 dragTransition={{ bounceStiffness: 420, bounceDamping: 26 }}
-                whileHover={reduce ? undefined : { y: -12, scale: 1.045, rotate: seat.tilt > 0 ? 1.8 : -1.8 }}
+                whileHover={reduce ? undefined : { y: -14, scale: 1.05, rotate: seat.tilt > 0 ? 2 : -2 }}
                 whileTap={reduce ? undefined : { scale: 0.985 }}
                 transition={{ type: 'spring', stiffness: 340, damping: 24 }}
               >
@@ -201,7 +207,6 @@ export function Landing({
       {/* keyed on the side, so switching remounts and animates in; no exit to wait on,
           which means a stalled animation can never deadlock the swap */}
       <motion.section
-        ref={work}
         key={side}
         className="hm-work"
         initial={reduce ? false : { opacity: 0, y: 14 }}

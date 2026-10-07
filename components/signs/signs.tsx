@@ -10,6 +10,7 @@ import { Doodles } from './doodles';
 import { Scribble } from './scribble';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
+import { About } from './about';
 import { IndexCard, StickyBoard } from './notes';
 import { ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
@@ -41,6 +42,8 @@ const parse = (hash: string): Route => {
   return { page: 'home' };
 };
 const routeKey = (r: Route) => (r.page === 'art' ? `art/${r.section ?? ''}` : r.page === 'projects' ? `projects/${r.group ?? ''}` : r.page);
+/** The pages in the new, plain language: no paper, no pencil, no tag. */
+const plain = (r: Route) => r.page === 'home' || r.page === 'about';
 const depth = (r: Route) => (r.page === 'home' ? 0 : (r.page === 'art' && r.section) || (r.page === 'projects' && r.group) ? 2 : 1);
 
 /** Which way the world moves during a swipe. A plank pointing right sends the world left. */
@@ -200,17 +203,17 @@ export default function Signs() {
       <AnimatePresence mode="sync" custom={move} initial={false}>
         <motion.section
           key={routeKey(route)}
-          className={`sg-page${route.page === 'home' ? ' sg-page--plain' : ''}`}
+          className={`sg-page${plain(route) ? ' sg-page--plain' : ''}`}
           custom={move}
           variants={variants}
           initial="enter"
           animate="center"
           exit="exit"
         >
-          {route.page !== 'home' && <Scribble />}
+          {plain(route) || <Scribble />}
           <motion.div className="sg-fold" variants={foldVariants} aria-hidden="true" />
           {route.page === 'home' && move.mode === 'tear' && <TornRemnant />}
-          {route.page !== 'home' && <Doodles seed={routeKey(route).length * 7 + 1} />}
+          {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
           {route.page === 'home' && <Landing onOpenProject={setProject} onOpenArt={setLightbox} />}
 
           {route.page === 'art' && !route.section && (
@@ -264,11 +267,11 @@ export default function Signs() {
 
           {route.page === 'contact' && <Contact onBack={goHome} />}
 
-          {route.page === 'about' && <About onBack={goHome} />}
+          {route.page === 'about' && <About onHome={goHome} />}
         </motion.section>
       </AnimatePresence>
 
-      <NameTag page={route.page === 'home' || nameHold ? 'art' : route.page} onHome={goHome} />
+      <NameTag page={plain(route) || nameHold ? 'art' : route.page} onHome={goHome} />
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
       </div>
@@ -808,60 +811,3 @@ function NameTag({ page, onHome }: { page: Route['page']; onHome: () => void }) 
 
 /* ---------- about page: a line about me, a paragraph, a photo, and where I am ---------- */
 
-function About({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="sg-wall sg-about">
-      <BackSign label="Home" onClick={onBack} />
-      <div className="ab">
-        <motion.div className="ab-text" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease: 'easeOut', delay: 0.45 }}>
-          <p className="ab-tagline">{ABOUT.tagline}</p>
-          {ABOUT.paragraphs.map((p) => (
-            <p key={p} className="ab-para">
-              {p}
-            </p>
-          ))}
-        </motion.div>
-        <motion.figure
-          className="ab-photo"
-          initial={{ y: 40, opacity: 0, rotate: 8 }}
-          animate={{ y: 0, opacity: 1, rotate: 3 }}
-          transition={{ type: 'spring', stiffness: 150, damping: 15, delay: 0.6 }}
-          whileHover={{ rotate: 0, scale: 1.04, y: -6 }}
-        >
-          <span className="ld-tape ld-tape-l" aria-hidden="true" />
-          <span className="ld-tape ld-tape-r" aria-hidden="true" />
-          <span className="ld-photo-pic">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={base() + ABOUT.photo}
-              alt="Nathan"
-              draggable={false}
-              onError={(e) => {
-                const fig = e.currentTarget.closest('figure');
-                if (fig) (fig as HTMLElement).style.display = 'none';
-              }}
-            />
-          </span>
-          <figcaption className="ld-photo-caption">me</figcaption>
-        </motion.figure>
-        <motion.div
-          className="ab-based"
-          initial={{ scale: 0.6, opacity: 0, rotate: 10 }}
-          animate={{ scale: 1, opacity: 1, rotate: 4 }}
-          transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.9 }}
-          whileHover={{ rotate: 0, scale: 1.06 }}
-        >
-          <span className="note-shadow" aria-hidden="true" />
-          <span className="note-paper" aria-hidden="true" />
-          <span className="note-tape" aria-hidden="true" />
-          <span className="ab-based-text">
-            <span className="ab-pin" aria-hidden="true">
-              ⌖
-            </span>
-            {ABOUT.based}
-          </span>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
