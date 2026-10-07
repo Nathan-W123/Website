@@ -783,7 +783,7 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
    =================================================================== */
 .sg-page--plain {
   background-image: none;
-  background-color: #fff;
+  background-color: #f7f6f1;
   cursor: auto;
 }
 .hm {
@@ -792,7 +792,8 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   --role-bar: #bdbdbd;
   --ink-soft: #8d8d8d;
   --ink-faint: #c9c9c9;
-  --rule: #ececec;
+  --rule: #e6e4dc;
+  --cream: #f7f6f1;
   --disp: var(--font-jost, 'Jost'), 'Futura', 'Century Gothic', system-ui, sans-serif;
   --body: var(--font-inter, 'Inter'), system-ui, -apple-system, sans-serif;
   position: relative;
@@ -805,8 +806,44 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   text-align: center;
 }
 
-/* ---- hero ---- */
-.hm-hero { padding-top: clamp(28px, 6vh, 72px); }
+/* ---- the bar across the top ---- */
+.hm-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  gap: clamp(22px, 3.2vw, 46px);
+  margin: 0 -24px;
+  padding: 19px 24px;
+  background: var(--cream);
+}
+.hm-bar a,
+.hm-bar button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--disp);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.hm-bar a:hover,
+.hm-bar button:hover { opacity: 0.55; }
+.hm-bar a:focus-visible,
+.hm-bar button:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 3px; }
+
+/* ---- hero: tall enough that the work below it starts off the screen ---- */
+.hm-hero {
+  min-height: calc(100svh - 118px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: clamp(20px, 4vh, 48px);
+}
 .hm-meta {
   display: flex;
   flex-direction: column;
@@ -839,7 +876,7 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-fan {
   --cw: clamp(140px, 16.5vw, 212px);
   position: relative;
-  height: calc(var(--cw) * 1.46);
+  height: calc(var(--cw) * 1.3);
   margin: clamp(-16px, -1.8vw, -6px) auto clamp(6px, 1.4vw, 22px);
 }
 .hm-fan-seat {
@@ -847,16 +884,16 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   top: 50%;
   left: 50%;
   width: var(--cw);
-  aspect-ratio: 6 / 7;
-  margin: calc(var(--cw) * -0.5833) 0 0 calc(var(--cw) / -2);
+  aspect-ratio: 1;
+  margin: calc(var(--cw) / -2) 0 0 calc(var(--cw) / -2);
 }
 .hm-fan-card {
   width: 100%;
   height: 100%;
   border-radius: clamp(12px, 1.3vw, 18px);
   overflow: hidden;
-  background: #f4f4f4;
-  box-shadow: 0 16px 34px -16px rgba(0, 0, 0, 0.32);
+  background: #fff;
+  box-shadow: 0 16px 34px -16px rgba(0, 0, 0, 0.28);
   cursor: grab;
   touch-action: pan-y;
   position: relative;
@@ -900,13 +937,13 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 /* ---- the switch: no label, because the underline above says which side you are on ---- */
 .hm-switch {
   display: block;
-  width: 62px;
-  height: 34px;
-  margin: clamp(24px, 4vh, 44px) auto 0;
+  width: 54px;
+  height: 25px;
+  margin: clamp(22px, 3.6vh, 40px) auto 0;
   padding: 0;
   border: 1px solid var(--rule);
   border-radius: 999px;
-  background: #f4f4f4;
+  background: #efeee8;
   cursor: pointer;
   transition: background 0.3s ease, border-color 0.3s ease;
 }
@@ -914,15 +951,15 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-switch:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 .hm-switch-knob {
   display: block;
-  width: 26px;
-  height: 26px;
+  width: 19px;
+  height: 19px;
   margin: 3px;
   border-radius: 50%;
   background: var(--ink);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
   transition: transform 0.34s cubic-bezier(0.22, 1, 0.3, 1), background 0.3s ease;
 }
-.hm-switch[aria-checked='true'] .hm-switch-knob { transform: translateX(28px); background: #fff; }
+.hm-switch[aria-checked='true'] .hm-switch-knob { transform: translateX(29px); background: #fff; }
 
 /* ---- the work ---- */
 .hm-work { padding-top: clamp(64px, 12vh, 132px); }
@@ -940,8 +977,9 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(26px, 4.2vw, 64px);
-  margin: clamp(34px, 6vh, 64px) 0 0;
+  gap: clamp(22px, 3vw, 46px);
+  max-width: 880px;
+  margin: clamp(34px, 6vh, 64px) auto 0;
   padding: 0;
   list-style: none;
 }
@@ -961,8 +999,8 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   aspect-ratio: 1;
   border-radius: clamp(14px, 1.8vw, 26px);
   overflow: hidden;
-  background: #f4f4f4;
-  box-shadow: 0 16px 32px -22px rgba(0, 0, 0, 0.45);
+  background: #fff;
+  box-shadow: 0 14px 28px -20px rgba(0, 0, 0, 0.4);
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.3, 1), box-shadow 0.45s ease;
 }
 .hm-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -972,6 +1010,16 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   box-shadow: 0 30px 48px -24px rgba(0, 0, 0, 0.42);
 }
 .hm-grid button:focus-visible .hm-tile { outline: 2px solid var(--ink); outline-offset: 5px; }
+.hm-tile-text { display: block; margin-top: 12px; }
+.hm-tile-name {
+  display: block;
+  font-family: var(--disp);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+}
+.hm-tile-line { display: block; margin-top: 4px; font-size: 13px; line-height: 1.45; color: var(--ink-soft); }
 
 /* ---- contact ---- */
 .hm-foot { padding-top: clamp(76px, 14vh, 150px); }
@@ -1005,6 +1053,8 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 
 @media (max-width: 560px) {
   .hm { padding: 0 18px 84px; }
-  .hm-fan { --cw: 30vw; margin-top: 14px; }
+  .hm-bar { margin: 0 -18px; gap: 20px; }
+  .hm-hero { min-height: calc(100svh - 104px); }
+  .hm-fan { --cw: 34vw; margin-top: 14px; }
   .hm-grid { gap: 16px; }
 }

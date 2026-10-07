@@ -18,10 +18,10 @@ type Side = 'engineering' | 'art';
 /** The fan, matched to the reference: near-level, heavily overlapped, gently turned,
  *  stacked left to right. x and y are percentages of a card's own width. */
 const SEATS = [
-  { tilt: -7.5, x: -84, y: 14, z: 1 },
-  { tilt: -3, x: -28, y: 4, z: 2 },
-  { tilt: 2.5, x: 28, y: -4, z: 3 },
-  { tilt: 7, x: 84, y: -14, z: 4 },
+  { tilt: -7.5, x: -84, y: 14, z: 1, from: { x: -760, y: 150, r: -42 } },
+  { tilt: -3, x: -28, y: 4, z: 2, from: { x: 120, y: -340, r: 26 } },
+  { tilt: 2.5, x: 28, y: -4, z: 3, from: { x: -180, y: 370, r: -19 } },
+  { tilt: 7, x: 84, y: -14, z: 4, from: { x: 830, y: -120, r: 38 } },
 ]
 
 /** Four of whichever side you are looking at, cropped to 4:5 and tonally matched
@@ -44,15 +44,18 @@ function Tile({
   i,
   image,
   label,
+  line,
   onOpen,
 }: {
   i: number;
   image?: string;
   label: string;
+  line?: string;
   onOpen: () => void;
 }) {
   const ref = useRef<HTMLLIElement>(null);
-  const seen = useInView(ref, { once: true, amount: 0.2, margin: '0px 0px -60px 0px' });
+  // not `once`: it should lift every time it comes back onto the screen
+  const seen = useInView(ref, { amount: 0.2, margin: '0px 0px -60px 0px' });
   const reduce = useReducedMotion();
   const rest = { opacity: 1, y: 0, scale: 1 };
   const low = { opacity: 0, y: 30, scale: 0.955 };
@@ -70,6 +73,12 @@ function Tile({
             <img src={base() + image} alt="" loading="lazy" draggable={false} />
           )}
         </span>
+        {line && (
+          <span className="hm-tile-text">
+            <span className="hm-tile-name">{label}</span>
+            <span className="hm-tile-line">{line}</span>
+          </span>
+        )}
       </button>
     </motion.li>
   );
@@ -84,6 +93,10 @@ export function Landing({
 }) {
   const [side, setSide] = useState<Side>('engineering');
   const reduce = useReducedMotion();
+  const work = useRef<HTMLElement>(null);
+  const fan = useRef<HTMLDivElement>(null);
+  // the cards fly in from off the edges on load and again on the way back up
+  const fanIn = useInView(fan, { amount: 0.35 });
 
   // the fan settles into place once, with a little overshoot, unless motion is unwanted
   const spring = useMemo(
@@ -93,6 +106,14 @@ export function Landing({
 
   return (
     <div className="hm">
+      <nav className="hm-bar" aria-label="Sections">
+        <a href="#/about">About</a>
+        <button type="button" onClick={() => work.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+          Gallery
+        </button>
+        <a href="#/contact">Contact</a>
+      </nav>
+
       <header className="hm-hero">
         <p className="hm-meta">
           Davis, California
@@ -101,15 +122,21 @@ export function Landing({
 
         <h1 className="hm-name">Nathan Ward</h1>
 
-        <div className="hm-fan" aria-hidden="true">
+        <div className="hm-fan" ref={fan} aria-hidden="true">
           {SEATS.map((seat, i) => (
             <motion.div
               key={i}
               className="hm-fan-seat"
               style={{ zIndex: seat.z } as CSSProperties}
-              initial={reduce ? false : { opacity: 0, scale: 0.72, rotate: 0, x: 0, y: 34 }}
-              animate={{ opacity: 1, scale: 1, rotate: seat.tilt, x: `${seat.x}%`, y: `${seat.y}%` }}
-              transition={{ ...spring, delay: reduce ? 0 : 0.1 + i * 0.07 }}
+              initial={
+                reduce ? false : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: `${seat.from.x}%`, y: `${seat.from.y}%` }
+              }
+              animate={
+                reduce || fanIn
+                  ? { opacity: 1, scale: 1, rotate: seat.tilt, x: `${seat.x}%`, y: `${seat.y}%` }
+                  : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: `${seat.from.x}%`, y: `${seat.from.y}%` }
+              }
+              transition={{ ...spring, delay: reduce || !fanIn ? 0 : 0.08 + i * 0.09 }}
             >
               {/* nudgeable: it gives a little under the cursor and springs back */}
               <motion.div
@@ -174,6 +201,7 @@ export function Landing({
       {/* keyed on the side, so switching remounts and animates in; no exit to wait on,
           which means a stalled animation can never deadlock the swap */}
       <motion.section
+        ref={work}
         key={side}
         className="hm-work"
         initial={reduce ? false : { opacity: 0, y: 14 }}
@@ -181,14 +209,12 @@ export function Landing({
         transition={{ duration: reduce ? 0.01 : 0.32, ease: 'easeOut' }}
       >
         <h3 className="hm-work-title">Selected work</h3>
-        <p className="hm-work-sub">
-          {side === 'engineering' ? 'Simulators, solvers and the odd neural network' : 'Markers, leather paint and a lot of patience'}
-        </p>
+        <p className="hm-work-sub">Scroll and stay awhile</p>
         <ul className="hm-grid">
           {side === 'engineering'
             ? ALL_PROJECTS.map((c, i) => (
                 /* the square tile, not the wide figure the case study uses */
-                <Tile key={c.id} i={i} image={`/tiles/${c.id}.webp`} label={c.title} onOpen={() => onOpenProject(c)} />
+                <Tile key={c.id} i={i} image={`/tiles/${c.id}.webp`} label={c.title} line={c.line} onOpen={() => onOpenProject(c)} />
               ))
             : ALL_ART.map((a, i) => (
                 <Tile
