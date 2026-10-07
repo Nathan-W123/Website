@@ -787,7 +787,9 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   cursor: auto;
 }
 .hm {
-  --ink: #1b1b1b;
+  --ink: #363636;
+  --role: #d2d2d2;
+  --role-bar: #bdbdbd;
   --ink-soft: #8d8d8d;
   --ink-faint: #c9c9c9;
   --rule: #ececec;
@@ -823,61 +825,77 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   margin: 0;
   font-family: var(--disp);
   font-weight: 700;
-  font-size: clamp(2.4rem, 9.4vw, 8.6rem);
-  line-height: 0.92;
+  /* sized so the word sits about as wide as the fan under it */
+  font-size: clamp(2rem, 6.4vw, 5.1rem);
+  line-height: 0.95;
   letter-spacing: -0.024em;
   text-transform: uppercase;
   white-space: nowrap;
+  color: var(--ink);
 }
 
 /* the four pieces, fanned out and overlapping under the name */
+/* --cw is the card width; everything in the fan is measured off it */
 .hm-fan {
+  --cw: clamp(140px, 16.5vw, 212px);
   position: relative;
-  height: clamp(240px, 31vw, 400px);
-  margin: clamp(-18px, -2vw, -8px) auto clamp(-26px, -3vw, -14px);
-  pointer-events: none;
+  height: calc(var(--cw) * 1.46);
+  margin: clamp(-16px, -1.8vw, -6px) auto clamp(6px, 1.4vw, 22px);
 }
-.hm-fan-card {
+.hm-fan-seat {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: clamp(132px, 18vw, 232px);
-  aspect-ratio: 4 / 5;
-  margin: calc(clamp(132px, 18vw, 232px) * -0.625) 0 0 calc(clamp(132px, 18vw, 232px) / -2);
-  border-radius: 16px;
+  width: var(--cw);
+  aspect-ratio: 6 / 7;
+  margin: calc(var(--cw) * -0.5833) 0 0 calc(var(--cw) / -2);
+}
+.hm-fan-card {
+  width: 100%;
+  height: 100%;
+  border-radius: clamp(12px, 1.3vw, 18px);
   overflow: hidden;
   background: #f4f4f4;
-  box-shadow: 0 18px 38px -16px rgba(0, 0, 0, 0.34);
+  box-shadow: 0 16px 34px -16px rgba(0, 0, 0, 0.32);
+  cursor: grab;
+  touch-action: pan-y;
+  position: relative;
 }
-.hm-fan-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hm-fan-card:active { cursor: grabbing; }
+/* absolute so the outgoing and incoming pictures stack while they cross-fade */
+.hm-fan-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
 
 .hm-role {
   margin: 0;
   font-family: var(--disp);
   font-weight: 700;
-  font-size: clamp(2.3rem, 9vw, 7.4rem);
-  line-height: 0.95;
+  font-size: clamp(1.9rem, 6.4vw, 5.1rem);
+  line-height: 0.98;
   letter-spacing: -0.022em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--role);
 }
-/* the half you are looking at is the half that is underlined */
-.hm-role span { position: relative; }
-.hm-role span::after {
-  content: '';
+/* the half you are looking at is the half the bar has slid under */
+.hm-role-word { position: relative; display: inline-block; }
+.hm-role-bar {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0.06em;
-  height: 0.055em;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.42s cubic-bezier(0.22, 1, 0.3, 1);
+  bottom: 0.015em;
+  height: 0.06em;
+  border-radius: 999px;
+  background: var(--role-bar);
 }
-.hm-role .is-on::after { transform: scaleX(1); }
-.hm-role-and { font-size: 0.58em; color: var(--ink-soft); }
-.hm-role-and::after { content: none; }
+/* and it lands with a little bounce */
+@keyframes hm-pop {
+  0% { transform: scale(1) rotate(0deg); }
+  28% { transform: scale(1.09) rotate(-2.2deg); }
+  56% { transform: scale(0.972) rotate(1.1deg); }
+  78% { transform: scale(1.016) rotate(-0.4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.hm-role-word.is-on { animation: hm-pop 0.56s cubic-bezier(0.34, 1.5, 0.64, 1); }
+.hm-role-and { font-size: 0.56em; }
 
 /* ---- the switch: no label, because the underline above says which side you are on ---- */
 .hm-switch {
@@ -921,14 +939,12 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 
 .hm-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: clamp(26px, 3.4vw, 48px);
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(26px, 4.2vw, 64px);
   margin: clamp(34px, 6vh, 64px) 0 0;
   padding: 0;
   list-style: none;
-  text-align: left;
 }
-.hm-grid--art { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 .hm-grid button {
   display: block;
   width: 100%;
@@ -943,25 +959,19 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-tile {
   display: block;
   aspect-ratio: 1;
-  border-radius: 16px;
+  border-radius: clamp(14px, 1.8vw, 26px);
   overflow: hidden;
   background: #f4f4f4;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.3, 1);
+  box-shadow: 0 16px 32px -22px rgba(0, 0, 0, 0.45);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.3, 1), box-shadow 0.45s ease;
 }
 .hm-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hm-grid button:hover .hm-tile,
-.hm-grid button:focus-visible .hm-tile { transform: translateY(-6px) scale(1.012); }
-.hm-grid button:focus-visible .hm-tile { outline: 2px solid var(--ink); outline-offset: 4px; }
-.hm-tile-name {
-  display: block;
-  margin-top: 14px;
-  font-family: var(--disp);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+.hm-grid button:focus-visible .hm-tile {
+  transform: translateY(-9px) scale(1.018);
+  box-shadow: 0 30px 48px -24px rgba(0, 0, 0, 0.42);
 }
-.hm-tile-line { display: block; margin-top: 5px; font-size: 14px; line-height: 1.45; color: var(--ink-soft); }
+.hm-grid button:focus-visible .hm-tile { outline: 2px solid var(--ink); outline-offset: 5px; }
 
 /* ---- contact ---- */
 .hm-foot { padding-top: clamp(76px, 14vh, 150px); }
@@ -986,9 +996,15 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-contacts a:hover { color: var(--ink); }
 .hm-contacts a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
+@media (max-width: 760px) {
+  .hm-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hm-role-word.is-on { animation: none; }
+}
+
 @media (max-width: 560px) {
   .hm { padding: 0 18px 84px; }
-  .hm-fan { height: 52vw; }
-  .hm-fan-card { width: 30vw; margin: calc(30vw * -0.625) 0 0 calc(30vw / -2); border-radius: 12px; }
-  .hm-grid { gap: 22px; }
+  .hm-fan { --cw: 30vw; }
+  .hm-grid { gap: 16px; }
 }

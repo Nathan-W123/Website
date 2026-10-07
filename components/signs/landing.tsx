@@ -1,7 +1,7 @@
 'use client';
 
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useMemo, useState, type CSSProperties } from 'react';
+import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
+import { Fragment, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ART, CONTACTS, PROJECT_GROUPS, type ArtItem, type Card } from './content';
 
 /**
@@ -18,11 +18,11 @@ type Side = 'engineering' | 'art';
 /** The fan, matched to the reference: near-level, heavily overlapped, gently turned,
  *  stacked left to right. x and y are percentages of a card's own width. */
 const SEATS = [
-  { tilt: -7, x: -88, y: 4, z: 1 },
-  { tilt: -2.5, x: -29.5, y: -2, z: 2 },
-  { tilt: 2.5, x: 29.5, y: -2, z: 3 },
-  { tilt: 7, x: 88, y: 4, z: 4 },
-];
+  { tilt: -7.5, x: -84, y: 14, z: 1 },
+  { tilt: -3, x: -28, y: 4, z: 2 },
+  { tilt: 2.5, x: 28, y: -4, z: 3 },
+  { tilt: 7, x: 84, y: -14, z: 4 },
+]
 
 /** Four of whichever side you are looking at, cropped to 4:5 and tonally matched
  *  within each set so the fan reads as one group rather than four odd scraps. */
@@ -33,6 +33,47 @@ const FAN: Record<Side, string[]> = {
 
 const ALL_PROJECTS: Card[] = PROJECT_GROUPS.flatMap((g) => g.cards);
 const ALL_ART: (ArtItem & { section: string })[] = ART.flatMap((s) => s.items.map((it) => ({ ...it, section: s.id })));
+
+/**
+ * One tile in the gallery. It waits a little low and faded until you scroll onto
+ * it, then lifts into place. The observer is ours rather than `whileInView`,
+ * which never fires for these list items in this build — and when it doesn't
+ * fire, motion treats the element as static and drops `initial` with it.
+ */
+function Tile({
+  i,
+  image,
+  label,
+  onOpen,
+}: {
+  i: number;
+  image?: string;
+  label: string;
+  onOpen: () => void;
+}) {
+  const ref = useRef<HTMLLIElement>(null);
+  const seen = useInView(ref, { once: true, amount: 0.2, margin: '0px 0px -60px 0px' });
+  const reduce = useReducedMotion();
+  const rest = { opacity: 1, y: 0, scale: 1 };
+  const low = { opacity: 0, y: 30, scale: 0.955 };
+  return (
+    <motion.li
+      ref={ref}
+      initial={reduce ? false : low}
+      animate={reduce || seen ? rest : low}
+      transition={{ duration: reduce ? 0.01 : 0.55, ease: [0.22, 1, 0.3, 1], delay: reduce ? 0 : (i % 3) * 0.08 }}
+    >
+      <button type="button" onClick={onOpen} aria-label={`Open ${label}`}>
+        <span className="hm-tile">
+          {image && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={base() + image} alt="" loading="lazy" draggable={false} />
+          )}
+        </span>
+      </button>
+    </motion.li>
+  );
+}
 
 export function Landing({
   onOpenProject,
@@ -62,27 +103,59 @@ export function Landing({
 
         <div className="hm-fan" aria-hidden="true">
           {SEATS.map((seat, i) => (
-            <AnimatePresence key={i} mode="wait" initial={false}>
+            <motion.div
+              key={i}
+              className="hm-fan-seat"
+              style={{ zIndex: seat.z } as CSSProperties}
+              initial={reduce ? false : { opacity: 0, scale: 0.72, rotate: 0, x: 0, y: 34 }}
+              animate={{ opacity: 1, scale: 1, rotate: seat.tilt, x: `${seat.x}%`, y: `${seat.y}%` }}
+              transition={{ ...spring, delay: reduce ? 0 : 0.1 + i * 0.07 }}
+            >
+              {/* nudgeable: it gives a little under the cursor and springs back */}
               <motion.div
-                key={FAN[side][i]}
                 className="hm-fan-card"
-                style={{ zIndex: seat.z } as CSSProperties}
-                initial={reduce ? false : { opacity: 0, scale: 0.72, rotate: 0, x: 0, y: 34 }}
-                animate={{ opacity: 1, scale: 1, rotate: seat.tilt, x: `${seat.x}%`, y: `${seat.y}%` }}
-                exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.84, y: 18, transition: { duration: 0.2, ease: 'easeIn' } }}
-                transition={{ ...spring, delay: reduce ? 0 : 0.1 + i * 0.07 }}
+                drag={!reduce}
+                dragConstraints={{ left: -16, right: 16, top: -16, bottom: 16 }}
+                dragElastic={0.22}
+                dragSnapToOrigin
+                dragTransition={{ bounceStiffness: 420, bounceDamping: 26 }}
+                whileHover={reduce ? undefined : { y: -12, scale: 1.045, rotate: seat.tilt > 0 ? 1.8 : -1.8 }}
+                whileTap={reduce ? undefined : { scale: 0.985 }}
+                transition={{ type: 'spring', stiffness: 340, damping: 24 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={base() + FAN[side][i]} alt="" draggable={false} />
+                <AnimatePresence initial={false}>
+                  <motion.img
+                    key={FAN[side][i]}
+                    src={base() + FAN[side][i]}
+                    alt=""
+                    draggable={false}
+                    initial={reduce ? false : { opacity: 0, scale: 1.07 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, transition: { duration: reduce ? 0.01 : 0.24 } }}
+                    transition={{ duration: reduce ? 0.01 : 0.4, ease: 'easeOut', delay: reduce ? 0 : i * 0.05 }}
+                  />
+                </AnimatePresence>
               </motion.div>
-            </AnimatePresence>
+            </motion.div>
           ))}
         </div>
 
         <h2 className="hm-role">
-          <span className={side === 'engineering' ? 'is-on' : ''}>Engineer</span>
-          <span className="hm-role-and"> and </span>
-          <span className={side === 'art' ? 'is-on' : ''}>Artist</span>
+          {(['engineering', 'art'] as Side[]).map((s2, i) => (
+            <Fragment key={s2}>
+              {i === 1 && <span className="hm-role-and"> and </span>}
+              <span className={`hm-role-word${side === s2 ? ' is-on' : ''}`}>
+                {s2 === 'engineering' ? 'Engineer' : 'Artist'}
+                {side === s2 && (
+                  <motion.span
+                    layoutId="hm-role-bar"
+                    className="hm-role-bar"
+                    transition={reduce ? { duration: 0.01 } : { type: 'spring', stiffness: 420, damping: 34 }}
+                  />
+                )}
+              </span>
+            </Fragment>
+          ))}
         </h2>
 
         {/* no labels: the underline in the line above says which side you are on */}
@@ -111,42 +184,22 @@ export function Landing({
         <p className="hm-work-sub">
           {side === 'engineering' ? 'Simulators, solvers and the odd neural network' : 'Markers, leather paint and a lot of patience'}
         </p>
-        {side === 'engineering' ? (
-          <ul className="hm-grid">
-            {ALL_PROJECTS.map((c) => (
-              <li key={c.id}>
-                <button type="button" onClick={() => onOpenProject(c)} aria-label={`Open ${c.title}`}>
-                  <span className="hm-tile">
-                    {c.image && (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={base() + c.image} alt="" loading="lazy" draggable={false} />
-                    )}
-                  </span>
-                  <span className="hm-tile-name">{c.title}</span>
-                  <span className="hm-tile-line">{c.line}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <ul className="hm-grid hm-grid--art">
-            {ALL_ART.map((a) => (
-              <li key={a.image}>
-                <button
-                  type="button"
-                  onClick={() => onOpenArt({ image: a.image, caption: a.caption, materials: a.materials })}
-                  aria-label={`Open ${a.caption}`}
-                >
-                  <span className="hm-tile">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={base() + a.image} alt="" loading="lazy" draggable={false} />
-                  </span>
-                  <span className="hm-tile-name">{a.caption}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ul className="hm-grid">
+          {side === 'engineering'
+            ? ALL_PROJECTS.map((c, i) => (
+                /* the square tile, not the wide figure the case study uses */
+                <Tile key={c.id} i={i} image={`/tiles/${c.id}.webp`} label={c.title} onOpen={() => onOpenProject(c)} />
+              ))
+            : ALL_ART.map((a, i) => (
+                <Tile
+                  key={a.image}
+                  i={i}
+                  image={a.image}
+                  label={a.caption}
+                  onOpen={() => onOpenArt({ image: a.image, caption: a.caption, materials: a.materials })}
+                />
+              ))}
+        </ul>
       </motion.section>
 
       <footer className="hm-foot">
