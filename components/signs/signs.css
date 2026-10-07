@@ -1005,6 +1005,6 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 
 @media (max-width: 560px) {
   .hm { padding: 0 18px 84px; }
-  .hm-fan { --cw: 30vw; }
+  .hm-fan { --cw: 30vw; margin-top: 14px; }
   .hm-grid { gap: 16px; }
 }
