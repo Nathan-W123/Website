@@ -104,8 +104,6 @@ export default function Signs() {
   const [swipe, setSwipe] = useState<{ id: number; dir: Dir } | null>(null);
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
-  // the landing page scrolls to the bench; the name tag steps aside once the hero is scrolled past
-  const [scrolled, setScrolled] = useState(false);
   // while a sheet is being torn off, the name waits underneath until the tear is done
   const [nameHold, setNameHold] = useState(false);
   const [tearing, setTearing] = useState(false);
@@ -202,19 +200,18 @@ export default function Signs() {
       <AnimatePresence mode="sync" custom={move} initial={false}>
         <motion.section
           key={routeKey(route)}
-          className="sg-page"
+          className={`sg-page${route.page === 'home' ? ' sg-page--plain' : ''}`}
           custom={move}
           variants={variants}
           initial="enter"
           animate="center"
           exit="exit"
-          onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 120)}
         >
-          <Scribble />
+          {route.page !== 'home' && <Scribble />}
           <motion.div className="sg-fold" variants={foldVariants} aria-hidden="true" />
           {route.page === 'home' && move.mode === 'tear' && <TornRemnant />}
-          <Doodles seed={routeKey(route).length * 7 + (route.page === 'home' ? 0 : 1)} />
-          {route.page === 'home' && <Landing onGo={onPlank} onOpenProject={setProject} onOpenArt={setLightbox} />}
+          {route.page !== 'home' && <Doodles seed={routeKey(route).length * 7 + 1} />}
+          {route.page === 'home' && <Landing onOpenProject={setProject} onOpenArt={setLightbox} />}
 
           {route.page === 'art' && !route.section && (
             <div className="sg-wall">
@@ -271,7 +268,7 @@ export default function Signs() {
         </motion.section>
       </AnimatePresence>
 
-      <NameTag page={(route.page === 'home' && scrolled) || nameHold ? 'art' : route.page} onHome={goHome} />
+      <NameTag page={route.page === 'home' || nameHold ? 'art' : route.page} onHome={goHome} />
 
       {swipe && <Dashes key={swipe.id} dir={swipe.dir} />}
       </div>

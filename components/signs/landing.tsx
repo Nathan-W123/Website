@@ -1,192 +1,169 @@
 'use client';
 
-import { motion } from 'motion/react';
-import { PencilDefs } from '@/components/sketch/rough';
-import { useEffect, useSyncExternalStore, type CSSProperties } from 'react';
-import { ART, PROJECT_GROUPS, RECENT, type Card } from './content';
-import { GALLERY } from './gallery';
-import type { Plank } from './signpost';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useMemo, useState, type CSSProperties } from 'react';
+import { ART, CONTACTS, PROJECT_GROUPS, type ArtItem, type Card } from './content';
 
 /**
- * Landing page: the name written in pencil near the top, two photos taped to
- * the paper (my art, my projects) and a sticky note for getting in touch.
- * Everything here is a link; the swipe direction is passed on through
- * `onGo` the same way the signpost planks do it.
+ * Home: the name set large, four pieces of work fanned out under it, and a
+ * line that says what I am. The pill under that line switches the whole page
+ * between the two halves of the portfolio — the word for the side you are on
+ * lights up, and the grid below it changes to match. One scroll, no routes.
  */
 
 const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 
-/** Each photo shows one picture, picked at random per visit from everything on the site. */
-const ART_POOL = ART.flatMap((s) => s.items.map((it) => it.image));
-// project pictures, not plots: app screens, renders and game shots only
-const PROJECT_POOL = ['/projects/black-hole/1.webp', '/projects/black-hole/2.webp', '/projects/aero/1.webp', '/projects/aero/2.webp', '/projects/aero/4.webp', '/projects/gambit/1.webp', '/projects/siege/1.webp', '/projects/siege/2.webp', '/projects/kumi/1.webp', '/projects/kumi/2.webp', '/projects/voice-agents/1.webp', '/projects/hf-scf/1.webp', '/projects/hf-scf/2.webp', '/projects/nonstandard/2.webp', '/projects/nonstandard/3.webp'].filter((p) => Object.values(GALLERY).some((g) => g.some((sh) => sh.src === p)));
-// picks are made on the client only (the server renders the first picture), and forgotten when the page unmounts
-const picks = new Map<string, number>();
-const pick = (key: string, n: number) => {
-  let v = picks.get(key);
-  if (v === undefined) {
-    v = Math.floor(Math.random() * n);
-    picks.set(key, v);
-  }
-  return v;
+type Side = 'engineering' | 'art';
+
+/** The fan, matched to the reference: near-level, heavily overlapped, gently turned,
+ *  stacked left to right. x and y are percentages of a card's own width. */
+const SEATS = [
+  { tilt: -7, x: -88, y: 4, z: 1 },
+  { tilt: -2.5, x: -29.5, y: -2, z: 2 },
+  { tilt: 2.5, x: 29.5, y: -2, z: 3 },
+  { tilt: 7, x: 88, y: 4, z: 4 },
+];
+
+/** Four of whichever side you are looking at, cropped to 4:5 and tonally matched
+ *  within each set so the fan reads as one group rather than four odd scraps. */
+const FAN: Record<Side, string[]> = {
+  engineering: ['/hero/eng-1.webp', '/hero/eng-2.webp', '/hero/eng-3.webp', '/hero/eng-4.webp'],
+  art: ['/hero/art-1.webp', '/hero/art-2.webp', '/hero/art-3.webp', '/hero/art-4.webp'],
 };
-const noop = () => () => {};
-function useRandomPick(key: string, n: number) {
-  return useSyncExternalStore(noop, () => pick(key, n), () => 0);
-}
 
-function Photo({ title, pool, href, tilt, delay, onGo, plank }: { title: string; pool: string[]; href: string; tilt: number; delay: number; onGo: (p: Plank) => void; plank: Plank }) {
-  const src = pool[useRandomPick(title, pool.length)] ?? pool[0];
-  return (
-    <motion.a
-      className="ld-photo"
-      href={href}
-      style={{ ['--tilt' as string]: `${tilt}deg` } as CSSProperties}
-      onClick={() => onGo(plank)}
-      initial={{ y: 40, opacity: 0, rotate: tilt - 6 }}
-      animate={{ y: 0, opacity: 1, rotate: tilt }}
-      transition={{ type: 'spring', stiffness: 140, damping: 16, delay }}
-      whileHover={{ rotate: -tilt * 0.6, scale: 1.07, y: -12, transition: { type: 'spring', stiffness: 300, damping: 12 } }}
-      whileTap={{ scale: 0.97, rotate: tilt }}
-    >
-      <span className="ld-tape ld-tape-l" aria-hidden="true" />
-      <span className="ld-tape ld-tape-r" aria-hidden="true" />
-      <span className="ld-photo-pic">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={base() + src} alt="" draggable={false} />
-      </span>
-      <span className="ld-photo-caption">{title}</span>
-    </motion.a>
+const ALL_PROJECTS: Card[] = PROJECT_GROUPS.flatMap((g) => g.cards);
+const ALL_ART: (ArtItem & { section: string })[] = ART.flatMap((s) => s.items.map((it) => ({ ...it, section: s.id })));
+
+export function Landing({
+  onOpenProject,
+  onOpenArt,
+}: {
+  onOpenProject: (c: Card) => void;
+  onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void;
+}) {
+  const [side, setSide] = useState<Side>('engineering');
+  const reduce = useReducedMotion();
+
+  // the fan settles into place once, with a little overshoot, unless motion is unwanted
+  const spring = useMemo(
+    () => (reduce ? { duration: 0.01 } : { type: 'spring' as const, stiffness: 260, damping: 16, mass: 0.9 }),
+    [reduce],
   );
-}
 
-const cardById = (id: string) => PROJECT_GROUPS.flatMap((g) => g.cards).find((c) => c.id === id);
-
-export function Landing({ onGo, onOpenProject, onOpenArt }: { onGo: (p: Plank) => void; onOpenProject: (c: Card) => void; onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void }) {
-  // a fresh random pair next time the landing page is shown
-  useEffect(() => () => picks.clear(), []);
   return (
-    <div className="ld">
-      <section className="ld-hero">
-      <PencilDefs />
-      {/* the name itself lives at the root (NameTag) so it can travel to the corner on the about page */}
-      <div className="ld-name-space" aria-hidden="true" />
-      <div className="ld-row">
-        <Photo title="my art" pool={ART_POOL} href="#/art" tilt={-4} delay={0.5} onGo={onGo} plank={{ label: 'My art', dir: 'right', href: '#/art' }} />
-        <Photo title="my projects" pool={PROJECT_POOL} href="#/projects" tilt={3} delay={0.65} onGo={onGo} plank={{ label: 'My projects', dir: 'left', href: '#/projects' }} />
-      </div>
-      {/* the cue to scroll: highlighted like a marker stroke, arrow bobbing */}
-      <motion.a
-        className="ld-cue"
-        href="#bench"
-        onClick={(e) => {
-          e.preventDefault();
-          document.getElementById('bench')?.scrollIntoView({ behavior: 'smooth' });
-        }}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.6 }}
-        whileHover={{ scale: 1.04 }}
-      >
-        <span className="ld-cue-text">things I&apos;ve been building</span>
-        <motion.span className="ld-cue-arrow" animate={{ y: [0, 9, 0] }} transition={{ duration: 1.3, repeat: Infinity, ease: 'easeInOut' }}>
-          ↓
-        </motion.span>
-      </motion.a>
-      {/* about me: a strip of tape stuck to the page that opens the about page */}
-      <motion.a
-        className="ld-tapelink"
-        href="#/about"
-        onClick={() => onGo({ label: 'About me', dir: 'right', href: '#/about' })}
-        data-mode="fade"
-        initial={{ y: 20, opacity: 0, rotate: -9 }}
-        animate={{ y: 0, opacity: 1, rotate: -4 }}
-        transition={{ type: 'spring', stiffness: 160, damping: 15, delay: 0.85 }}
-        whileHover={{ rotate: -1, scale: 1.08, y: -4, transition: { type: 'spring', stiffness: 320, damping: 12 } }}
-        whileTap={{ scale: 0.97 }}
-      >
-        about me
-      </motion.a>
-      <motion.a
-        className="ld-sticky"
-        href="#/contact"
-        onClick={() => onGo({ label: 'Contact me', dir: 'left', href: '#/contact' })}
-        initial={{ scale: 0.6, opacity: 0, rotate: 12 }}
-        animate={{ scale: 1, opacity: 1, rotate: 4 }}
-        transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 1 }}
-        whileHover={{ rotate: -3, scale: 1.1, y: -10, transition: { type: 'spring', stiffness: 320, damping: 11 } }}
-        whileTap={{ scale: 0.96, rotate: 4 }}
-      >
-        <span className="note-shadow" aria-hidden="true" />
-        <span className="note-paper" aria-hidden="true" />
-        <span className="note-tape" aria-hidden="true" />
-        <span className="ld-sticky-text">contact me</span>
-      </motion.a>
-      </section>
+    <div className="hm">
+      <header className="hm-hero">
+        <p className="hm-meta">
+          Davis, California
+          <a href={`mailto:${CONTACTS.find((c) => c.id === 'email')?.handle}`}>{CONTACTS.find((c) => c.id === 'email')?.handle}</a>
+        </p>
 
-      {/* the bench: most recent things, just finished or in progress */}
-      <section className="ld-bench" id="bench">
-        <div className="ld-bench-row">
-          {RECENT.map((r, i) => {
-            const tilt = [-3, 2.5, -2][i % 3];
-            if (r.kind === 'project') {
-              const card = cardById(r.id);
-              if (!card) return null;
-              return (
-                <motion.button
-                  key={r.id}
-                  type="button"
-                  className="ld-bench-item"
-                  style={{ ['--tilt' as string]: `${tilt}deg` } as CSSProperties}
-                  onClick={() => onOpenProject(card)}
-                  initial={{ y: 40, opacity: 0, rotate: tilt - 5 }}
-                  whileInView={{ y: 0, opacity: 1, rotate: tilt }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ type: 'spring', stiffness: 140, damping: 16, delay: i * 0.12 }}
-                  whileHover={{ rotate: 0, scale: 1.05, y: -8 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="ld-tape ld-tape-l" aria-hidden="true" />
-                  <span className="ld-tape ld-tape-r" aria-hidden="true" />
-                  <span className="ld-bench-pic">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {card.image && <img src={base() + card.image} alt="" draggable={false} />}
-                  </span>
-                  <span className="ld-bench-name">{card.title}</span>
-                  <span className="ld-bench-line">{card.line}</span>
-                  <span className="ld-status">{r.status}</span>
-                </motion.button>
-              );
-            }
-            const item = ART.find((s) => s.id === r.section)?.items.find((it) => it.image === r.image);
-            return (
-              <motion.button
-                key={r.image}
-                type="button"
-                className="ld-bench-item"
-                style={{ ['--tilt' as string]: `${tilt}deg` } as CSSProperties}
-                onClick={() => onOpenArt({ image: r.image, caption: item?.caption ?? r.title, materials: item?.materials })}
-                initial={{ y: 40, opacity: 0, rotate: tilt - 5 }}
-                whileInView={{ y: 0, opacity: 1, rotate: tilt }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ type: 'spring', stiffness: 140, damping: 16, delay: i * 0.12 }}
-                whileHover={{ rotate: 0, scale: 1.05, y: -8 }}
-                whileTap={{ scale: 0.98 }}
+        <h1 className="hm-name">Nathan Ward</h1>
+
+        <div className="hm-fan" aria-hidden="true">
+          {SEATS.map((seat, i) => (
+            <AnimatePresence key={i} mode="wait" initial={false}>
+              <motion.div
+                key={FAN[side][i]}
+                className="hm-fan-card"
+                style={{ zIndex: seat.z } as CSSProperties}
+                initial={reduce ? false : { opacity: 0, scale: 0.72, rotate: 0, x: 0, y: 34 }}
+                animate={{ opacity: 1, scale: 1, rotate: seat.tilt, x: `${seat.x}%`, y: `${seat.y}%` }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.84, y: 18, transition: { duration: 0.2, ease: 'easeIn' } }}
+                transition={{ ...spring, delay: reduce ? 0 : 0.1 + i * 0.07 }}
               >
-                <span className="ld-tape ld-tape-l" aria-hidden="true" />
-                <span className="ld-tape ld-tape-r" aria-hidden="true" />
-                <span className="ld-bench-pic">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={base() + r.image} alt="" draggable={false} />
-                </span>
-                <span className="ld-bench-name">{r.title}</span>
-                <span className="ld-bench-line">hand-painted Air Force 1s</span>
-                <span className="ld-status">{r.status}</span>
-              </motion.button>
-            );
-          })}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={base() + FAN[side][i]} alt="" draggable={false} />
+              </motion.div>
+            </AnimatePresence>
+          ))}
         </div>
-      </section>
+
+        <h2 className="hm-role">
+          <span className={side === 'engineering' ? 'is-on' : ''}>Engineer</span>
+          <span className="hm-role-and"> and </span>
+          <span className={side === 'art' ? 'is-on' : ''}>Artist</span>
+        </h2>
+
+        {/* no labels: the underline in the line above says which side you are on */}
+        <button
+          type="button"
+          className="hm-switch"
+          role="switch"
+          aria-checked={side === 'art'}
+          aria-label={side === 'art' ? 'Showing art. Switch to engineering.' : 'Showing engineering. Switch to art.'}
+          onClick={() => setSide((s) => (s === 'art' ? 'engineering' : 'art'))}
+        >
+          <span className="hm-switch-knob" aria-hidden="true" />
+        </button>
+      </header>
+
+      {/* keyed on the side, so switching remounts and animates in; no exit to wait on,
+          which means a stalled animation can never deadlock the swap */}
+      <motion.section
+        key={side}
+        className="hm-work"
+        initial={reduce ? false : { opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduce ? 0.01 : 0.32, ease: 'easeOut' }}
+      >
+        <h3 className="hm-work-title">Selected work</h3>
+        <p className="hm-work-sub">
+          {side === 'engineering' ? 'Simulators, solvers and the odd neural network' : 'Markers, leather paint and a lot of patience'}
+        </p>
+        {side === 'engineering' ? (
+          <ul className="hm-grid">
+            {ALL_PROJECTS.map((c) => (
+              <li key={c.id}>
+                <button type="button" onClick={() => onOpenProject(c)} aria-label={`Open ${c.title}`}>
+                  <span className="hm-tile">
+                    {c.image && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={base() + c.image} alt="" loading="lazy" draggable={false} />
+                    )}
+                  </span>
+                  <span className="hm-tile-name">{c.title}</span>
+                  <span className="hm-tile-line">{c.line}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className="hm-grid hm-grid--art">
+            {ALL_ART.map((a) => (
+              <li key={a.image}>
+                <button
+                  type="button"
+                  onClick={() => onOpenArt({ image: a.image, caption: a.caption, materials: a.materials })}
+                  aria-label={`Open ${a.caption}`}
+                >
+                  <span className="hm-tile">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={base() + a.image} alt="" loading="lazy" draggable={false} />
+                  </span>
+                  <span className="hm-tile-name">{a.caption}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </motion.section>
+
+      <footer className="hm-foot">
+        <h3 className="hm-work-title">Contact</h3>
+        <ul className="hm-contacts">
+          {CONTACTS.map((c) => (
+            <li key={c.id}>
+              <a href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
+                {c.label}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a href="#/about">About</a>
+          </li>
+        </ul>
+      </footer>
     </div>
   );
 }

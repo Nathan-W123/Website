@@ -776,3 +776,219 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 @media (prefers-reduced-motion: reduce) {
   .sg-plank, .sg-card > a { transition: none; }
 }
+
+/* ===================================================================
+   Home. White, one geometric face set large, the work supplying the
+   colour. Lives inside .sg-page, so it covers the ruled paper over.
+   =================================================================== */
+.sg-page--plain {
+  background-image: none;
+  background-color: #fff;
+  cursor: auto;
+}
+.hm {
+  --ink: #1b1b1b;
+  --ink-soft: #8d8d8d;
+  --ink-faint: #c9c9c9;
+  --rule: #ececec;
+  --disp: var(--font-jost, 'Jost'), 'Futura', 'Century Gothic', system-ui, sans-serif;
+  --body: var(--font-inter, 'Inter'), system-ui, -apple-system, sans-serif;
+  position: relative;
+  z-index: 2;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px 120px;
+  font-family: var(--body);
+  color: var(--ink);
+  text-align: center;
+}
+
+/* ---- hero ---- */
+.hm-hero { padding-top: clamp(28px, 6vh, 72px); }
+.hm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 clamp(18px, 5vh, 52px);
+  font-family: var(--disp);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.hm-meta a { color: var(--ink-soft); text-decoration: none; }
+.hm-meta a:hover { color: var(--ink); }
+
+.hm-name {
+  margin: 0;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 9.4vw, 8.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.024em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* the four pieces, fanned out and overlapping under the name */
+.hm-fan {
+  position: relative;
+  height: clamp(240px, 31vw, 400px);
+  margin: clamp(-18px, -2vw, -8px) auto clamp(-26px, -3vw, -14px);
+  pointer-events: none;
+}
+.hm-fan-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(132px, 18vw, 232px);
+  aspect-ratio: 4 / 5;
+  margin: calc(clamp(132px, 18vw, 232px) * -0.625) 0 0 calc(clamp(132px, 18vw, 232px) / -2);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f4f4f4;
+  box-shadow: 0 18px 38px -16px rgba(0, 0, 0, 0.34);
+}
+.hm-fan-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.hm-role {
+  margin: 0;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: clamp(2.3rem, 9vw, 7.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.022em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+/* the half you are looking at is the half that is underlined */
+.hm-role span { position: relative; }
+.hm-role span::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.06em;
+  height: 0.055em;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.3, 1);
+}
+.hm-role .is-on::after { transform: scaleX(1); }
+.hm-role-and { font-size: 0.58em; color: var(--ink-soft); }
+.hm-role-and::after { content: none; }
+
+/* ---- the switch: no label, because the underline above says which side you are on ---- */
+.hm-switch {
+  display: block;
+  width: 62px;
+  height: 34px;
+  margin: clamp(24px, 4vh, 44px) auto 0;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: #f4f4f4;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+.hm-switch[aria-checked='true'] { background: var(--ink); border-color: var(--ink); }
+.hm-switch:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.hm-switch-knob {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 3px;
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.3, 1), background 0.3s ease;
+}
+.hm-switch[aria-checked='true'] .hm-switch-knob { transform: translateX(28px); background: #fff; }
+
+/* ---- the work ---- */
+.hm-work { padding-top: clamp(64px, 12vh, 132px); }
+.hm-work-title {
+  margin: 0;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 6vw, 4.4rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.hm-work-sub { margin: 10px 0 0; font-size: 15px; color: var(--ink-soft); }
+
+.hm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: clamp(26px, 3.4vw, 48px);
+  margin: clamp(34px, 6vh, 64px) 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.hm-grid--art { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.hm-grid button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.hm-tile {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f4f4f4;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.3, 1);
+}
+.hm-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hm-grid button:hover .hm-tile,
+.hm-grid button:focus-visible .hm-tile { transform: translateY(-6px) scale(1.012); }
+.hm-grid button:focus-visible .hm-tile { outline: 2px solid var(--ink); outline-offset: 4px; }
+.hm-tile-name {
+  display: block;
+  margin-top: 14px;
+  font-family: var(--disp);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.hm-tile-line { display: block; margin-top: 5px; font-size: 14px; line-height: 1.45; color: var(--ink-soft); }
+
+/* ---- contact ---- */
+.hm-foot { padding-top: clamp(76px, 14vh, 150px); }
+.hm-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 30px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.hm-contacts a {
+  font-family: var(--disp);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.hm-contacts a:hover { color: var(--ink); }
+.hm-contacts a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+@media (max-width: 560px) {
+  .hm { padding: 0 18px 84px; }
+  .hm-fan { height: 52vw; }
+  .hm-fan-card { width: 30vw; margin: calc(30vw * -0.625) 0 0 calc(30vw / -2); border-radius: 12px; }
+  .hm-grid { gap: 22px; }
+}
