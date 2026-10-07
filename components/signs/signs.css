@@ -1136,14 +1136,8 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 .pv-close:hover { background: var(--ink); color: var(--cream, #f7f6f1); }
 .pv-close:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-/* the name and the lede, side by side rather than stacked and centred */
-.pv-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-  gap: clamp(14px, 2.4vw, 42px);
-  align-items: end;
-  text-align: left;
-}
+/* the name at the top, the one-line introduction under it */
+.pv-head { text-align: center; }
 .pv-title {
   margin: 0;
   font-family: var(--disp);
@@ -1155,7 +1149,8 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   text-wrap: balance;
 }
 .pv-brief {
-  margin: 0 0 0.35em;
+  max-width: 54ch;
+  margin: clamp(14px, 2.4vh, 24px) auto 0;
   font-size: clamp(14px, 1.1vw, 15.5px);
   line-height: 1.65;
   color: var(--ink-soft);
@@ -1242,7 +1237,6 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 
 @media (max-width: 640px) {
   .pv { padding-left: 18px; padding-right: 18px; }
-  .pv-head { grid-template-columns: 1fr; gap: 16px; align-items: start; }
   .pv-flow { gap: 26px; }
   .pv-shot.is-left,
   .pv-shot.is-right,
