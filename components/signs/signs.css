@@ -1297,3 +1297,34 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   gap: 14px;
   margin-top: 14px;
 }
+
+/* who the art has been for: only on the art side, in from the left and out to
+   the right. The slot holds its height either way so nothing above it moves. */
+.hm-clients-slot {
+  min-height: 78px;
+  margin-top: clamp(22px, 3.4vh, 40px);
+  overflow: hidden;
+}
+.hm-clients { display: flex; flex-direction: column; gap: 7px; }
+.hm-clients-title {
+  margin: 0;
+  font-family: var(--disp);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.hm-clients-list {
+  margin: 0;
+  font-family: var(--disp);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  color: var(--ink-faint);
+}
+@media (max-width: 560px) {
+  .hm-clients-slot { min-height: 104px; }
+}

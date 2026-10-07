@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { ART, CONTACTS, PROJECT_GROUPS, type ArtItem, type Card } from './content';
+import { ART, CONTACTS, PROJECT_GROUPS, WORKED_WITH, type ArtItem, type Card } from './content';
 import { TopBar } from './topbar';
 
 /**
@@ -25,10 +25,10 @@ type Side = 'engineering' | 'art';
  * screen size.
  */
 const SEATS = [
-  { w: 0.92, dx: -0.97, dy: 0.1, tilt: -7, z: 2, from: { x: '-95vw', y: '24vh', r: -38 } },
-  { w: 1.06, dx: -0.33, dy: -0.02, tilt: -2.5, z: 4, from: { x: '18vw', y: '-78vh', r: 22 } },
-  { w: 0.95, dx: 0.33, dy: 0.08, tilt: 3.5, z: 3, from: { x: '-26vw', y: '82vh', r: -16 } },
-  { w: 1.01, dx: 0.97, dy: -0.07, tilt: 7, z: 1, from: { x: '96vw', y: '-30vh', r: 34 } },
+  { w: 0.92, dx: -0.97, dy: 0.1, tilt: -7, z: 2, from: { x: '-13vw', y: '5vh', r: -15 } },
+  { w: 1.06, dx: -0.33, dy: -0.02, tilt: -2.5, z: 4, from: { x: '4vw', y: '-7vh', r: 8 } },
+  { w: 0.95, dx: 0.33, dy: 0.08, tilt: 3.5, z: 3, from: { x: '-5vw', y: '7vh', r: -6 } },
+  { w: 1.01, dx: 0.97, dy: -0.07, tilt: 7, z: 1, from: { x: '12vw', y: '-4vh', r: 14 } },
 ]
 
 /** Four of whichever side you are looking at, cropped to 4:5 and tonally matched
@@ -133,7 +133,7 @@ export function Landing({
 
   // the fan settles into place once, with a little overshoot, unless motion is unwanted
   const spring = useMemo(
-    () => (reduce ? { duration: 0.01 } : { type: 'spring' as const, stiffness: 260, damping: 16, mass: 0.9 }),
+    () => (reduce ? { duration: 0.01 } : { type: 'spring' as const, stiffness: 240, damping: 21, mass: 0.9 }),
     [reduce],
   );
 
@@ -155,10 +155,10 @@ export function Landing({
               key={i}
               className="hm-fan-seat"
               style={{ zIndex: seat.z, '--w': seat.w, '--dx': seat.dx, '--dy': seat.dy } as CSSProperties}
-              initial={reduce ? false : { opacity: 0, scale: 0.8, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }}
+              initial={reduce ? false : { opacity: 0, scale: 0.93, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }}
               animate={
                 !reduce && !fanIn
-                  ? { opacity: 0, scale: 0.8, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }
+                  ? { opacity: 0, scale: 0.93, rotate: seat.from.r, x: seat.from.x, y: seat.from.y }
                   : stacked
                     ? // squared up into a deck: the offsets its seat gives it, cancelled,
                       // and every card scaled to the same width whatever size it is
@@ -229,6 +229,24 @@ export function Landing({
         >
           <span className="hm-switch-knob" aria-hidden="true" />
         </button>
+
+        <div className="hm-clients-slot">
+          <AnimatePresence initial={false}>
+            {side === 'art' && (
+              <motion.div
+                key="clients"
+                className="hm-clients"
+                initial={reduce ? { opacity: 0 } : { opacity: 0, x: -80 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, x: 80, transition: { duration: 0.3, ease: 'easeIn' } }}
+                transition={{ duration: reduce ? 0.01 : 0.5, ease: [0.22, 1, 0.3, 1], delay: reduce ? 0 : 0.12 }}
+              >
+                <p className="hm-clients-title">Worked with</p>
+                <p className="hm-clients-list">{WORKED_WITH.join(', ')}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </header>
 
       {/* keyed on the side, so switching remounts and animates in; no exit to wait on,
