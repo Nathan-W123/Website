@@ -997,13 +997,29 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   box-shadow: 0 14px 28px -20px rgba(0, 0, 0, 0.4);
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.3, 1), box-shadow 0.45s ease;
 }
-.hm-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* the picture is a touch larger than its tile, so it has somewhere to go */
+.hm-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.001);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.3, 1);
+}
+
+/* Hover: the tile lifts off the page, the picture pushes gently against its
+   own edges, and the words under it come forward. Focus gets the same, so a
+   keyboard finds its way around the grid the way a cursor does. */
 .hm-grid button:hover .hm-tile,
 .hm-grid button:focus-visible .hm-tile {
-  transform: translateY(-9px) scale(1.018);
-  box-shadow: 0 30px 48px -24px rgba(0, 0, 0, 0.42);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 32px 50px -24px rgba(0, 0, 0, 0.44);
 }
+.hm-grid button:hover .hm-tile img,
+.hm-grid button:focus-visible .hm-tile img { transform: scale(1.07); }
+.hm-grid button:active .hm-tile { transform: translateY(-4px) scale(1.005); transition-duration: 0.12s; }
 .hm-grid button:focus-visible .hm-tile { outline: 2px solid var(--ink); outline-offset: 5px; }
+
 .hm-tile-text { display: block; margin-top: 12px; }
 .hm-tile-name {
   display: block;
@@ -1012,8 +1028,33 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   font-weight: 600;
   letter-spacing: 0.085em;
   text-transform: uppercase;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.3, 1);
 }
-.hm-tile-line { display: block; margin-top: 4px; font-size: 13px; line-height: 1.45; color: var(--ink-soft); }
+.hm-tile-line {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  transition: color 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.3, 1);
+}
+.hm-grid button:hover .hm-tile-name,
+.hm-grid button:focus-visible .hm-tile-name,
+.hm-grid button:hover .hm-tile-line,
+.hm-grid button:focus-visible .hm-tile-line { transform: translateX(4px); }
+.hm-grid button:hover .hm-tile-line,
+.hm-grid button:focus-visible .hm-tile-line { color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-tile,
+  .hm-tile img,
+  .hm-tile-name,
+  .hm-tile-line { transition: none; }
+  .hm-grid button:hover .hm-tile,
+  .hm-grid button:focus-visible .hm-tile { transform: none; }
+  .hm-grid button:hover .hm-tile img,
+  .hm-grid button:focus-visible .hm-tile img { transform: none; }
+}
 
 /* ---- contact ---- */
 .hm-foot { padding-top: clamp(76px, 14vh, 150px); }
@@ -1352,3 +1393,19 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 @media (max-width: 560px) {
   .hm-clients-slot { min-height: 104px; }
 }
+
+/* the art half signs off with somewhere to follow rather than a list of links */
+.hm-foot-line {
+  margin: clamp(12px, 2vh, 20px) 0 0;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+.hm-foot-line a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--ink-faint);
+  padding-bottom: 1px;
+  transition: border-color 0.25s ease;
+}
+.hm-foot-line a:hover { border-color: var(--ink); }
+.hm-foot-line a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }

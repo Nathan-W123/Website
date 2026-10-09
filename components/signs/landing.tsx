@@ -39,6 +39,7 @@ const FAN: Record<Side, string[]> = {
 };
 
 const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
+const instagram = CONTACTS.find((c) => c.id === 'instagram');
 
 const ALL_PROJECTS: Card[] = PROJECT_GROUPS.flatMap((g) => g.cards);
 const ALL_ART: (ArtItem & { section: string })[] = ART.flatMap((s) => s.items.map((it) => ({ ...it, section: s.id })));
@@ -312,21 +313,42 @@ export function Landing({
         </ul>
       </motion.section>
 
-      <footer className="hm-foot">
-        <h3 className="hm-work-title">Contact</h3>
-        <ul className="hm-contacts">
-          {CONTACTS.map((c) => (
-            <li key={c.id}>
-              <a href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
-                {c.label}
+      {/* keyed on the side, so it fades in with the half it belongs to */}
+      <motion.footer
+        key={`foot-${side}`}
+        className="hm-foot"
+        initial={reduce ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduce ? 0.01 : 0.4, ease: 'easeOut' }}
+      >
+        {side === 'art' ? (
+          <>
+            <h3 className="hm-work-title">Want more?</h3>
+            <p className="hm-foot-line">
+              Follow me on{' '}
+              <a href={instagram?.href} target="_blank" rel="noreferrer">
+                Instagram {instagram?.handle}
               </a>
-            </li>
-          ))}
-          <li>
-            <a href="#/about">About</a>
-          </li>
-        </ul>
-      </footer>
+            </p>
+          </>
+        ) : (
+          <>
+            <h3 className="hm-work-title">Contact</h3>
+            <ul className="hm-contacts">
+              {CONTACTS.map((c) => (
+                <li key={c.id}>
+                  <a href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
+                    {c.label}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a href="#/about">About</a>
+              </li>
+            </ul>
+          </>
+        )}
+      </motion.footer>
     </div>
   );
 }
