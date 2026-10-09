@@ -38,6 +38,8 @@ const FAN: Record<Side, string[]> = {
   art: ['/hero/art-1.webp', '/hero/art-2.webp', '/hero/art-3.webp', '/hero/art-4.webp'],
 };
 
+const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
+
 const ALL_PROJECTS: Card[] = PROJECT_GROUPS.flatMap((g) => g.cards);
 const ALL_ART: (ArtItem & { section: string })[] = ART.flatMap((s) => s.items.map((it) => ({ ...it, section: s.id })));
 
@@ -102,6 +104,13 @@ export function Landing({
   // mid-shuffle the four cards are squared into one deck; the pictures change
   // underneath while they are stacked, then the deck is dealt back out
   const [stacked, setStacked] = useState(false);
+  // the second beat of the shuffle: the top face of each card peels off and
+  // tucks in behind the one underneath, which is already the other side
+  const [peeling, setPeeling] = useState(false);
+  // which cards have passed the top of their arc and gone behind. zIndex is not
+  // something motion can animate — it snaps straight to the last value — so the
+  // layer swap is driven from here, timed to each card's own apex.
+  const [tucked, setTucked] = useState<number[]>([]);
   const shuffleTimers = useRef<number[]>([]);
   const reduce = useReducedMotion();
   const fan = useRef<HTMLDivElement>(null);
@@ -110,15 +119,25 @@ export function Landing({
 
   const flip = () => {
     if (stacked) return;
-    const other: Side = side === 'art' ? 'engineering' : 'art';
+    const next = other(side);
     if (reduce) {
-      setSide(other);
+      setSide(next);
       return;
     }
     setStacked(true);
+    shuffleTimers.current.push(window.setTimeout(() => setPeeling(true), 290));
+    SEATS.forEach((_, i) => {
+      shuffleTimers.current.push(window.setTimeout(() => setTucked((t) => [...t, i]), 290 + i * 70 + 300));
+    });
     shuffleTimers.current.push(
-      window.setTimeout(() => setSide(other), 330),
-      window.setTimeout(() => setStacked(false), 430),
+      // every face is behind its neighbour by now, so swapping the two over
+      // changes nothing you can see
+      window.setTimeout(() => {
+        setSide(next);
+        setPeeling(false);
+        setTucked([]);
+      }, 1110),
+      window.setTimeout(() => setStacked(false), 1170),
     );
   };
   useEffect(() => () => shuffleTimers.current.forEach((t) => window.clearTimeout(t)), []);
@@ -183,18 +202,33 @@ export function Landing({
                 whileTap={reduce ? undefined : { scale: 0.985 }}
                 transition={{ type: 'spring', stiffness: 340, damping: 24 }}
               >
-                <AnimatePresence initial={false}>
-                  <motion.img
-                    key={FAN[side][i]}
-                    src={base() + FAN[side][i]}
-                    alt=""
-                    draggable={false}
-                    initial={reduce ? false : { opacity: 0, scale: 1.07 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, transition: { duration: reduce ? 0.01 : 0.14 } }}
-                    transition={{ duration: reduce ? 0.01 : 0.2, ease: 'easeOut' }}
-                  />
-                </AnimatePresence>
+                {/* the side you are about to see, already in place underneath */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="hm-fan-face is-under" src={base() + FAN[other(side)][i]} alt="" draggable={false} />
+                <motion.img
+                  className="hm-fan-face is-over"
+                  src={base() + FAN[side][i]}
+                  alt=""
+                  draggable={false}
+                  style={{ zIndex: tucked.includes(i) ? 0 : 2 }}
+                  animate={
+                    peeling && !reduce
+                      ? {
+                          // out to the side, then back into the deck — but behind
+                          // the face below, so it is gone the moment it returns
+                          x: ['0%', '72%', '0%'],
+                          y: ['0%', '-9%', '0%'],
+                          rotate: [0, 10, 0],
+                          scale: [1, 0.96, 1],
+                        }
+                      : { x: '0%', y: '0%', rotate: 0, scale: 1 }
+                  }
+                  transition={
+                    peeling && !reduce
+                      ? { duration: 0.6, times: [0, 0.5, 1], ease: 'easeInOut', delay: i * 0.07 }
+                      : { duration: 0 }
+                  }
+                />
               </motion.div>
             </motion.div>
           ))}

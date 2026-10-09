@@ -871,16 +871,30 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   width: 100%;
   height: 100%;
   border-radius: clamp(12px, 1.3vw, 18px);
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 16px 34px -16px rgba(0, 0, 0, 0.28);
+  /* visible, so a face peeling off the top of the deck is seen past the edge */
+  overflow: visible;
   cursor: grab;
   touch-action: pan-y;
   position: relative;
 }
 .hm-fan-card:active { cursor: grabbing; }
-/* absolute so the outgoing and incoming pictures stack while they cross-fade */
-.hm-fan-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
+/* Two faces to a card: the side you are looking at, and the side you are about
+   to see, waiting underneath. Each clips and shadows itself, because either one
+   can be the piece that is travelling. */
+.hm-fan-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  background: #fff;
+  box-shadow: 0 16px 34px -16px rgba(0, 0, 0, 0.28);
+}
+.hm-fan-face.is-under { z-index: 1; }
+.hm-fan-face.is-over { z-index: 2; }
 
 .hm-role {
   margin: 0;
