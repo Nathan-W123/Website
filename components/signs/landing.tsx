@@ -210,7 +210,7 @@ export function Landing({
                   <motion.span
                     layoutId="hm-role-bar"
                     className="hm-role-bar"
-                    transition={reduce ? { duration: 0.01 } : { type: 'spring', stiffness: 420, damping: 34 }}
+                    transition={reduce ? { duration: 0.01 } : { duration: 0.32, ease: 'linear' }}
                   />
                 )}
               </span>

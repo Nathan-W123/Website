@@ -19,7 +19,7 @@ export const ABOUT = {
 };
 
 /** Commissions and clients, listed on an index card on the art board. */
-export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', 'NewSong School of Music', 'Akers Real Estate', 'FAM (Foster Adoption Ministry)'];
+export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', 'NewSongs School of Music', 'Akers Real Estate', 'FAM (Foster Adoption Ministry)'];
 
 /** The bench: things just finished or in progress, shown under the landing page. */
 export type Recent = { kind: 'project'; id: string; status: string } | { kind: 'art'; section: string; image: string; title: string; status: string };
