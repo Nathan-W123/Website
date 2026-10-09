@@ -138,7 +138,7 @@ export function Landing({
   );
 
   return (
-    <div className={`hm${side === 'engineering' ? ' hm--eng' : ''}`}>
+    <div className="hm">
       <TopBar onHome={() => undefined} here="home" />
 
       <header className="hm-hero">
