@@ -1409,3 +1409,13 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 .hm-foot-line a:hover { border-color: var(--ink); }
 .hm-foot-line a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* ---- About: what is on the bench, under the writing ---- */
+.ab2-featured { padding-top: clamp(30px, 6vh, 70px); }
+.ab2-grid {
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 1000px;
+}
+@media (max-width: 900px) {
+  .ab2-grid { grid-template-columns: repeat(2, 1fr); }
+}

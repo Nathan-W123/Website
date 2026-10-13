@@ -1,15 +1,34 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ABOUT, CONTACTS } from './content';
+import { ABOUT, CONTACTS, PROJECT_GROUPS, RECENT, type Card } from './content';
 import { TopBar } from './topbar';
+
+const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 
 /**
  * About: the whole thing set large, one sentence at a time. Only the line you
  * are reading is in ink — the rest sit back in grey and come forward as you
  * scroll onto them.
  */
-export function About({ onHome }: { onHome: () => void }) {
+/** The bench, resolved against the project list so a tile carries its real title. */
+type Feature = { key: string; title: string; status: string; image: string; card?: Card };
+const ALL: Card[] = PROJECT_GROUPS.flatMap((g) => g.cards);
+const FEATURED: Feature[] = RECENT.flatMap((r) => {
+  if (r.kind === 'art') return [{ key: r.image, title: r.title, status: r.status, image: r.image }];
+  const card = ALL.find((c) => c.id === r.id);
+  return card ? [{ key: r.id, title: card.title, status: r.status, image: `/tiles/${r.id}.webp`, card }] : [];
+});
+
+export function About({
+  onHome,
+  onOpenProject,
+  onOpenArt,
+}: {
+  onHome: () => void;
+  onOpenProject: (c: Card) => void;
+  onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void;
+}) {
   const [active, setActive] = useState(0);
   const root = useRef<HTMLDivElement>(null);
   const lines = useRef<(HTMLParagraphElement | null)[]>([]);
@@ -63,6 +82,35 @@ export function About({ onHome }: { onHome: () => void }) {
           </p>
         ))}
       </div>
+      <section className="ab2-featured">
+        <h2 className="hm-work-title">Featured work</h2>
+        <p className="hm-work-sub">What is on the bench right now</p>
+        <ul className="hm-grid ab2-grid">
+          {FEATURED.map((f) => (
+            <li key={f.key}>
+              <button
+                type="button"
+                aria-label={`Open ${f.title}`}
+                onClick={() =>
+                  f.card
+                    ? onOpenProject(f.card)
+                    : onOpenArt({ image: f.image, caption: f.title, materials: undefined })
+                }
+              >
+                <span className="hm-tile">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={base() + f.image} alt="" loading="lazy" draggable={false} />
+                </span>
+                <span className="hm-tile-text">
+                  <span className="hm-tile-name">{f.title}</span>
+                  <span className="hm-tile-line">{f.status}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <footer className="hm-foot">
         <h2 className="hm-work-title">Contact</h2>
         <ul className="hm-contacts">

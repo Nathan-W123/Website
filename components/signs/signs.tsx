@@ -158,7 +158,7 @@ export default function Signs() {
 
           {route.page === 'contact' && <Contact onBack={goHome} />}
 
-          {route.page === 'about' && <About onHome={goHome} />}
+          {route.page === 'about' && <About onHome={goHome} onOpenProject={setProject} onOpenArt={setLightbox} />}
         </motion.section>
       </AnimatePresence>
 
