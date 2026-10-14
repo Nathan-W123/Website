@@ -1410,12 +1410,60 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-foot-line a:hover { border-color: var(--ink); }
 .hm-foot-line a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
-/* ---- About: what is on the bench, under the writing ---- */
+/* ---- About: what is on the bench, under the writing ----
+   A pile of cards until you reach for it, and then it fans out. Each card is
+   placed from the middle and shifted in multiples of its own width, so the
+   spacing holds at any size. */
 .ab2-featured { padding-top: clamp(30px, 6vh, 70px); }
-.ab2-grid {
-  grid-template-columns: repeat(4, 1fr);
+.ab2-deck {
+  --fw: clamp(132px, 17vw, 208px);
+  position: relative;
+  height: calc(var(--fw) + 62px);
   max-width: 1000px;
+  margin: clamp(34px, 6vh, 64px) auto 0;
+  padding: 0;
+  list-style: none;
 }
-@media (max-width: 900px) {
-  .ab2-grid { grid-template-columns: repeat(2, 1fr); }
+.ab2-card {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--fw);
+  margin-left: calc(var(--fw) / -2);
+}
+.ab2-card button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.ab2-card .hm-tile {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: clamp(12px, 1.4vw, 20px);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.46);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+.ab2-card button:hover .hm-tile,
+.ab2-card button:focus-visible .hm-tile {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 30px 46px -22px rgba(0, 0, 0, 0.46);
+}
+.ab2-card button:focus-visible .hm-tile { outline: 2px solid var(--ink); outline-offset: 4px; }
+.ab2-card .hm-tile-text { margin-top: 10px; }
+
+@media (max-width: 760px) {
+  .ab2-deck { --fw: 38vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab2-card .hm-tile { transition: none; }
+  .ab2-card button:hover .hm-tile,
+  .ab2-card button:focus-visible .hm-tile { transform: none; }
 }
