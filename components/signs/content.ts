@@ -32,7 +32,7 @@ export const RECENT: Recent[] = [
 
 export const CONTACTS = [
   { id: 'instagram', label: 'Instagram', handle: '@naze_draws', href: 'https://instagram.com/naze_draws' },
-  { id: 'linkedin', label: 'LinkedIn', handle: 'linkedin.com/in/nathan-ward', href: 'https://www.linkedin.com/in/nathan-ward' },
+  { id: 'linkedin', label: 'LinkedIn', handle: 'linkedin.com/in/nathan-ward-', href: 'https://www.linkedin.com/in/nathan-ward-' },
   { id: 'github', label: 'GitHub', handle: 'Nathan-W123', href: 'https://github.com/Nathan-W123' },
   { id: 'email', label: 'Email', handle: 'ncward@ucdavis.edu', href: 'mailto:ncward@ucdavis.edu' },
 ];
