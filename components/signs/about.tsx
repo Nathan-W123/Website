@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { ABOUT, CONTACTS } from './content';
+
+const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
+import { ABOUT, CONTACTS, SPOTS } from './content';
 import { BrandIcon } from './icons';
 
 /**
@@ -21,6 +23,72 @@ const restAt = (n: number) => ({
   rotate: n === 0 ? 0 : 5,
   scale: n === 0 ? 1 : 0.97,
 });
+
+/** How the photos sit when a spot is opened: a short fan, centred on the mark. */
+const FAN_AT = [
+  { x: '-108%', y: '-96%', r: -9 },
+  { x: '0%', y: '-108%', r: 2 },
+  { x: '108%', y: '-96%', r: 10 },
+];
+
+/**
+ * A phrase with a picture set into it. Hovering the phrase fans a few more out
+ * above the line — they are absolutely placed and never in the flow, so the
+ * sentence does not reflow when they appear.
+ */
+function Spot({ name, text, reduce }: { name: string; text: string; reduce: boolean }) {
+  const [open, setOpen] = useState(false);
+  const spot = SPOTS[name];
+  if (!spot) return <>{text}</>;
+  return (
+    <span
+      className="ab2-spot"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocusCapture={() => setOpen(true)}
+      onBlurCapture={() => setOpen(false)}
+    >
+      {text}{' '}
+      <span className="ab2-spot-mark" tabIndex={0} role="img" aria-label={`${text} — hover for photos`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={base() + spot.icon} alt="" draggable={false} />
+        <span className="ab2-spot-fan" aria-hidden="true">
+          {spot.shots.map((src, i) => (
+            <motion.span
+              key={src}
+              className="ab2-spot-shot"
+              initial={false}
+              animate={
+                open && !reduce
+                  ? { opacity: 1, x: FAN_AT[i].x, y: FAN_AT[i].y, rotate: FAN_AT[i].r, scale: 1 }
+                  : { opacity: 0, x: '0%', y: '-20%', rotate: 0, scale: 0.7 }
+              }
+              transition={{ type: 'spring', stiffness: 340, damping: 28, delay: open ? i * 0.04 : 0 }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={base() + src} alt="" loading="lazy" draggable={false} />
+            </motion.span>
+          ))}
+        </span>
+      </span>
+    </span>
+  );
+}
+
+/** Split a paragraph on the {key|words} marks and render the pieces. */
+function line(text: string, reduce: boolean) {
+  const out: ReactNode[] = [];
+  const re = /\{([a-z-]+)\|([^}]+)\}/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push(<Spot key={m.index} name={m[1]} text={m[2]} reduce={reduce} />);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
 
 export function About({ onHome }: { onHome: () => void }) {
   const [active, setActive] = useState(0);
@@ -101,7 +169,7 @@ export function About({ onHome }: { onHome: () => void }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: reduce ? 0 : 0.5, ease: [0.22, 1, 0.3, 1], delay: reduce ? 0 : 0.16 + i * 0.07 }}
           >
-            {p}
+            {line(p, !!reduce)}
             {/* the marks sit at the end of the last line, not in a footer under it */}
             {i === ABOUT.paragraphs.length - 1 && (
             <div

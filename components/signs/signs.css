@@ -1621,3 +1621,45 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 @media (prefers-reduced-motion: reduce) {
   .hm-corner-say { transition: none; }
 }
+
+/* ---- About: a picture set into a phrase, and a few more on hover ---- */
+.ab2-spot { position: relative; }
+.ab2-spot-mark {
+  position: relative;
+  display: inline-block;
+  width: 0.78em;
+  height: 0.78em;
+  vertical-align: -0.06em;
+  border-radius: 0.2em;
+  overflow: visible;
+  cursor: pointer;
+}
+.ab2-spot-mark > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.2em;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 2px 7px -4px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.3, 1);
+}
+.ab2-spot-mark:hover > img,
+.ab2-spot-mark:focus-visible > img { transform: translateY(-2px) scale(1.06); }
+.ab2-spot-mark:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* the fan is pinned to the mark and never in the flow, so the sentence does
+   not reflow when it opens */
+.ab2-spot-fan { position: absolute; left: 50%; top: 0; width: 0; height: 0; pointer-events: none; }
+.ab2-spot-shot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.5em;
+  height: 3.1em;
+  margin: -1.55em 0 0 -1.25em;
+  border-radius: 0.22em;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.55);
+}
+.ab2-spot-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
