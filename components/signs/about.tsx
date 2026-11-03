@@ -10,8 +10,17 @@ import { BrandIcon } from './icons';
  * are reading is in ink — the rest sit back in grey and come forward as you
  * scroll onto them.
  */
-/** How the little pile of marks sits before you reach for it. */
-const LEAN = [-7, -2.5, 3, 7];
+/**
+ * Closed, the pile reads as two cards: the front one square on, and one corner
+ * behind it. The third and fourth sit exactly under the second, so the edge
+ * stays a single clean line rather than a stack of four.
+ */
+const restAt = (n: number) => ({
+  x: `${Math.min(n, 1) * 17}%`,
+  y: `${Math.min(n, 1) * -5}%`,
+  rotate: n === 0 ? 0 : 5,
+  scale: n === 0 ? 1 : 0.97,
+});
 
 export function About({ onHome }: { onHome: () => void }) {
   const [active, setActive] = useState(0);
@@ -109,7 +118,7 @@ export function About({ onHome }: { onHome: () => void }) {
                   rel="noreferrer"
                   aria-label={c.label}
                   style={{ zIndex: CONTACTS.length - n }}
-                  animate={open ? { x: `${n * 112}%`, rotate: 0, scale: 1 } : { x: `${n * 21}%`, y: `${n * -5}%`, rotate: LEAN[n], scale: 1 - n * 0.03 }}
+                  animate={open ? { x: `${n * 112}%`, y: '0%', rotate: 0, scale: 1 } : restAt(n)}
                   transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30, delay: (fan ? n : CONTACTS.length - 1 - n) * 0.03 }}
                   whileHover={reduce ? undefined : { y: -5 }}
                 >
@@ -118,7 +127,6 @@ export function About({ onHome }: { onHome: () => void }) {
               ))}
             </div>
             )}
-            {i === ABOUT.paragraphs.length - 1 && '.'}
           </motion.p>
         ))}
       </div>

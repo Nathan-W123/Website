@@ -1,0 +1,130 @@
+/* The walk-in. Black ink on white paper, like everything else here.
+   One clock runs the whole thing: the walk lasts --cb-walk, every limb cycle
+   divides into it evenly, and the wave starts the moment the walk ends. */
+.cb-stage {
+  --cb-walk: 2.8s;      /* how long he is on his way in */
+  --cb-step: 0.56s;     /* one stride; 5 of them fill the walk exactly */
+  --cb-from: -58vw;     /* far enough left to start off any screen */
+  --cb-size: clamp(150px, 26vw, 260px);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  overflow: hidden;
+  color: #111;
+}
+.cb-art {
+  display: block;
+  width: var(--cb-size);
+  height: auto;
+  overflow: visible;
+}
+.cb-shadow { fill: rgba(17, 17, 17, 0.14); }
+
+/* every pivot is a fixed point in the viewBox, so nesting two rotations about
+   the same shoulder just adds them up */
+.cb-leg,
+.cb-arm,
+.cb-arm-raise,
+.cb-forearm,
+.cb-arm-wave,
+.cb-head {
+  transform-box: view-box;
+}
+.cb-leg-front { transform-origin: 86px 218px; }
+.cb-leg-back { transform-origin: 114px 218px; }
+.cb-arm-l { transform-origin: 72px 163px; }
+.cb-arm-r,
+.cb-arm-raise { transform-origin: 128px 163px; }
+/* the elbow, where the forearm bends and the wave happens */
+.cb-forearm,
+.cb-arm-wave { transform-origin: 142px 196px; }
+.cb-head { transform-origin: 100px 144px; }
+
+/* --- the travel ------------------------------------------------------- */
+.cb-walker {
+  animation: cb-walk-in var(--cb-walk) cubic-bezier(0.32, 0, 0.26, 1) both;
+}
+@keyframes cb-walk-in {
+  from { transform: translateX(var(--cb-from)); }
+  to { transform: translateX(0); }
+}
+
+/* --- the walk cycle ---------------------------------------------------- */
+/* 5 strides, then `both` leaves every limb at the neutral 100% frame */
+.cb-bob { animation: cb-bob calc(var(--cb-step) / 2) ease-in-out 10 both; }
+@keyframes cb-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.cb-leg-front { animation: cb-swing-a var(--cb-step) ease-in-out 5 both; }
+.cb-leg-back { animation: cb-swing-b var(--cb-step) ease-in-out 5 both; }
+/* arms swing opposite the leg on their own side */
+.cb-arm-l { animation: cb-swing-b var(--cb-step) ease-in-out 5 both; }
+.cb-arm-r { animation: cb-swing-a var(--cb-step) ease-in-out 5 both; }
+
+@keyframes cb-swing-a {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(22deg); }
+  75% { transform: rotate(-22deg); }
+}
+@keyframes cb-swing-b {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-22deg); }
+  75% { transform: rotate(22deg); }
+}
+/* --- the wave ---------------------------------------------------------- */
+/* arrives, then the arm comes up and stays up, shaking */
+.cb-arm-raise {
+  animation: cb-raise 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) var(--cb-walk) both;
+}
+@keyframes cb-raise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-72deg); }
+}
+.cb-forearm {
+  animation: cb-bend 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) var(--cb-walk) both;
+}
+@keyframes cb-bend {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-95deg); }
+}
+.cb-arm-wave {
+  animation: cb-wave 0.62s ease-in-out calc(var(--cb-walk) + 0.42s) infinite;
+}
+@keyframes cb-wave {
+  0%, 100% { transform: rotate(-14deg); }
+  50% { transform: rotate(16deg); }
+}
+/* a small lean into the wave, and he holds it */
+.cb-head {
+  animation: cb-tilt 0.5s ease-out var(--cb-walk) both;
+}
+@keyframes cb-tilt {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(7deg); }
+}
+
+/* --- for anyone who would rather it kept still ------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .cb-walker,
+  .cb-bob,
+  .cb-leg,
+  .cb-arm,
+  .cb-arm-wave,
+  .cb-head {
+    animation: none !important;
+    transform: none !important;
+  }
+  /* he is simply already here, already waving */
+  .cb-arm-raise {
+    animation: none !important;
+    transform: rotate(-72deg);
+  }
+  .cb-forearm {
+    animation: none !important;
+    transform: rotate(-95deg);
+  }
+}
