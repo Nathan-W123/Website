@@ -12,11 +12,15 @@ import { BrandIcon } from './icons';
 
 const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 
-/** Where the pictures land when a phrase is opened. Deliberately uneven. */
+/**
+ * Where the pictures land when a phrase is opened. Not an arc: different
+ * distances, different angles, different sizes, and not mirrored about the
+ * mark, so it reads as a handful dropped rather than a fan.
+ */
 const SCATTER = [
-  { x: '-152%', y: '-118%', r: -12, s: 1 },
-  { x: '-18%', y: '-168%', r: 6, s: 1.08 },
-  { x: '134%', y: '-104%', r: 14, s: 0.94 },
+  { x: '-176%', y: '-74%', r: -15, s: 1.04 },
+  { x: '-54%', y: '-196%', r: 8, s: 0.86 },
+  { x: '118%', y: '-134%', r: 21, s: 1.16 },
 ];
 
 /**
@@ -104,7 +108,7 @@ export function About({ onHome }: { onHome: () => void }) {
               rel="noreferrer"
               aria-label={c.label}
             >
-              <BrandIcon id={c.id} size={20} />
+              <BrandIcon id={c.id} size={23} />
             </a>
           ))}
         </p>

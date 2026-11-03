@@ -13,12 +13,13 @@ export const ABOUT = {
    * a few more when you hover it. The keys are defined in SPOTS below.
    */
   paragraphs: [
-    "Hi, I'm Nathan. I study civil engineering and chemistry at UC Davis, where I do {quantum|quantum research}.",
-    "In Winter 2027 I'm joining Machina Labs as a {forming|simulation engineer}.",
-    'I also run an {shoes|art business, painting custom shoes}.',
+    "Hi, I'm Nathan. I study civil engineering and chemistry at UC Davis, where I do {quantum|quantum research} most weeks.",
+    "In Winter 2027 I'm joining {forming|Machina Labs} as a simulation engineer.",
+    'I also run an art business, painting {shoes|custom shoes} for people and organisations.',
     'Before transferring, I placed in the top 1% in the nation on the 2025 organic chemistry ACS exam.',
-    'I like building fast, and working at the frontier. Say hi',
+    'I like building fast, and working at the frontier.',
   ],
+
 
 
 
@@ -45,7 +46,7 @@ export const RECENT: Recent[] = [
 export const SPOTS: Record<string, { icon: string; shots: string[] }> = {
   quantum: {
     icon: '/tiles/hf-scf.webp',
-    shots: ['/projects/hf-scf/2.webp', '/projects/quantize/1.webp', '/projects/hf-scf/3.webp'],
+    shots: ['/projects/quantize/1.webp', '/projects/hf-scf/3.webp', '/projects/quantize/3.webp'],
   },
   forming: {
     icon: '/tiles/machina.webp',
