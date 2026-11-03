@@ -470,49 +470,80 @@ function ProjectCard({ card, index, onOpen }: { card: Card; index: number; onOpe
   );
 }
 
-/* ---------- project viewer: a framed photo you can page through, with the write-up under it ---------- */
+/* ---------- project page: the cover on one side, the write-up on the other ---------- */
 
-/**
- * The text a project page carries besides its brief, in the order it is worth
- * reading. Each one is set beside or under a picture rather than stacked at the
- * top, so the page reads as a spread.
- */
-function notesOf(card: Card): { h: string; t: string }[] {
-  const st = card.study;
-  if (!st) return card.notes.map((t, i) => ({ h: i === 0 ? 'Notes' : '', t }));
-  const out: { h: string; t: string }[] = [
-    { h: 'The problem', t: st.problem },
-    ...st.how.slice(0, 2).map((t, i) => ({ h: i === 0 ? 'How it works' : '', t })),
-    ...st.challenges.slice(0, 2).map((t, i) => ({ h: i === 0 ? 'What was hard' : '', t })),
-    ...st.results.slice(0, 2).map((t, i) => ({ h: i === 0 ? 'Results' : '', t })),
-    { h: 'My part', t: st.contribution },
-  ];
-  return out.filter((n) => n.t);
+/** Everything in the project's gallery, laid out at once. */
+function Collage({ shots, onClose }: { shots: Card['images']; onClose: () => void }) {
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return (
+    <motion.div
+      className="pv-collage"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.16 } }}
+      onClick={onClose}
+    >
+      <button type="button" className="pv-close" onClick={onClose} aria-label="Close">
+        Close
+      </button>
+      <motion.div
+        className="pv-collage-grid"
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.3, 1] }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {shots.map((shot, i) => (
+          <figure key={shot.src} className={`pv-collage-item${i % 5 === 0 ? ' is-wide' : ''}`}>
+            {shot.video ? (
+              <video poster={base() + shot.src} aria-label={shot.caption} muted loop playsInline autoPlay={!reducedMotion} controls={reducedMotion} preload="metadata">
+                <source src={base() + shot.video + '.webm'} type="video/webm" />
+                <source src={base() + shot.video + '.mp4'} type="video/mp4" />
+              </video>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={base() + shot.src} alt={shot.caption} loading={i < 3 ? undefined : 'lazy'} draggable={false} />
+            )}
+            <figcaption>
+              {shot.caption}
+              {shot.credit && !shot.credit.startsWith('own') && (
+                <>
+                  {' '}
+                  <a href={shot.credit} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
+                    (source)
+                  </a>
+                </>
+              )}
+            </figcaption>
+          </figure>
+        ))}
+      </motion.div>
+    </motion.div>
+  );
 }
 
 function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
   const ref = useDialog<HTMLDivElement>();
-  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const [peek, setPeek] = useState(false);
+  const [collage, setCollage] = useState(false);
+  const page = card.study?.page;
+  const shots = card.images;
+  const cover = shots[0];
+  // the three behind the cover, which slide out from under it on hover
+  const behind = shots.slice(1, 4);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key !== 'Escape') return;
+      if (collage) setCollage(false);
+      else onClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  // one picture, then one piece of text, alternating sides down the page
-  const notes = notesOf(card);
-  const flow: ({ kind: 'shot'; i: number } | { kind: 'note'; i: number })[] = [];
-  const n = Math.max(card.images.length, notes.length);
-  for (let i = 0; i < n; i++) {
-    if (i < card.images.length) flow.push({ kind: 'shot', i });
-    if (i < notes.length) flow.push({ kind: 'note', i });
-  }
+  }, [collage, onClose]);
 
   return (
-    <motion.div className="pv-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.18 } }}>
+    <motion.div className="pv-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.2 } }}>
       <motion.div
         // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="dialog"
@@ -521,71 +552,83 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
         aria-labelledby="pv-title"
         tabIndex={-1}
         className="pv"
-        initial={{ opacity: 0, y: 26 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.34, ease: [0.22, 1, 0.3, 1] }}
+        initial={{ opacity: 0, scale: 0.94, y: 22 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12, transition: { duration: 0.2, ease: 'easeIn' } }}
+        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
       >
-        <button type="button" className="pv-close" onClick={onClose} aria-label="Close">
-          Close
-        </button>
+        <div className="pv-coverwrap">
+          <div
+            className="pv-cover"
+            onMouseEnter={() => setPeek(true)}
+            onMouseLeave={() => setPeek(false)}
+            onFocusCapture={() => setPeek(true)}
+            onBlurCapture={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setPeek(false);
+            }}
+          >
+            {behind.map((shot, i) => (
+              <motion.span
+                key={shot.src}
+                className="pv-behind"
+                style={{ zIndex: behind.length - i }}
+                aria-hidden="true"
+                initial={false}
+                animate={peek ? { x: `${-(i + 1) * 5}%`, y: `${-(i + 1) * 7}%`, rotate: -(i + 1) * 2, opacity: 1 } : { x: 0, y: 0, rotate: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: peek ? i * 0.045 : (behind.length - 1 - i) * 0.03 }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={base() + shot.src} alt="" draggable={false} />
+              </motion.span>
+            ))}
+            <button type="button" className="pv-cover-face" onClick={() => setCollage(true)} aria-label={`See all ${shots.length} images of ${card.title}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={base() + cover.src} alt={cover.caption} draggable={false} />
+            </button>
+          </div>
+          <p className="pv-cover-hint">{shots.length} images — click to see them all</p>
+        </div>
 
-        <header className="pv-head">
+        <div className="pv-text">
+          <button type="button" className="pv-back" onClick={onClose}>
+            ← Back
+          </button>
           <h2 id="pv-title" className="pv-title">
             {card.title}
           </h2>
-          <p className="pv-brief">{card.study?.brief ?? card.line}</p>
-        </header>
+          <p className="pv-kicker">{card.tag}</p>
 
-        <div className="pv-flow">
-          {flow.map((item) =>
-            item.kind === 'shot' ? (
-              <figure key={`s${item.i}`} className={`pv-shot ${item.i % 2 ? 'is-right' : 'is-left'}`}>
-                {card.images[item.i].video ? (
-                  <video
-                    poster={base() + card.images[item.i].src}
-                    aria-label={card.images[item.i].caption}
-                    muted
-                    loop
-                    playsInline
-                    autoPlay={!reducedMotion}
-                    controls={reducedMotion}
-                    preload="metadata"
-                  >
-                    <source src={base() + card.images[item.i].video + '.webm'} type="video/webm" />
-                    <source src={base() + card.images[item.i].video + '.mp4'} type="video/mp4" />
-                  </video>
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={base() + card.images[item.i].src} alt={card.images[item.i].caption} loading={item.i < 2 ? undefined : 'lazy'} draggable={false} />
-                )}
-                {card.images[item.i].credit && !card.images[item.i].credit!.startsWith('own') && (
-                  <figcaption>
-                    <a href={card.images[item.i].credit} target="_blank" rel="noreferrer">
-                      Image source
-                    </a>
-                  </figcaption>
-                )}
-              </figure>
-            ) : (
-              <div key={`n${item.i}`} className={`pv-note ${item.i % 2 ? 'is-left' : 'is-right'}`}>
-                {notes[item.i].h && <h3>{notes[item.i].h}</h3>}
-                <p>{notes[item.i].t}</p>
-              </div>
-            ),
+          <div className="pv-body">
+            {page ? page.body.map((t) => <p key={t}>{t}</p>) : <p>{card.line}</p>}
+          </div>
+
+          {page && (
+            <>
+              <h3 className="pv-choices-h">Design choices</h3>
+              <ul className="pv-choices">
+                {page.choices.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+            </>
           )}
-        </div>
 
-        <ul className="pv-chips">
-          {card.stack.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-        {card.href && (
-          <a className="pv-link" href={card.href} target="_blank" rel="noreferrer">
-            Open project ↗
-          </a>
-        )}
+          <div className="pv-meta">
+            <ul className="pv-chips">
+              {card.stack.slice(0, 4).map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+            {card.href && (
+              <a className="pv-link" href={card.href} target="_blank" rel="noreferrer">
+                Open project ↗
+              </a>
+            )}
+          </div>
+        </div>
       </motion.div>
+
+      <AnimatePresence>{collage && <Collage key="collage" shots={shots} onClose={() => setCollage(false)} />}</AnimatePresence>
     </motion.div>
   );
 }

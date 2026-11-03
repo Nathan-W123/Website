@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/rea
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ART, CONTACTS, PROJECT_GROUPS, WORKED_WITH, type ArtItem, type Card } from './content';
 import { TopBar } from './topbar';
+import { ContactIcon } from './icons';
 
 /**
  * Home: the name set large, four pieces of work fanned out under it, and a
@@ -40,6 +41,8 @@ const FAN: Record<Side, string[]> = {
 
 const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
 const instagram = CONTACTS.find((c) => c.id === 'instagram');
+/** The two worth following on the engineering side, shown as marks rather than words. */
+const FOLLOW = CONTACTS.filter((c) => c.id === 'linkedin' || c.id === 'github');
 
 const ALL_PROJECTS: Card[] = PROJECT_GROUPS.flatMap((g) => g.cards);
 const ALL_ART: (ArtItem & { section: string })[] = ART.flatMap((s) => s.items.map((it) => ({ ...it, section: s.id })));
@@ -326,25 +329,23 @@ export function Landing({
             <h3 className="hm-work-title">Want more?</h3>
             <p className="hm-foot-line">
               Follow me on{' '}
-              <a href={instagram?.href} target="_blank" rel="noreferrer">
-                Instagram {instagram?.handle}
+              <a className="hm-foot-ig" href={instagram?.href} target="_blank" rel="noreferrer">
+                <ContactIcon id="instagram" size={20} />
+                {instagram?.handle}
               </a>
             </p>
           </>
         ) : (
           <>
-            <h3 className="hm-work-title">Contact</h3>
-            <ul className="hm-contacts">
-              {CONTACTS.map((c) => (
+            <h3 className="hm-work-title">Keep up with me</h3>
+            <ul className="hm-social">
+              {FOLLOW.map((c) => (
                 <li key={c.id}>
-                  <a href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
-                    {c.label}
+                  <a href={c.href} target="_blank" rel="noreferrer" aria-label={c.label}>
+                    <ContactIcon id={c.id} size={26} />
                   </a>
                 </li>
               ))}
-              <li>
-                <a href="#/about">About</a>
-              </li>
             </ul>
           </>
         )}

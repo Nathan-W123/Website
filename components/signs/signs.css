@@ -1127,154 +1127,237 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 
 /* ------------------------------------------------------- Project page ----
-   A project opens as its own page on the cream: the name, two sentences, and
-   then the work itself, two to a row with every third running full width. */
+   One screen, no scrolling: the cover on one side, the write-up on the other.
+   The text is cut to fit rather than the page being allowed to grow. */
 .pv-scrim {
   position: fixed;
   inset: 0;
   z-index: 60;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   background: var(--cream, #f7f6f1);
 }
 .pv {
   --ink: #363636;
   --ink-soft: #8d8d8d;
+  --rule: #e6e4dc;
   --disp: var(--font-jost, 'Jost'), 'Futura', 'Century Gothic', system-ui, sans-serif;
   --body: var(--font-inter, 'Inter'), system-ui, -apple-system, sans-serif;
-  position: relative;
-  max-width: 1120px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 4.6vw, 76px);
+  height: 100svh;
+  max-width: 1340px;
   margin: 0 auto;
-  padding: clamp(66px, 10vh, 104px) 24px clamp(70px, 12vh, 130px);
+  padding: clamp(22px, 3.4vh, 48px) clamp(22px, 3.6vw, 64px);
   font-family: var(--body);
   color: var(--ink);
-  text-align: center;
 }
 .pv:focus { outline: none; }
-.pv-close {
-  position: fixed;
-  top: 18px;
-  right: 22px;
-  z-index: 2;
-  padding: 9px 17px;
-  border: 1px solid var(--rule, #e6e4dc);
-  border-radius: 999px;
-  background: var(--cream, #f7f6f1);
-  font-family: var(--disp);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ink);
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+
+/* ---- the cover, with the rest of the gallery tucked behind it ---- */
+.pv-coverwrap { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.pv-cover { position: relative; }
+.pv-behind,
+.pv-cover-face {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: clamp(12px, 1.3vw, 18px);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 18px 38px -24px rgba(0, 0, 0, 0.46);
 }
-.pv-close:hover { background: var(--ink); color: var(--cream, #f7f6f1); }
-.pv-close:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-/* the name at the top, the one-line introduction under it */
-.pv-head { text-align: center; }
+.pv-behind { position: absolute; inset: 0; }
+.pv-cover-face {
+  position: relative;
+  z-index: 5;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+.pv-cover:hover .pv-cover-face {
+  transform: translateY(-4px) rotate(-0.8deg);
+  box-shadow: 0 30px 50px -26px rgba(0, 0, 0, 0.48);
+}
+.pv-cover-face:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
+.pv-behind img,
+.pv-cover-face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pv-cover-hint {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  transition: color 0.3s ease;
+}
+.pv-cover:hover + .pv-cover-hint { color: var(--ink); }
+
+/* ---- the write-up ---- */
+.pv-text { display: flex; flex-direction: column; min-width: 0; }
+.pv-back {
+  align-self: flex-start;
+  margin: 0 0 clamp(14px, 2.4vh, 26px);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--body);
+  font-size: 14px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.pv-back:hover { color: var(--ink); }
+.pv-back:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 3px; }
 .pv-title {
   margin: 0;
   font-family: var(--disp);
   font-weight: 700;
-  font-size: clamp(2rem, 6.2vw, 4.6rem);
-  line-height: 0.98;
-  letter-spacing: -0.022em;
-  text-transform: uppercase;
+  font-size: clamp(1.9rem, 3.5vw, 3.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
-.pv-brief {
-  max-width: 54ch;
-  margin: clamp(14px, 2.4vh, 24px) auto 0;
-  font-size: clamp(14px, 1.1vw, 15.5px);
-  line-height: 1.65;
+.pv-kicker {
+  margin: clamp(8px, 1.4vh, 14px) 0 0;
+  font-family: var(--disp);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.pv-body { display: flex; flex-direction: column; gap: clamp(10px, 1.6vh, 16px); margin-top: clamp(16px, 2.6vh, 28px); }
+.pv-body p {
+  margin: 0;
+  max-width: 56ch;
+  font-size: clamp(13.5px, 1.02vw, 15.5px);
+  line-height: 1.6;
   color: var(--ink-soft);
   text-wrap: pretty;
 }
-
-/* Pictures and text down one column, each pulled to its own side, so the page
-   reads as a spread instead of a stack with a paragraph nailed to the top. */
-.pv-flow {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: clamp(34px, 6vh, 72px) clamp(20px, 2.6vw, 38px);
-  margin: clamp(44px, 8vh, 92px) 0 0;
-  align-items: start;
-  /* the spans leave a gutter free beside each picture; dense lets the piece of
-     text that follows it drop into that gutter instead of onto its own row */
-  grid-auto-flow: row dense;
-  text-align: left;
-}
-.pv-shot {
-  margin: 0;
-  border-radius: clamp(14px, 1.5vw, 22px);
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 16px 34px -24px rgba(0, 0, 0, 0.42);
-}
-.pv-shot.is-left { grid-column: 1 / 8; }
-.pv-shot.is-right { grid-column: 6 / 13; }
-.pv-shot img,
-.pv-shot video { display: block; width: 100%; height: auto; }
-.pv-shot figcaption {
-  padding: 9px 14px;
-  font-size: 12px;
-  color: var(--ink-soft);
-}
-.pv-shot figcaption a { color: inherit; }
-.pv-note { align-self: center; }
-.pv-note.is-right { grid-column: 8 / 13; }
-.pv-note.is-left { grid-column: 1 / 6; }
-.pv-note h3 {
-  margin: 0 0 9px;
+.pv-choices-h {
+  margin: clamp(18px, 2.8vh, 30px) 0 clamp(8px, 1.2vh, 12px);
   font-family: var(--disp);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--ink);
 }
-.pv-note p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.68;
+.pv-choices { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.pv-choices li {
+  position: relative;
+  padding-left: 17px;
+  max-width: 56ch;
+  font-size: clamp(13px, 0.98vw, 15px);
+  line-height: 1.5;
   color: var(--ink-soft);
-  text-wrap: pretty;
 }
-.pv-chips {
+.pv-choices li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink-faint, #c9c9c9);
+}
+.pv-meta {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 10px;
-  margin: clamp(38px, 6vh, 66px) 0 0;
-  padding: 0;
-  list-style: none;
+  align-items: center;
+  gap: 10px 18px;
+  margin-top: clamp(20px, 3.2vh, 36px);
 }
+.pv-chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
 .pv-chips li {
-  padding: 6px 13px;
-  border: 1px solid var(--rule, #e6e4dc);
+  padding: 5px 11px;
+  border: 1px solid var(--rule);
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--ink-soft);
 }
 .pv-link {
-  display: inline-block;
-  margin-top: clamp(26px, 4vh, 44px);
   font-family: var(--disp);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--ink);
   text-decoration: none;
   border-bottom: 1.5px solid var(--ink);
-  padding-bottom: 2px;
+  padding-bottom: 1px;
 }
 .pv-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 
-@media (max-width: 640px) {
-  .pv { padding-left: 18px; padding-right: 18px; }
-  .pv-flow { gap: 26px; }
-  .pv-shot.is-left,
-  .pv-shot.is-right,
-  .pv-note.is-left,
-  .pv-note.is-right { grid-column: 1 / -1; }
+.pv-close {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 10;
+  padding: 9px 17px;
+  border: 1px solid var(--rule, #e6e4dc);
+  border-radius: 999px;
+  background: var(--cream, #f7f6f1);
+  font-family: var(--font-jost, 'Jost'), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #363636;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.pv-close:hover { background: #363636; color: var(--cream, #f7f6f1); }
+.pv-close:focus-visible { outline: 2px solid #363636; outline-offset: 3px; }
+
+/* ---- every picture at once ---- */
+.pv-collage {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  overflow-y: auto;
+  background: var(--cream, #f7f6f1);
+  padding: clamp(60px, 9vh, 96px) clamp(18px, 4vw, 64px) clamp(40px, 8vh, 80px);
+}
+.pv-collage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(16px, 2vw, 28px);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.pv-collage-item {
+  margin: 0;
+  border-radius: clamp(12px, 1.3vw, 18px);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 16px 32px -24px rgba(0, 0, 0, 0.44);
+}
+.pv-collage-item.is-wide { grid-column: 1 / -1; }
+.pv-collage-item img,
+.pv-collage-item video { display: block; width: 100%; height: auto; }
+.pv-collage-item figcaption {
+  padding: 9px 14px 11px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #8d8d8d;
+}
+.pv-collage-item figcaption a { color: inherit; }
+
+@media (max-width: 900px) {
+  /* a phone cannot hold both halves at once, so here it scrolls */
+  .pv-scrim { overflow-y: auto; }
+  .pv {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100svh;
+    align-content: center;
+    gap: 26px;
+    padding: 58px 18px 46px;
+  }
+  .pv-collage-grid { grid-template-columns: 1fr; }
+  .pv-collage-item.is-wide { grid-column: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-cover-face { transition: none; }
+  .pv-cover:hover .pv-cover-face { transform: none; }
 }
 
 /* ------------------------------------------------------- Art lightbox ----
@@ -1466,4 +1549,31 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   .ab2-card .hm-tile { transition: none; }
   .ab2-card button:hover .hm-tile,
   .ab2-card button:focus-visible .hm-tile { transform: none; }
+}
+
+/* the engineering half signs off with two marks, not a list of words */
+.hm-social {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin: clamp(18px, 3vh, 30px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.hm-social a {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  color: var(--ink);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.3, 1), border-color 0.3s ease, background 0.3s ease;
+}
+.hm-social a:hover { transform: translateY(-4px); border-color: var(--ink); background: #fff; }
+.hm-social a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.hm-foot-ig { display: inline-flex; align-items: center; gap: 7px; vertical-align: -0.3em; }
+@media (prefers-reduced-motion: reduce) {
+  .hm-social a { transition: none; }
+  .hm-social a:hover { transform: none; }
 }
