@@ -184,7 +184,18 @@ export function Landing({
           <a href={`mailto:${CONTACTS.find((c) => c.id === 'email')?.handle}`}>{CONTACTS.find((c) => c.id === 'email')?.handle}</a>
         </p>
 
-        <h1 className="hm-name">Nathan Ward</h1>
+        {/* the name is the way in to About: it flies up and becomes that page's
+            heading, so the two are one element as far as motion is concerned */}
+        <h1 className="hm-name">
+          <a className="hm-name-link" href="#/about">
+            <motion.span layoutId="nathan" className="hm-name-text">
+              Nathan Ward
+            </motion.span>
+            <span className="hm-name-hint" aria-hidden="true">
+              About me
+            </span>
+          </a>
+        </h1>
 
         <div className="hm-fan" ref={fan} aria-hidden="true">
           {SEATS.map((seat, i) => (

@@ -67,7 +67,11 @@ export function About({ onHome }: { onHome: () => void }) {
   return (
     <div className="hm ab2" ref={root}>
       <TopBar onHome={onHome} here="about" />
-      <h1 className="ab2-title">About</h1>
+      <h1 className="ab2-title">
+        <motion.span layoutId="nathan" className="hm-name-text">
+          Nathan Ward
+        </motion.span>
+      </h1>
       <div className="ab2-body">
         {ABOUT.paragraphs.map((p, i) => (
           <p
