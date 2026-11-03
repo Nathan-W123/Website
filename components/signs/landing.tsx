@@ -46,6 +46,12 @@ const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
  * the wrong one means the card you are looking at just swaps its picture.
  */
 const TOP = SEATS.reduce((best, seat, i) => (seat.z > SEATS[best].z ? i : best), 0);
+
+/** Two bits of confetti, out of the top corners of whichever word just won. */
+const POP = [
+  { at: '2%', dx: -74, r: -165 },
+  { at: '98%', dx: 74, r: 165 },
+];
 const instagram = CONTACTS.find((c) => c.id === 'instagram');
 /** The two worth following on the engineering side, shown as marks rather than words. */
 const FOLLOW = CONTACTS.filter((c) => c.id === 'linkedin' || c.id === 'github');
@@ -191,14 +197,37 @@ export function Landing({
             {side === 'engineering' ? (
               <span className="hm-corner-int">&#8750;</span>
             ) : (
-              <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19.6 3.1a2 2 0 0 1 1.3 3.4l-7.7 7.7-2.8-2.8 7.7-7.7a2 2 0 0 1 1.5-.6Z" />
-                <path d="M10.4 11.4 7.2 8.2" />
-                <path d="M8.4 13.3a3.1 3.1 0 0 0-4.4 0c-1.2 1.2-.6 3-1.5 4.3 1.9.5 3.1 2 5.2 1.5 2-.5 3-2.4 2.3-4.2a3.1 3.1 0 0 0-1.6-1.6Z" />
+<svg viewBox="0 0 24 24" width="27" height="27" fill="currentColor" aria-hidden="true">
+                {/* drawn upright and then leaned over: a slim handle, a ferrule
+                    wider than it, and a tuft wider again that tapers to a point */}
+                <g transform="rotate(-38 12 12)">
+                  <rect x="10.9" y="2.2" width="2.2" height="8" rx="1.1" />
+                  <rect x="8.5" y="10" width="7" height="2.8" rx="0.7" />
+                  <path d="M8.3 13.3h7.4l-2 6.3a1.8 1.8 0 0 1-3.4 0z" />
+                </g>
               </svg>
             )}
           </motion.span>
         </AnimatePresence>
+        {stacked && !reduce && (
+          <svg className="hm-corner-ring" viewBox="0 0 56 56" aria-hidden="true">
+            <motion.circle
+              cx="28"
+              cy="28"
+              r="26.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.67, ease: 'linear' }}
+            />
+          </svg>
+        )}
+        <span className="hm-corner-say" aria-hidden="true">
+          {side === 'engineering' ? 'My nerdy side' : 'My artsy side'}
+        </span>
       </button>
 
       <header className="hm-hero">
@@ -211,12 +240,11 @@ export function Landing({
             heading, so the two are one element as far as motion is concerned */}
         <h1 className="hm-name">
           <a className="hm-name-link" href="#/about">
+            <span className="hm-name-pre" aria-hidden="true">Who&rsquo;s</span>
             <motion.span layoutId="nathan" className="hm-name-text">
               Nathan Ward
             </motion.span>
-            <span className="hm-name-hint" aria-hidden="true">
-              About me
-            </span>
+            <span className="hm-name-post" aria-hidden="true">?</span>
           </a>
         </h1>
 
@@ -311,6 +339,25 @@ export function Landing({
                     transition={reduce ? { duration: 0.01 } : { layout: { duration: 0.26, ease: 'linear' }, duration: 0.26, ease: 'linear' }}
                   />
                 )}
+                {side === s2 &&
+                  !reduce &&
+                  POP.map((c, k) => (
+                    <motion.span
+                      key={`${side}-${k}`}
+                      className="hm-role-pop"
+                      style={{ left: c.at }}
+                      aria-hidden="true"
+                      initial={{ opacity: 0, x: 0, y: 0, rotate: 0, scale: 0.6 }}
+                      animate={{
+                        opacity: [0, 1, 1, 0],
+                        x: [0, c.dx * 0.45, c.dx * 0.8, c.dx],
+                        y: [0, -48, -28, 18],
+                        rotate: [0, c.r * 0.35, c.r * 0.7, c.r],
+                        scale: [0.6, 1, 1, 0.85],
+                      }}
+                      transition={{ duration: 0.85, times: [0, 0.22, 0.6, 1], ease: 'easeOut' }}
+                    />
+                  ))}
               </span>
             </Fragment>
           ))}
@@ -387,6 +434,7 @@ export function Landing({
         {side === 'art' ? (
           <>
             <h3 className="hm-work-title">Want more?</h3>
+            <p className="hm-work-sub">Drop a follow</p>
             <ul className="hm-social">
               <li>
                 <a href={instagram?.href} target="_blank" rel="noreferrer" aria-label={`Instagram ${instagram?.handle}`}>
@@ -398,6 +446,7 @@ export function Landing({
         ) : (
           <>
             <h3 className="hm-work-title">Keep up with me</h3>
+            <p className="hm-work-sub">Drop a follow</p>
             <ul className="hm-social">
               {FOLLOW.map((c) => (
                 <li key={c.id}>

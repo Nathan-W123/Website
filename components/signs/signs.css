@@ -891,15 +891,16 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   border-radius: 999px;
   background: var(--role-bar);
 }
-/* and it lands with a little bounce */
-@keyframes hm-pop {
-  0% { transform: scale(1) rotate(0deg); }
-  28% { transform: scale(1.09) rotate(-2.2deg); }
-  56% { transform: scale(0.972) rotate(1.1deg); }
-  78% { transform: scale(1.016) rotate(-0.4deg); }
-  100% { transform: scale(1) rotate(0deg); }
+.hm-role-pop {
+  position: absolute;
+  top: 0.16em;
+  width: 0.13em;
+  height: 0.19em;
+  border-radius: 0.03em;
+  background: var(--role-bar);
+  pointer-events: none;
 }
-.hm-role-word.is-on .hm-role-glyph { animation: hm-pop 0.42s cubic-bezier(0.34, 1.5, 0.64, 1); }
+
 .hm-role-and { font-size: 0.56em; }
 
 /* ---- the switch: no label, because the underline above says which side you are on ---- */
@@ -1057,7 +1058,6 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   .hm-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hm-role-word.is-on .hm-role-glyph { animation: none; }
 }
 
 @media (max-width: 560px) {
@@ -1547,6 +1547,31 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-name-link:focus-visible::after { transform: scaleX(1); }
 .hm-name-link:focus-visible { outline: none; }
 .hm-name-link:focus-visible .hm-name-text { outline: 2px solid var(--ink); outline-offset: 8px; border-radius: 4px; }
+/* On the home page the hover completes the question: Who's slides in from the
+   left of the name and the mark out to the right of it. Both are positioned
+   outside the name rather than in the flow, so the name itself never moves —
+   which also keeps motion's measurement of it honest when you click mid-hover. */
+.hm-name-pre,
+.hm-name-post {
+  position: absolute;
+  top: 0;
+  opacity: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.42s cubic-bezier(0.22, 1, 0.3, 1);
+}
+.hm-name-pre { right: 100%; margin-right: 0.2em; transform: translateX(0.42em); }
+.hm-name-post { left: 100%; margin-left: 0.06em; transform: translateX(-0.42em); }
+.hm-name-link:hover .hm-name-pre,
+.hm-name-link:focus-visible .hm-name-pre,
+.hm-name-link:hover .hm-name-post,
+.hm-name-link:focus-visible .hm-name-post { opacity: 1; transform: translateX(0); }
+/* no room for the question either side of the name on a narrow screen */
+@media (max-width: 1000px) {
+  .hm-name-pre,
+  .hm-name-post { display: none; }
+}
+
 /* the nudge that says it is a door */
 .hm-name-hint {
   position: absolute;
@@ -1604,4 +1629,46 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 @media (max-width: 560px) {
   .hm-corner { width: 46px; height: 46px; }
+}
+
+/* the shuffle takes about two thirds of a second, so the corner says so */
+.hm-corner-ring {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  transform: rotate(-90deg);
+  pointer-events: none;
+  color: var(--ink);
+}
+
+/* the shuffle takes about two thirds of a second, so the corner shows it running */
+.hm-corner-ring {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  transform: rotate(-90deg);
+  pointer-events: none;
+  color: var(--ink);
+}
+/* and says which side you are on, in from the right, set like the work subtitle */
+.hm-corner-say {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(10px, -50%);
+  transition: opacity 0.28s ease, transform 0.4s cubic-bezier(0.22, 1, 0.3, 1);
+}
+.hm-corner:hover .hm-corner-say,
+.hm-corner:focus-visible .hm-corner-say { opacity: 1; transform: translate(0, -50%); }
+@media (prefers-reduced-motion: reduce) {
+  .hm-corner-say { transition: none; }
 }
