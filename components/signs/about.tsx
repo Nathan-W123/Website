@@ -87,9 +87,6 @@ export function About({ onHome }: { onHome: () => void }) {
           <motion.span layoutId="nathan" className="hm-name-text">
             Nathan Ward
           </motion.span>
-          <span className="hm-name-hint" aria-hidden="true">
-            Back home
-          </span>
         </button>
       </h1>
       <div className="ab2-body">

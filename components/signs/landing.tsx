@@ -47,11 +47,20 @@ const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
  */
 const TOP = SEATS.reduce((best, seat, i) => (seat.z > SEATS[best].z ? i : best), 0);
 
-/** Two bits of confetti, out of the top corners of whichever word just won. */
-const POP = [
-  { at: '2%', dx: -74, r: -165 },
-  { at: '98%', dx: 74, r: 165 },
-];
+/**
+ * Two bits of confetti off the outer edge of whichever word just won: away to
+ * the left for Engineer, away to the right for Artist. `k` separates the pair
+ * so they do not fly the same line.
+ */
+const popsFor = (s: Side) => {
+  const out = s === 'engineering' ? -1 : 1;
+  return [0, 1].map((k) => ({
+    at: s === 'engineering' ? '1%' : '99%',
+    dx: out * (62 + k * 26),
+    dy: -38 - k * 22,
+    r: out * (130 + k * 70),
+  }));
+};
 const instagram = CONTACTS.find((c) => c.id === 'instagram');
 /** The two worth following on the engineering side, shown as marks rather than words. */
 const FOLLOW = CONTACTS.filter((c) => c.id === 'linkedin' || c.id === 'github');
@@ -178,12 +187,9 @@ export function Landing({
     <div className="hm">
       {/* The same switch, pinned to the corner, so you can change sides from
           anywhere down the page instead of scrolling back up to the pill. */}
-      <button
-        type="button"
-        className="hm-corner"
-        onClick={flip}
-        aria-label={side === 'art' ? 'Showing art. Switch to engineering.' : 'Showing engineering. Switch to art.'}
-      >
+      {/* the way in to About. It wears whichever mark matches the side you are
+          on, but it does not change sides — the pill is the only thing that does */}
+      <a className="hm-corner" href="#/about" aria-label="About me">
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={side}
@@ -197,38 +203,17 @@ export function Landing({
             {side === 'engineering' ? (
               <span className="hm-corner-int">&#8750;</span>
             ) : (
-<svg viewBox="0 0 24 24" width="27" height="27" fill="currentColor" aria-hidden="true">
-                {/* drawn upright and then leaned over: a slim handle, a ferrule
-                    wider than it, and a tuft wider again that tapers to a point */}
-                <g transform="rotate(-38 12 12)">
-                  <rect x="10.9" y="2.2" width="2.2" height="8" rx="1.1" />
-                  <rect x="8.5" y="10" width="7" height="2.8" rx="0.7" />
-                  <path d="M8.3 13.3h7.4l-2 6.3a1.8 1.8 0 0 1-3.4 0z" />
-                </g>
-              </svg>
+<span
+                className="hm-corner-brush"
+                style={{ WebkitMaskImage: `url(${base()}/icons/brush.png)`, maskImage: `url(${base()}/icons/brush.png)` }}
+              />
             )}
           </motion.span>
         </AnimatePresence>
-        {stacked && !reduce && (
-          <svg className="hm-corner-ring" viewBox="0 0 56 56" aria-hidden="true">
-            <motion.circle
-              cx="28"
-              cy="28"
-              r="26.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 0.67, ease: 'linear' }}
-            />
-          </svg>
-        )}
         <span className="hm-corner-say" aria-hidden="true">
           {side === 'engineering' ? 'My nerdy side' : 'My artsy side'}
         </span>
-      </button>
+      </a>
 
       <header className="hm-hero">
         <p className="hm-meta">
@@ -239,13 +224,9 @@ export function Landing({
         {/* the name is the way in to About: it flies up and becomes that page's
             heading, so the two are one element as far as motion is concerned */}
         <h1 className="hm-name">
-          <a className="hm-name-link" href="#/about">
-            <span className="hm-name-pre" aria-hidden="true">Who&rsquo;s</span>
-            <motion.span layoutId="nathan" className="hm-name-text">
-              Nathan Ward
-            </motion.span>
-            <span className="hm-name-post" aria-hidden="true">?</span>
-          </a>
+          <motion.span layoutId="nathan" className="hm-name-text">
+            Nathan Ward
+          </motion.span>
         </h1>
 
         <div className="hm-fan" ref={fan} aria-hidden="true">
@@ -341,7 +322,7 @@ export function Landing({
                 )}
                 {side === s2 &&
                   !reduce &&
-                  POP.map((c, k) => (
+                  popsFor(s2).map((c, k) => (
                     <motion.span
                       key={`${side}-${k}`}
                       className="hm-role-pop"
@@ -351,7 +332,7 @@ export function Landing({
                       animate={{
                         opacity: [0, 1, 1, 0],
                         x: [0, c.dx * 0.45, c.dx * 0.8, c.dx],
-                        y: [0, -48, -28, 18],
+                        y: [0, c.dy, c.dy * 0.6, 18],
                         rotate: [0, c.r * 0.35, c.r * 0.7, c.r],
                         scale: [0.6, 1, 1, 0.85],
                       }}
@@ -373,6 +354,15 @@ export function Landing({
           onClick={flip}
         >
           <span className="hm-switch-knob" aria-hidden="true" />
+          {stacked && !reduce && (
+            <motion.span
+              className="hm-switch-run"
+              aria-hidden="true"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.67, ease: 'linear' }}
+            />
+          )}
         </button>
 
         <div className="hm-clients-slot">
