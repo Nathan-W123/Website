@@ -95,8 +95,8 @@
   animation: cb-wave 0.62s ease-in-out calc(var(--cb-walk) + 0.42s) infinite;
 }
 @keyframes cb-wave {
-  0%, 100% { transform: rotate(-14deg); }
-  50% { transform: rotate(16deg); }
+  0%, 100% { transform: rotate(-17deg); }
+  50% { transform: rotate(19deg); }
 }
 /* a small lean into the wave, and he holds it */
 .cb-head {

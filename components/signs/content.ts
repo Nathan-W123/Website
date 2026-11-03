@@ -17,6 +17,8 @@ export const ABOUT = {
   ],
 
 
+
+
   based: 'based in Davis',
   /** Drop the portrait at public/about/nathan.jpg; the frame hides itself until it exists. */
   photo: '/about/nathan.jpg',

@@ -170,6 +170,36 @@ export function Landing({
 
   return (
     <div className="hm">
+      {/* The same switch, pinned to the corner, so you can change sides from
+          anywhere down the page instead of scrolling back up to the pill. */}
+      <button
+        type="button"
+        className="hm-corner"
+        onClick={flip}
+        aria-label={side === 'art' ? 'Showing art. Switch to engineering.' : 'Showing engineering. Switch to art.'}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={side}
+            className="hm-corner-mark"
+            initial={reduce ? false : { opacity: 0, rotate: -35, scale: 0.7 }}
+            animate={{ opacity: 1, rotate: 0, scale: 1 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, rotate: 35, scale: 0.7, transition: { duration: 0.16 } }}
+            transition={{ duration: reduce ? 0.01 : 0.26, ease: [0.22, 1, 0.3, 1] }}
+            aria-hidden="true"
+          >
+            {side === 'engineering' ? (
+              <span className="hm-corner-int">&#8750;</span>
+            ) : (
+              <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19.6 3.1a2 2 0 0 1 1.3 3.4l-7.7 7.7-2.8-2.8 7.7-7.7a2 2 0 0 1 1.5-.6Z" />
+                <path d="M10.4 11.4 7.2 8.2" />
+                <path d="M8.4 13.3a3.1 3.1 0 0 0-4.4 0c-1.2 1.2-.6 3-1.5 4.3 1.9.5 3.1 2 5.2 1.5 2-.5 3-2.4 2.3-4.2a3.1 3.1 0 0 0-1.6-1.6Z" />
+              </svg>
+            )}
+          </motion.span>
+        </AnimatePresence>
+      </button>
 
       <header className="hm-hero">
         <p className="hm-meta">

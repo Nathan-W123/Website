@@ -63,10 +63,17 @@ export function About({ onHome }: { onHome: () => void }) {
       });
       setActive(best);
     };
+    // Measure again once the type has settled. The first pass runs while the
+    // lines are still animating in and before the face has loaded, so the line
+    // positions it reads are not the ones you end up looking at — which is why
+    // the top of the page sat with nothing in ink until you scrolled.
     pick();
+    const again = [window.setTimeout(pick, 120), window.setTimeout(pick, 850)];
+    document.fonts?.ready.then(pick).catch(() => {});
     scroller?.addEventListener('scroll', pick, { passive: true });
     window.addEventListener('resize', pick);
     return () => {
+      again.forEach((t) => window.clearTimeout(t));
       scroller?.removeEventListener('scroll', pick);
       window.removeEventListener('resize', pick);
     };

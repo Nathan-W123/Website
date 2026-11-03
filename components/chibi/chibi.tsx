@@ -15,7 +15,8 @@ export function Chibi({ className = '' }: { className?: string }) {
     <div className={`cb-stage ${className}`}>
       <div className="cb-walker">
         <div className="cb-bob">
-          <svg className="cb-art" viewBox="0 0 200 300" role="img" aria-label="A small cartoon of me walking in and waving">
+          <svg className="cb-art" viewBox="0 0 200 300">
+            <title>A small cartoon of me walking in and waving</title>
             <g
               fill="none"
               stroke="currentColor"

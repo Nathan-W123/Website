@@ -1505,6 +1505,9 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   box-shadow: 0 10px 22px -14px rgba(0, 0, 0, 0.5);
   transition: border-color 0.25s ease, background 0.25s ease;
 }
+/* the marks belong to the line they sit in, so they hang back with it */
+.ab2-chip { opacity: 0.4; transition: opacity 0.45s ease, border-color 0.25s ease, background 0.25s ease; }
+.ab2-line.is-on .ab2-chip { opacity: 1; }
 .ab2-chip:hover { border-color: var(--ink); background: #fff; }
 .ab2-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
@@ -1568,4 +1571,37 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   .hm-name-link::after,
   .hm-name-hint { transition: none; }
   .hm-name-link:hover { transform: none; }
+}
+
+/* ---- the corner switch: the pill again, within reach anywhere down the page ---- */
+.hm-corner {
+  position: fixed;
+  top: clamp(16px, 2.4vh, 28px);
+  left: clamp(16px, 2.4vw, 34px);
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: #fcfcfa;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 10px 22px -16px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.3, 1), border-color 0.25s ease, background 0.25s ease;
+}
+.hm-corner:hover { transform: translateY(-3px) scale(1.05); border-color: var(--ink); background: #fff; }
+.hm-corner:active { transform: translateY(-1px) scale(0.98); }
+.hm-corner:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.hm-corner-mark { display: grid; place-items: center; width: 25px; height: 25px; }
+/* the contour integral, set in the display face so it matches the headings */
+.hm-corner-int { font-family: var(--disp); font-size: 29px; font-weight: 500; line-height: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .hm-corner { transition: none; }
+  .hm-corner:hover { transform: none; }
+}
+@media (max-width: 560px) {
+  .hm-corner { width: 46px; height: 46px; }
 }
