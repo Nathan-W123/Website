@@ -10,16 +10,10 @@ export type Shot = { src: string; caption: string; credit?: string; video?: stri
 
 export const GALLERY: Record<string, Shot[]> = {
   'siege': [
-    { src: '/projects/siege/1.webp', caption: 'Clash Royale arena mid-battle (official Supercell screenshot)', credit: 'https://apps.apple.com/us/app/clash-royale/id1053012308' },
+    { src: '/projects/siege/5.webp', caption: 'What the policy sees: a box per unit, red for the opponent, over an official Supercell screenshot', credit: 'https://apps.apple.com/us/app/clash-royale/id1053012308' },
     { src: '/projects/siege/2.webp', caption: 'Live WebGL viewer of the policy network mid-match' },
     { src: '/projects/siege/3.webp', caption: 'Architecture diagram: 2.68M-parameter policy network' },
     { src: '/projects/siege/4.webp', caption: 'Self-play training curve vs five scripted archetypes' },
-  ],
-  'kumi': [
-    { src: '/projects/kumi/1.webp', caption: 'Shared task board with owners and status' },
-    { src: '/projects/kumi/2.webp', caption: 'Task overview: brief, access, Codex results' },
-    { src: '/projects/kumi/3.webp', caption: 'Team chat with the Codex composer' },
-    { src: '/projects/kumi/4.webp', caption: 'Task lifecycle states from the architecture reference' },
   ],
   'black-hole': [
     { src: '/projects/black-hole/1.webp', caption: 'Lensed accretion disk at 80° inclination' },

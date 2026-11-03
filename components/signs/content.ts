@@ -76,7 +76,6 @@ export type Card = { id: string; title: string; line: string; tag: string; stack
 const TAGS: Record<string, string> = {
   machina: 'Sheet-forming solver',
   siege: 'Reinforcement-learning agent',
-  kumi: 'Multi-agent Git coordination',
   ignis: 'Rocket propulsion engine',
   sparlab: 'Finite-element solver',
   aether6: 'Fixed-wing flight simulator',
@@ -97,7 +96,7 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
   {
     id: 'ml-ai',
     label: 'ML / AI',
-    cards: pick(['machina', 'siege', 'kumi']).map(toCard),
+    cards: pick(['machina', 'siege']).map(toCard),
   },
   {
     id: 'numerical',
