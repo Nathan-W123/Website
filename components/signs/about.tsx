@@ -1,40 +1,27 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-
-const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 import { ABOUT, CONTACTS, SPOTS } from './content';
 import { BrandIcon } from './icons';
 
 /**
- * About: the whole thing set large, one sentence at a time. Only the line you
- * are reading is in ink — the rest sit back in grey and come forward as you
- * scroll onto them.
+ * About: a few paragraphs at a size you can actually read. Some phrases carry
+ * a picture set into them, and hovering one scatters a few more above the line.
  */
-/**
- * Closed, the pile reads as two cards: the front one square on, and one corner
- * behind it. The third and fourth sit exactly under the second, so the edge
- * stays a single clean line rather than a stack of four.
- */
-const restAt = (n: number) => ({
-  x: `${Math.min(n, 1) * 17}%`,
-  y: `${Math.min(n, 1) * -5}%`,
-  rotate: n === 0 ? 0 : 5,
-  scale: n === 0 ? 1 : 0.97,
-});
 
-/** How the photos sit when a spot is opened: a short fan, centred on the mark. */
-const FAN_AT = [
-  { x: '-108%', y: '-96%', r: -9 },
-  { x: '0%', y: '-108%', r: 2 },
-  { x: '108%', y: '-96%', r: 10 },
+const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
+
+/** Where the pictures land when a phrase is opened. Deliberately uneven. */
+const SCATTER = [
+  { x: '-152%', y: '-118%', r: -12, s: 1 },
+  { x: '-18%', y: '-168%', r: 6, s: 1.08 },
+  { x: '134%', y: '-104%', r: 14, s: 0.94 },
 ];
 
 /**
- * A phrase with a picture set into it. Hovering the phrase fans a few more out
- * above the line — they are absolutely placed and never in the flow, so the
- * sentence does not reflow when they appear.
+ * A phrase with a picture set into it. The pictures are absolutely placed and
+ * never enter the flow, so the sentence does not reflow when they appear.
  */
 function Spot({ name, text, reduce }: { name: string; text: string; reduce: boolean }) {
   const [open, setOpen] = useState(false);
@@ -49,7 +36,7 @@ function Spot({ name, text, reduce }: { name: string; text: string; reduce: bool
       onBlurCapture={() => setOpen(false)}
     >
       {text}{' '}
-      <span className="ab2-spot-mark" tabIndex={0} role="img" aria-label={`${text} — hover for photos`}>
+      <button type="button" className="ab2-spot-mark" aria-label={`${text} — show photos`} onClick={() => setOpen((v) => !v)}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={base() + spot.icon} alt="" draggable={false} />
         <span className="ab2-spot-fan" aria-hidden="true">
@@ -60,7 +47,7 @@ function Spot({ name, text, reduce }: { name: string; text: string; reduce: bool
               initial={false}
               animate={
                 open && !reduce
-                  ? { opacity: 1, x: FAN_AT[i].x, y: FAN_AT[i].y, rotate: FAN_AT[i].r, scale: 1 }
+                  ? { opacity: 1, x: SCATTER[i].x, y: SCATTER[i].y, rotate: SCATTER[i].r, scale: SCATTER[i].s }
                   : { opacity: 0, x: '0%', y: '-20%', rotate: 0, scale: 0.7 }
               }
               transition={{ type: 'spring', stiffness: 340, damping: 28, delay: open ? i * 0.04 : 0 }}
@@ -70,7 +57,7 @@ function Spot({ name, text, reduce }: { name: string; text: string; reduce: bool
             </motion.span>
           ))}
         </span>
-      </span>
+      </button>
     </span>
   );
 }
@@ -91,116 +78,36 @@ function line(text: string, reduce: boolean) {
 }
 
 export function About({ onHome }: { onHome: () => void }) {
-  const [active, setActive] = useState(0);
-  const [fan, setFan] = useState(false);
-  // a pile you cannot hover is a pile you cannot open, so on touch it starts fanned
-  const [canHover, setCanHover] = useState(true);
   const reduce = useReducedMotion();
-  const open = fan || !canHover || !!reduce;
-  const root = useRef<HTMLDivElement>(null);
-  const lines = useRef<(HTMLParagraphElement | null)[]>([]);
-
-  useEffect(() => {
-    const m = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const read = () => setCanHover(m.matches);
-    read();
-    m.addEventListener('change', read);
-    return () => m.removeEventListener('change', read);
-  }, []);
-
-  // The line nearest the reading line is the one in ink. Picking a single
-  // winner each frame, rather than asking each line whether it is on screen,
-  // is what keeps exactly one of them dark at any time.
-  useEffect(() => {
-    // our own scrolling ancestor, not whichever .sg-page happens to be first:
-    // during a route change the outgoing page is still in the document, and
-    // listening to that one means the handler dies with it
-    const scroller = root.current?.closest('.sg-page');
-    const pick = () => {
-      const reading = window.innerHeight * 0.42;
-      let best = 0;
-      let bestGap = Infinity;
-      lines.current.forEach((el, i) => {
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        const gap = Math.abs(r.top + r.height / 2 - reading);
-        if (gap < bestGap) {
-          bestGap = gap;
-          best = i;
-        }
-      });
-      setActive(best);
-    };
-    // Measure again once the type has settled. The first pass runs while the
-    // lines are still animating in and before the face has loaded, so the line
-    // positions it reads are not the ones you end up looking at — which is why
-    // the top of the page sat with nothing in ink until you scrolled.
-    pick();
-    const again = [window.setTimeout(pick, 120), window.setTimeout(pick, 850)];
-    document.fonts?.ready.then(pick).catch(() => {});
-    scroller?.addEventListener('scroll', pick, { passive: true });
-    window.addEventListener('resize', pick);
-    return () => {
-      again.forEach((t) => window.clearTimeout(t));
-      scroller?.removeEventListener('scroll', pick);
-      window.removeEventListener('resize', pick);
-    };
-  }, []);
-
   return (
-    <div className="hm ab2" ref={root}>
-      {/* the name brought you here and it takes you back */}
-      <h1 className="ab2-title">
-        <button type="button" className="hm-name-link" onClick={onHome}>
-          <motion.span layoutId="nathan" className="hm-name-text">
-            Nathan Ward
-          </motion.span>
-        </button>
-      </h1>
+    <div className="hm ab2">
+      <button type="button" className="pv-back ab2-back" onClick={onHome}>
+        ← Back
+      </button>
+
       <div className="ab2-body">
-        {ABOUT.paragraphs.map((p, i) => (
-          <motion.p
-            key={p}
-            ref={(el) => {
-              lines.current[i] = el;
-            }}
-            className={`ab2-line${i === active ? ' is-on' : ''}`}
-            initial={reduce ? false : { opacity: 0, y: 26 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reduce ? 0 : 0.5, ease: [0.22, 1, 0.3, 1], delay: reduce ? 0 : 0.16 + i * 0.07 }}
-          >
+        {ABOUT.paragraphs.map((p) => (
+          <p key={p} className="ab2-line">
             {line(p, !!reduce)}
-            {/* the marks sit at the end of the last line, not in a footer under it */}
-            {i === ABOUT.paragraphs.length - 1 && (
-            <div
-              className="ab2-social"
-              onMouseEnter={() => setFan(true)}
-              onMouseLeave={() => setFan(false)}
-              onFocusCapture={() => setFan(true)}
-              onBlurCapture={(e) => {
-                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFan(false);
-              }}
-            >
-              {CONTACTS.map((c, n) => (
-                <motion.a
-                  key={c.id}
-                  className="ab2-chip"
-                  href={c.href}
-                  target={c.href.startsWith('mailto:') ? undefined : '_blank'}
-                  rel="noreferrer"
-                  aria-label={c.label}
-                  style={{ zIndex: CONTACTS.length - n }}
-                  animate={open ? { x: `${n * 112}%`, y: '0%', rotate: 0, scale: 1 } : restAt(n)}
-                  transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30, delay: (fan ? n : CONTACTS.length - 1 - n) * 0.03 }}
-                  whileHover={reduce ? undefined : { y: -5 }}
-                >
-                  <BrandIcon id={c.id} size={25} />
-                </motion.a>
-              ))}
-            </div>
-            )}
-          </motion.p>
+          </p>
         ))}
+        {/* always out, because a row you have to keep hovered is a row you
+            cannot click */}
+        <p className="ab2-line ab2-socials">
+          Find me on
+          {CONTACTS.map((c) => (
+            <a
+              key={c.id}
+              className="ab2-chip"
+              href={c.href}
+              target={c.href.startsWith('mailto:') ? undefined : '_blank'}
+              rel="noreferrer"
+              aria-label={c.label}
+            >
+              <BrandIcon id={c.id} size={20} />
+            </a>
+          ))}
+        </p>
       </div>
     </div>
   );

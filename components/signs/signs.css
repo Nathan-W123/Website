@@ -1069,36 +1069,86 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 
 /* ---------------------------------------------------------------- About ----
-   The whole thing set large, one sentence at a time. Only the line being read
-   is in ink; the rest sit back in grey until you scroll onto them. */
-.ab2 { text-align: center; }
-.ab2-title {
-  margin: clamp(40px, 9vh, 96px) 0 clamp(26px, 5vh, 60px);
-  white-space: nowrap;
-  font-family: var(--disp);
-  font-weight: 700;
-  font-size: clamp(1.7rem, 5vw, 3.6rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  color: var(--ink);
+   Paragraphs at a size you can read, left on the page, all of them in ink.
+   No heading, no scroll-driven highlight: the writing is short enough that
+   neither earned its keep. */
+.ab2 { text-align: left; }
+.ab2-back { margin: clamp(26px, 5vh, 54px) 0 0; }
+.ab2-body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.6vh, 26px);
+  max-width: 62ch;
+  margin: clamp(26px, 6vh, 64px) 0 clamp(60px, 12vh, 130px);
 }
-.ab2-body { max-width: 940px; margin: 0 auto; padding-bottom: 62vh; overflow: visible; }
 .ab2-line {
-  margin: 0 0 0.5em;
-  font-family: var(--disp);
-  font-weight: 700;
-  font-size: clamp(1.5rem, 4.6vw, 3.9rem);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  text-wrap: balance;
-  color: var(--role);
-  transition: color 0.45s ease;
+  margin: 0;
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.62;
+  color: var(--ink);
+  text-wrap: pretty;
 }
-.ab2-line.is-on { color: var(--ink); }
+
+/* a picture set into a phrase, and a few more scattered above it on hover */
+.ab2-spot { position: relative; }
+.ab2-spot-mark {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.25em;
+  border-radius: 0.26em;
+  cursor: pointer;
+}
+.ab2-spot-mark > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.26em;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 2px 7px -4px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.3, 1);
+}
+.ab2-spot-mark:hover > img,
+.ab2-spot-mark:focus-visible > img { transform: translateY(-2px) scale(1.08); }
+.ab2-spot-mark:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.ab2-spot-fan { position: absolute; left: 50%; top: 0; width: 0; height: 0; pointer-events: none; }
+.ab2-spot-shot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6.4em;
+  height: 7.8em;
+  margin: -3.9em 0 0 -3.2em;
+  border-radius: 0.3em;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55);
+}
+.ab2-spot-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* the socials: out on the page, not behind a hover */
+.ab2-socials { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.ab2-chip {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  background: #fcfcfa;
+  color: var(--ink);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.3, 1), border-color 0.2s ease, background 0.2s ease;
+}
+.ab2-chip:hover { transform: translateY(-3px); border-color: var(--ink); background: #fff; }
+.ab2-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
-  .ab2-line { transition: none; }
+  .ab2-chip,
+  .ab2-spot-mark > img { transition: none; }
+  .ab2-chip:hover { transform: none; }
 }
 
 /* ------------------------------------------------------- Project page ----
@@ -1479,40 +1529,6 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 /* a gallery tile gives under the cursor too, and springs back */
 .hm-tile-drag { display: block; touch-action: pan-y; }
 
-/* ---- About: a small pile of marks, fanning out when you reach for it ---- */
-/* sized off the line it sits in, and fanning to the right so it never covers
-   the words it follows */
-.ab2-social {
-  --cs: clamp(34px, 0.72em, 56px);
-  position: relative;
-  display: inline-block;
-  vertical-align: baseline;
-  width: var(--cs);
-  height: var(--cs);
-  margin-left: 0.3em;
-}
-.ab2-chip {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: grid;
-  place-items: center;
-  width: var(--cs);
-  height: var(--cs);
-  border: 1px solid var(--rule);
-  border-radius: 26%;
-  background: #fcfcfa;
-  color: var(--ink);
-  box-shadow: 0 10px 22px -14px rgba(0, 0, 0, 0.5);
-  transition: border-color 0.25s ease, background 0.25s ease;
-}
-/* the marks belong to the line they sit in, so they hang back with it */
-.ab2-chip { opacity: 0.4; transition: opacity 0.45s ease, border-color 0.25s ease, background 0.25s ease; }
-.ab2-line.is-on .ab2-chip { opacity: 1; }
-.ab2-chip:hover { border-color: var(--ink); background: #fff; }
-.ab2-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-
-
 .hm-name-text { display: inline-block; }
 
 /* ---- the name on About, which is the way back ---- */
@@ -1626,6 +1642,9 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .ab2-spot { position: relative; }
 .ab2-spot-mark {
   position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
   display: inline-block;
   width: 0.78em;
   height: 0.78em;
