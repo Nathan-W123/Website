@@ -3,7 +3,6 @@
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ART, CONTACTS, PROJECT_GROUPS, WORKED_WITH, type ArtItem, type Card } from './content';
-import { TopBar } from './topbar';
 import { BrandIcon } from './icons';
 
 /**
@@ -160,14 +159,6 @@ export function Landing({
   };
   useEffect(() => () => shuffleTimers.current.forEach((t) => window.clearTimeout(t)), []);
 
-  // Gallery, pressed from another page, routes home and leaves a note behind
-  useEffect(() => {
-    if (window.sessionStorage.getItem('signs:to-work') !== '1') return;
-    window.sessionStorage.removeItem('signs:to-work');
-    const t = window.setTimeout(() => document.querySelector('.hm-work')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 420);
-    return () => window.clearTimeout(t);
-  }, []);
-
   // the fan settles into place once, with a little overshoot, unless motion is unwanted
   const spring = useMemo(
     () => (reduce ? { duration: 0.01 } : { type: 'spring' as const, stiffness: 240, damping: 21, mass: 0.9 }),
@@ -176,7 +167,6 @@ export function Landing({
 
   return (
     <div className="hm">
-      <TopBar onHome={() => undefined} here="home" />
 
       <header className="hm-hero">
         <p className="hm-meta">

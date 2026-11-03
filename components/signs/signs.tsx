@@ -4,13 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
 import { ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } from './content';
-import { SignChain } from './chain';
 import { Doodles } from './doodles';
 import { Scribble } from './scribble';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
 import { About } from './about';
-import { TopBar } from './topbar';
 import { IndexCard, StickyBoard } from './notes';
 import { BrandIcon, ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
@@ -100,9 +98,9 @@ export default function Signs() {
         <motion.section
           key={routeKey(route)}
           className={`sg-page${plain(route) ? ' sg-page--plain' : ''}`}
-          initial={reduce ? false : { opacity: 0, y: 16 }}
+          initial={reduce ? false : { opacity: 0, y: 26 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12, transition: { duration: 0.22, ease: 'easeIn' } }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, y: 44, scale: 0.985, transition: { duration: 0.3, ease: 'easeIn' } }}
           transition={{ duration: reduce ? 0.01 : 0.36, ease: [0.22, 1, 0.3, 1] }}
         >
           {plain(route) || <Scribble />}
@@ -399,7 +397,10 @@ function Contact({ onBack }: { onBack: () => void }) {
   );
   return (
     <div className="hm ct">
-      <TopBar onHome={onBack} here="about" />
+      {/* nothing links here — the NFC tag does — so this is the way into the site */}
+      <button type="button" className="ct-home" onClick={onBack}>
+        Nathan Ward
+      </button>
       <motion.div
         className="ct-card"
         initial={{ opacity: 0, y: 18 }}

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ABOUT, CONTACTS } from './content';
 import { BrandIcon } from './icons';
-import { TopBar } from './topbar';
 
 /**
  * About: the whole thing set large, one sentence at a time. Only the line you
@@ -66,20 +65,28 @@ export function About({ onHome }: { onHome: () => void }) {
 
   return (
     <div className="hm ab2" ref={root}>
-      <TopBar onHome={onHome} here="about" />
+      {/* the name brought you here and it takes you back */}
       <h1 className="ab2-title">
-        <motion.span layoutId="nathan" className="hm-name-text">
-          Nathan Ward
-        </motion.span>
+        <button type="button" className="hm-name-link" onClick={onHome}>
+          <motion.span layoutId="nathan" className="hm-name-text">
+            Nathan Ward
+          </motion.span>
+          <span className="hm-name-hint" aria-hidden="true">
+            Back home
+          </span>
+        </button>
       </h1>
       <div className="ab2-body">
         {ABOUT.paragraphs.map((p, i) => (
-          <p
+          <motion.p
             key={p}
             ref={(el) => {
               lines.current[i] = el;
             }}
             className={`ab2-line${i === active ? ' is-on' : ''}`}
+            initial={reduce ? false : { opacity: 0, y: 26 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduce ? 0 : 0.5, ease: [0.22, 1, 0.3, 1], delay: reduce ? 0 : 0.16 + i * 0.07 }}
           >
             {p}
             {/* the marks sit at the end of the last line, not in a footer under it */}
@@ -111,7 +118,7 @@ export function About({ onHome }: { onHome: () => void }) {
               ))}
             </div>
             )}
-          </p>
+          </motion.p>
         ))}
       </div>
     </div>
