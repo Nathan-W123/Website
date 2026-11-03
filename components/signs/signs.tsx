@@ -9,6 +9,7 @@ import { Scribble } from './scribble';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
 import { About } from './about';
+import { Corner, type Side } from './corner';
 import { IndexCard, StickyBoard } from './notes';
 import { BrandIcon, ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
@@ -43,6 +44,8 @@ const routeKey = (r: Route) => (r.page === 'art' ? `art/${r.section ?? ''}` : r.
 const plain = (r: Route) => r.page === 'home' || r.page === 'about' || r.page === 'contact';
 export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
+  // which half the landing page is showing, so About can wear the same mark
+  const [side, setSide] = useState<Side>('engineering');
   const reduce = useReducedMotion();
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
@@ -105,7 +108,7 @@ export default function Signs() {
         >
           {plain(route) || <Scribble />}
           {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
-          {route.page === 'home' && <Landing onOpenProject={setProject} onOpenArt={setLightbox} />}
+          {route.page === 'home' && <Landing onOpenProject={setProject} onOpenArt={setLightbox} onSide={setSide} />}
 
           {route.page === 'art' && !route.section && (
             <div className="sg-wall">
@@ -156,7 +159,7 @@ export default function Signs() {
 
           {route.page === 'contact' && <Contact onBack={goHome} />}
 
-          {route.page === 'about' && <About onHome={goHome} />}
+          {route.page === 'about' && <About onHome={goHome} side={side} />}
         </motion.section>
       </AnimatePresence>
 
@@ -546,7 +549,13 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
       >
         <div className="pv-coverwrap">
-          <button type="button" className="pv-shown" onClick={() => setExpanded(shown)} aria-label={`Expand: ${shots[shown].caption}`}>
+          <motion.button
+            type="button"
+            className="pv-shown"
+            layoutId={`card-${card.id}`}
+            onClick={() => setExpanded(shown)}
+            aria-label={`Expand: ${shots[shown].caption}`}
+          >
             <AnimatePresence initial={false} mode="popLayout">
               <motion.img
                 key={shots[shown].src}
@@ -559,7 +568,7 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
                 transition={{ duration: 0.2, ease: 'easeOut' }}
               />
             </AnimatePresence>
-          </button>
+          </motion.button>
           {shots.length > 1 && (
             <ul className="pv-strip">
               {shots.map((shot, i) => (

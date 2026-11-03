@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/rea
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ART, CONTACTS, PROJECT_GROUPS, WORKED_WITH, type ArtItem, type Card } from './content';
 import { BrandIcon } from './icons';
+import { Corner } from './corner';
 
 /**
  * Home: the name set large, four pieces of work fanned out under it, and a
@@ -76,12 +77,14 @@ const ALL_ART: (ArtItem & { section: string })[] = ART.flatMap((s) => s.items.ma
  */
 function Tile({
   i,
+  id,
   image,
   label,
   line,
   onOpen,
 }: {
   i: number;
+  id: string;
   image?: string;
   label: string;
   line?: string;
@@ -112,12 +115,12 @@ function Tile({
           dragTransition={{ bounceStiffness: 420, bounceDamping: 26 }}
           transition={{ type: 'spring', stiffness: 340, damping: 24 }}
         >
-          <span className="hm-tile">
+          <motion.span className="hm-tile" layoutId={`card-${id}`}>
             {image && (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={base() + image} alt="" loading="lazy" draggable={false} />
             )}
-          </span>
+          </motion.span>
         </motion.span>
         {line && (
           <span className="hm-tile-text">
@@ -133,9 +136,11 @@ function Tile({
 export function Landing({
   onOpenProject,
   onOpenArt,
+  onSide,
 }: {
   onOpenProject: (c: Card) => void;
   onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void;
+  onSide: (s: Side) => void;
 }) {
   const [side, setSide] = useState<Side>('engineering');
   // mid-shuffle the four cards are squared into one deck; the pictures change
@@ -159,6 +164,7 @@ export function Landing({
     const next = other(side);
     if (reduce) {
       setSide(next);
+      onSide(next);
       return;
     }
     setStacked(true);
@@ -169,6 +175,7 @@ export function Landing({
       // which is also why swapping the faces over here changes nothing you can see
       window.setTimeout(() => {
         setSide(next);
+        onSide(next);
         setPeeling(false);
         setTucked([]);
       }, 630),
@@ -187,39 +194,14 @@ export function Landing({
     <div className="hm">
       {/* The same switch, pinned to the corner, so you can change sides from
           anywhere down the page instead of scrolling back up to the pill. */}
-      {/* the way in to About. It wears whichever mark matches the side you are
-          on, but it does not change sides — the pill is the only thing that does */}
-      <a className="hm-corner" href="#/about" aria-label="About me">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={side}
-            className="hm-corner-mark"
-            initial={reduce ? false : { opacity: 0, rotate: -35, scale: 0.7 }}
-            animate={{ opacity: 1, rotate: 0, scale: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, rotate: 35, scale: 0.7, transition: { duration: 0.16 } }}
-            transition={{ duration: reduce ? 0.01 : 0.26, ease: [0.22, 1, 0.3, 1] }}
-            aria-hidden="true"
-          >
-            {side === 'engineering' ? (
-              <span className="hm-corner-int">&#8750;</span>
-            ) : (
-<span
-                className="hm-corner-brush"
-                style={{ WebkitMaskImage: `url(${base()}/icons/brush.png)`, maskImage: `url(${base()}/icons/brush.png)` }}
-              />
-            )}
-          </motion.span>
-        </AnimatePresence>
-        <span className="hm-corner-say" aria-hidden="true">
-          {side === 'engineering' ? 'My nerdy side' : 'My artsy side'}
-        </span>
-      </a>
+      <Corner
+        side={side}
+        href="#/about"
+        label="About me"
+        say={side === 'engineering' ? 'My nerdy side' : 'My artsy side'}
+      />
 
       <header className="hm-hero">
-        <p className="hm-meta">
-          Davis, California
-          <a href={`mailto:${CONTACTS.find((c) => c.id === 'email')?.handle}`}>{CONTACTS.find((c) => c.id === 'email')?.handle}</a>
-        </p>
 
         {/* the name is the way in to About: it flies up and becomes that page's
             heading, so the two are one element as far as motion is concerned */}
@@ -399,12 +381,13 @@ export function Landing({
           {side === 'engineering'
             ? ALL_PROJECTS.map((c, i) => (
                 /* the square tile, not the wide figure the case study uses */
-                <Tile key={c.id} i={i} image={`/tiles/${c.id}.webp`} label={c.title} line={c.tag} onOpen={() => onOpenProject(c)} />
+                <Tile key={c.id} i={i} id={c.id} image={`/tiles/${c.id}.webp`} label={c.title} line={c.tag} onOpen={() => onOpenProject(c)} />
               ))
             : ALL_ART.map((a, i) => (
                 <Tile
                   key={a.image}
                   i={i}
+                  id={a.image}
                   image={a.image}
                   label={a.caption}
                   onOpen={() => onOpenArt({ image: a.image, caption: a.caption, materials: a.materials })}

@@ -8,17 +8,14 @@ export const NAME = 'Nathan W.';
 /** The about page: a one-liner, a paragraph, a photo and where I am. */
 export const ABOUT = {
   tagline: 'Learning by building.',
-  /**
-   * `{key|words}` marks a phrase that carries a small picture inline and shows
-   * a few more when you hover it. The keys are defined in SPOTS below.
-   */
   paragraphs: [
-    "Hi, I'm Nathan. I study civil engineering and chemistry at UC Davis, where I do {quantum|quantum research} most weeks.",
-    "In Winter 2027 I'm joining {forming|Machina Labs} as a simulation engineer.",
-    'I also run an art business, painting {shoes|custom shoes} for people and organisations.',
+    "Hi, I'm Nathan. I study civil engineering and chemistry at UC Davis, where I do quantum research.",
+    "In Winter 2027 I'm joining Machina Labs as a simulation engineer.",
+    'I also run an art business, painting custom shoes for people and organizations.',
     'Before transferring, I placed in the top 1% in the nation on the 2025 organic chemistry ACS exam.',
     'I like building fast, and working at the frontier.',
   ],
+
 
 
 
@@ -31,7 +28,7 @@ export const ABOUT = {
 };
 
 /** Commissions and clients, listed on an index card on the art board. */
-export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', 'NewSongs School of Music', 'Akers Real Estate', 'FAM (Foster Adoption Ministry)'];
+export const WORKED_WITH = ['Lodi Fire Department', 'Pacific Coast Producers', 'NewSongs School of Music', 'FAM (Foster Adoption Ministry)'];
 
 /** The bench: things just finished or in progress, shown under the landing page. */
 export type Recent = { kind: 'project'; id: string; status: string } | { kind: 'art'; section: string; image: string; title: string; status: string };
@@ -41,22 +38,6 @@ export const RECENT: Recent[] = [
   { kind: 'project', id: 'aero', status: 'just finished' },
   { kind: 'art', section: 'shoes', image: '/art/shoes/purple-monster.webp', title: 'Gengar shoes', status: 'just finished' },
 ];
-
-/** What sits inline in the About copy, and what fans out of it on hover. */
-export const SPOTS: Record<string, { icon: string; shots: string[] }> = {
-  quantum: {
-    icon: '/tiles/hf-scf.webp',
-    shots: ['/projects/quantize/1.webp', '/projects/hf-scf/3.webp', '/projects/quantize/3.webp'],
-  },
-  forming: {
-    icon: '/tiles/machina.webp',
-    shots: ['/projects/machina/1.webp', '/projects/machina/2.webp', '/projects/machina/4.webp'],
-  },
-  shoes: {
-    icon: '/art/shoes/purple-monster.webp',
-    shots: ['/art/shoes/wave-dragon.webp', '/art/shoes/graffiti.webp', '/art/shoes/strawberries.webp'],
-  },
-};
 
 export const CONTACTS = [
   { id: 'instagram', label: 'Instagram', handle: '@naze_draws', href: 'https://instagram.com/naze_draws' },
