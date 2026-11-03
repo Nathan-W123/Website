@@ -13,7 +13,7 @@ export const ABOUT = {
     "In Winter 2027 I'm joining Machina Labs as a simulation engineer.",
     'I also run an art business, painting custom shoes.',
     'Before transferring, I placed in the top 1% in the nation on the 2025 organic chemistry ACS exam.',
-    'I like building fast, and working at the frontier. Say hi.',
+    'I like building fast, and working at the frontier. Say hi',
   ],
 
 

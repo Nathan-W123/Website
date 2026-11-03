@@ -109,7 +109,7 @@ export function About({ onHome }: { onHome: () => void }) {
                   rel="noreferrer"
                   aria-label={c.label}
                   style={{ zIndex: CONTACTS.length - n }}
-                  animate={open ? { x: `${n * 112}%`, rotate: 0, scale: 1 } : { x: `${n * 11}%`, rotate: LEAN[n], scale: 0.96 }}
+                  animate={open ? { x: `${n * 112}%`, rotate: 0, scale: 1 } : { x: `${n * 21}%`, y: `${n * -5}%`, rotate: LEAN[n], scale: 1 - n * 0.03 }}
                   transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30, delay: (fan ? n : CONTACTS.length - 1 - n) * 0.03 }}
                   whileHover={reduce ? undefined : { y: -5 }}
                 >
@@ -118,6 +118,7 @@ export function About({ onHome }: { onHome: () => void }) {
               ))}
             </div>
             )}
+            {i === ABOUT.paragraphs.length - 1 && '.'}
           </motion.p>
         ))}
       </div>

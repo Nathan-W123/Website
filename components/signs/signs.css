@@ -1082,7 +1082,7 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   text-transform: uppercase;
   color: var(--ink);
 }
-.ab2-body { max-width: 940px; margin: 0 auto; padding-bottom: 22vh; overflow: visible; }
+.ab2-body { max-width: 940px; margin: 0 auto; padding-bottom: 62vh; overflow: visible; }
 .ab2-line {
   margin: 0 0 0.5em;
   font-family: var(--disp);
@@ -1449,22 +1449,6 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   .hm-clients-slot { min-height: 104px; }
 }
 
-/* the art half signs off with somewhere to follow rather than a list of links */
-.hm-foot-line {
-  margin: clamp(12px, 2vh, 20px) 0 0;
-  font-size: 15px;
-  color: var(--ink-soft);
-}
-.hm-foot-line a {
-  color: var(--ink);
-  text-decoration: none;
-  border-bottom: 1.5px solid var(--ink-faint);
-  padding-bottom: 1px;
-  transition: border-color 0.25s ease;
-}
-.hm-foot-line a:hover { border-color: var(--ink); }
-.hm-foot-line a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-
 /* the engineering half signs off with two marks, not a list of words */
 .hm-social {
   display: flex;
@@ -1486,14 +1470,13 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 }
 .hm-social a:hover { transform: translateY(-4px); border-color: var(--ink); background: #fff; }
 .hm-social a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-.hm-foot-ig { display: inline-flex; align-items: center; gap: 7px; vertical-align: -0.3em; }
 @media (prefers-reduced-motion: reduce) {
   .hm-social a { transition: none; }
   .hm-social a:hover { transform: none; }
 }
 
 /* a gallery tile gives under the cursor too, and springs back */
-.hm-tile-drag { touch-action: pan-y; }
+.hm-tile-drag { display: block; touch-action: pan-y; }
 
 /* ---- About: a small pile of marks, fanning out when you reach for it ---- */
 /* sized off the line it sits in, and fanning to the right so it never covers
@@ -1530,9 +1513,16 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-name-link {
   position: relative;
   display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
   color: inherit;
   text-decoration: none;
   cursor: pointer;
+  /* About renders this as a button, and the UA sheet resets both of these on
+     form controls — which is how the name there lost its capitals */
+  font: inherit;
+  text-transform: inherit;
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.3, 1);
 }
 .hm-name-text { display: inline-block; }

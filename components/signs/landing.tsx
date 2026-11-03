@@ -39,9 +39,13 @@ const FAN: Record<Side, string[]> = {
 };
 
 const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
-/** The card sitting on top of the squared-up deck. It is the only one you can
- *  see while they are stacked, so it is the only one that has to travel. */
-const TOP = 3;
+/**
+ * The card sitting on top of the squared-up deck: the one with the highest
+ * z, which is not the last in the list. It is the only one you can see while
+ * they are stacked, so it is the only one that has to travel — and picking
+ * the wrong one means the card you are looking at just swaps its picture.
+ */
+const TOP = SEATS.reduce((best, seat, i) => (seat.z > SEATS[best].z ? i : best), 0);
 const instagram = CONTACTS.find((c) => c.id === 'instagram');
 /** The two worth following on the engineering side, shown as marks rather than words. */
 const FOLLOW = CONTACTS.filter((c) => c.id === 'linkedin' || c.id === 'github');
@@ -81,25 +85,25 @@ function Tile({
       animate={reduce || seen ? rest : low}
       transition={{ duration: reduce ? 0.01 : 0.55, ease: [0.22, 1, 0.3, 1], delay: reduce ? 0 : (i % 3) * 0.08 }}
     >
-      {/* the same give the cards in the fan have: nudge it and it springs back.
-          The drag sits inside the reveal, so the two are not writing x and y
-          over the top of one another. */}
-      <motion.div
-        className="hm-tile-drag"
-        drag={!reduce}
-        dragConstraints={{ left: -14, right: 14, top: -14, bottom: 14 }}
-        dragElastic={0.2}
-        dragSnapToOrigin
-        dragTransition={{ bounceStiffness: 420, bounceDamping: 26 }}
-        transition={{ type: 'spring', stiffness: 340, damping: 24 }}
-      >
       <button type="button" onClick={onOpen} aria-label={`Open ${label}`}>
-        <span className="hm-tile">
-          {image && (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={base() + image} alt="" loading="lazy" draggable={false} />
-          )}
-        </span>
+        {/* the same give the cards in the fan have: nudge it and it springs back.
+            Only the picture moves — the name under it stays put. */}
+        <motion.span
+          className="hm-tile-drag"
+          drag={!reduce}
+          dragConstraints={{ left: -14, right: 14, top: -14, bottom: 14 }}
+          dragElastic={0.2}
+          dragSnapToOrigin
+          dragTransition={{ bounceStiffness: 420, bounceDamping: 26 }}
+          transition={{ type: 'spring', stiffness: 340, damping: 24 }}
+        >
+          <span className="hm-tile">
+            {image && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={base() + image} alt="" loading="lazy" draggable={false} />
+            )}
+          </span>
+        </motion.span>
         {line && (
           <span className="hm-tile-text">
             <span className="hm-tile-name">{label}</span>
@@ -107,7 +111,6 @@ function Tile({
           </span>
         )}
       </button>
-      </motion.div>
     </motion.li>
   );
 }
@@ -354,13 +357,13 @@ export function Landing({
         {side === 'art' ? (
           <>
             <h3 className="hm-work-title">Want more?</h3>
-            <p className="hm-foot-line">
-              Follow me on{' '}
-              <a className="hm-foot-ig" href={instagram?.href} target="_blank" rel="noreferrer">
-                <BrandIcon id="instagram" size={19} />
-                {instagram?.handle}
-              </a>
-            </p>
+            <ul className="hm-social">
+              <li>
+                <a href={instagram?.href} target="_blank" rel="noreferrer" aria-label={`Instagram ${instagram?.handle}`}>
+                  <BrandIcon id="instagram" size={23} />
+                </a>
+              </li>
+            </ul>
           </>
         ) : (
           <>
