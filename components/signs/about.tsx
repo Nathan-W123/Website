@@ -82,38 +82,38 @@ export function About({ onHome }: { onHome: () => void }) {
             className={`ab2-line${i === active ? ' is-on' : ''}`}
           >
             {p}
+            {/* the marks sit at the end of the last line, not in a footer under it */}
+            {i === ABOUT.paragraphs.length - 1 && (
+            <div
+              className="ab2-social"
+              onMouseEnter={() => setFan(true)}
+              onMouseLeave={() => setFan(false)}
+              onFocusCapture={() => setFan(true)}
+              onBlurCapture={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFan(false);
+              }}
+            >
+              {CONTACTS.map((c, n) => (
+                <motion.a
+                  key={c.id}
+                  className="ab2-chip"
+                  href={c.href}
+                  target={c.href.startsWith('mailto:') ? undefined : '_blank'}
+                  rel="noreferrer"
+                  aria-label={c.label}
+                  style={{ zIndex: CONTACTS.length - n }}
+                  animate={open ? { x: `${n * 112}%`, rotate: 0, scale: 1 } : { x: `${n * 11}%`, rotate: LEAN[n], scale: 0.96 }}
+                  transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30, delay: (fan ? n : CONTACTS.length - 1 - n) * 0.03 }}
+                  whileHover={reduce ? undefined : { y: -5 }}
+                >
+                  <BrandIcon id={c.id} size={25} />
+                </motion.a>
+              ))}
+            </div>
+            )}
           </p>
         ))}
       </div>
-      <footer className="hm-foot">
-        {/* a small pile of marks that fans out when you reach for it */}
-        <div
-          className="ab2-social"
-          onMouseEnter={() => setFan(true)}
-          onMouseLeave={() => setFan(false)}
-          onFocusCapture={() => setFan(true)}
-          onBlurCapture={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFan(false);
-          }}
-        >
-          {CONTACTS.map((c, i) => (
-            <motion.a
-              key={c.id}
-              className="ab2-chip"
-              href={c.href}
-              target={c.href.startsWith('mailto:') ? undefined : '_blank'}
-              rel="noreferrer"
-              aria-label={c.label}
-              style={{ zIndex: CONTACTS.length - i }}
-              animate={open ? { x: `${(i - 1.5) * 118}%`, rotate: 0, scale: 1 } : { x: `${(i - 1.5) * 13}%`, rotate: LEAN[i], scale: 0.96 }}
-              transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30, delay: (fan ? i : CONTACTS.length - 1 - i) * 0.03 }}
-              whileHover={reduce ? undefined : { y: -6 }}
-            >
-              <BrandIcon id={c.id} size={25} />
-            </motion.a>
-          ))}
-        </div>
-      </footer>
     </div>
   );
 }
