@@ -147,15 +147,15 @@ export function Landing({
     setStacked(true);
     shuffleTimers.current.push(
       window.setTimeout(() => setPeeling(true), 170),
-      // past the top of its arc: it goes behind, and the rest of its journey is hidden
-      window.setTimeout(() => setTucked([TOP]), 170 + 170),
+      // past the top of its arc, so the rest of the way down it is behind
+      window.setTimeout(() => setTucked([TOP]), 170 + 205),
       // which is also why swapping the faces over here changes nothing you can see
       window.setTimeout(() => {
         setSide(next);
         setPeeling(false);
         setTucked([]);
-      }, 530),
-      window.setTimeout(() => setStacked(false), 570),
+      }, 630),
+      window.setTimeout(() => setStacked(false), 670),
     );
   };
   useEffect(() => () => shuffleTimers.current.forEach((t) => window.clearTimeout(t)), []);
@@ -222,9 +222,17 @@ export function Landing({
                 whileTap={reduce ? undefined : { scale: 0.985 }}
                 transition={{ type: 'spring', stiffness: 340, damping: 24 }}
               >
-                {/* the side you are about to see, already in place underneath */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="hm-fan-face is-under" src={base() + FAN[other(side)][i]} alt="" draggable={false} />
+                {/* the side you are about to see, waiting under this one. While the
+                    deck is squared up it sits a corner out, so you can see the deck
+                    is two deep; it slides into the top spot as the card above leaves. */}
+                <motion.img
+                  className="hm-fan-face is-under"
+                  src={base() + FAN[other(side)][i]}
+                  alt=""
+                  draggable={false}
+                  animate={stacked && !peeling && !reduce ? { x: '6%', y: '5%', rotate: 3 } : { x: '0%', y: '0%', rotate: 0 }}
+                  transition={{ duration: reduce ? 0 : 0.22, ease: 'easeOut' }}
+                />
                 <motion.img
                   className="hm-fan-face is-over"
                   src={base() + FAN[side][i]}
@@ -236,16 +244,18 @@ export function Landing({
                       ? {
                           // out to the side, then back into the deck — but behind
                           // the face below, so it is gone the moment it returns
-                          x: ['0%', '72%', '0%'],
-                          y: ['0%', '-9%', '0%'],
-                          rotate: [0, 10, 0],
+                          // up and out, then down into the place the other card
+                          // just left — the back of the deck
+                          x: ['0%', '66%', '6%'],
+                          y: ['0%', '-11%', '5%'],
+                          rotate: [0, 10, 3],
                           scale: [1, 0.96, 1],
                         }
                       : { x: '0%', y: '0%', rotate: 0, scale: 1 }
                   }
                   transition={
                     peeling && !reduce && i === TOP
-                      ? { duration: 0.34, times: [0, 0.5, 1], ease: 'easeInOut' }
+                      ? { duration: 0.42, times: [0, 0.48, 1], ease: 'easeInOut' }
                       : { duration: 0 }
                   }
                 />

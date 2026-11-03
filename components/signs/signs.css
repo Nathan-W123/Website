@@ -1506,3 +1506,29 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 
 /* a gallery tile gives under the cursor too, and springs back */
 .hm-tile-drag { touch-action: pan-y; }
+
+/* ---- About: a small pile of marks, fanning out when you reach for it ---- */
+.ab2-social {
+  --cs: 58px;
+  position: relative;
+  height: calc(var(--cs) + 16px);
+  margin: clamp(26px, 5vh, 54px) auto 0;
+}
+.ab2-chip {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: var(--cs);
+  height: var(--cs);
+  margin-left: calc(var(--cs) / -2);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: #fcfcfa;
+  color: var(--ink);
+  box-shadow: 0 10px 22px -14px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.ab2-chip:hover { border-color: var(--ink); background: #fff; }
+.ab2-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }

@@ -9,10 +9,14 @@ export const NAME = 'Nathan W.';
 export const ABOUT = {
   tagline: 'Learning by building.',
   paragraphs: [
-    "Hi, I'm Nathan, a senior at UC Davis studying civil engineering and chemistry.",
-    'I do quantum chemistry research and run an art business, creating custom pieces for individuals and organizations.',
-    'Outside of academia I spend my time playing volleyball, speed-cubing, and weightlifting.',
+    "Hi, I'm Nathan. I study civil engineering and chemistry at UC Davis, and do quantum chemistry research.",
+    "In Winter 2027 I'm joining Machina Labs as a simulation engineer.",
+    'I also run an art business, painting custom shoes.',
+    'Before transferring, I placed in the top 1% in the nation on the 2025 organic chemistry ACS exam.',
+    'I like building fast, and working at the frontier. Say hi.',
   ],
+
+
   based: 'based in Davis',
   /** Drop the portrait at public/about/nathan.jpg; the frame hides itself until it exists. */
   photo: '/about/nathan.jpg',

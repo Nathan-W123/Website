@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { ABOUT, CONTACTS } from './content';
+import { BrandIcon } from './icons';
 import { TopBar } from './topbar';
 
 /**
@@ -9,10 +11,26 @@ import { TopBar } from './topbar';
  * are reading is in ink — the rest sit back in grey and come forward as you
  * scroll onto them.
  */
+/** How the little pile of marks sits before you reach for it. */
+const LEAN = [-7, -2.5, 3, 7];
+
 export function About({ onHome }: { onHome: () => void }) {
   const [active, setActive] = useState(0);
+  const [fan, setFan] = useState(false);
+  // a pile you cannot hover is a pile you cannot open, so on touch it starts fanned
+  const [canHover, setCanHover] = useState(true);
+  const reduce = useReducedMotion();
+  const open = fan || !canHover || !!reduce;
   const root = useRef<HTMLDivElement>(null);
   const lines = useRef<(HTMLParagraphElement | null)[]>([]);
+
+  useEffect(() => {
+    const m = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const read = () => setCanHover(m.matches);
+    read();
+    m.addEventListener('change', read);
+    return () => m.removeEventListener('change', read);
+  }, []);
 
   // The line nearest the reading line is the one in ink. Picking a single
   // winner each frame, rather than asking each line whether it is on screen,
@@ -64,16 +82,33 @@ export function About({ onHome }: { onHome: () => void }) {
         ))}
       </div>
       <footer className="hm-foot">
-        <h2 className="hm-work-title">Contact</h2>
-        <ul className="hm-contacts">
-          {CONTACTS.map((c) => (
-            <li key={c.id}>
-              <a href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
-                {c.label}
-              </a>
-            </li>
+        {/* a small pile of marks that fans out when you reach for it */}
+        <div
+          className="ab2-social"
+          onMouseEnter={() => setFan(true)}
+          onMouseLeave={() => setFan(false)}
+          onFocusCapture={() => setFan(true)}
+          onBlurCapture={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFan(false);
+          }}
+        >
+          {CONTACTS.map((c, i) => (
+            <motion.a
+              key={c.id}
+              className="ab2-chip"
+              href={c.href}
+              target={c.href.startsWith('mailto:') ? undefined : '_blank'}
+              rel="noreferrer"
+              aria-label={c.label}
+              style={{ zIndex: CONTACTS.length - i }}
+              animate={open ? { x: `${(i - 1.5) * 118}%`, rotate: 0, scale: 1 } : { x: `${(i - 1.5) * 13}%`, rotate: LEAN[i], scale: 0.96 }}
+              transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30, delay: (fan ? i : CONTACTS.length - 1 - i) * 0.03 }}
+              whileHover={reduce ? undefined : { y: -6 }}
+            >
+              <BrandIcon id={c.id} size={25} />
+            </motion.a>
           ))}
-        </ul>
+        </div>
       </footer>
     </div>
   );
