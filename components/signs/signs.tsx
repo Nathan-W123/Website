@@ -12,7 +12,7 @@ import { Landing } from './landing';
 import { About } from './about';
 import { TopBar } from './topbar';
 import { IndexCard, StickyBoard } from './notes';
-import { ContactIcon } from './icons';
+import { BrandIcon, ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
 import './signs.css';
 
@@ -158,7 +158,7 @@ export default function Signs() {
 
           {route.page === 'contact' && <Contact onBack={goHome} />}
 
-          {route.page === 'about' && <About onHome={goHome} onOpenProject={setProject} onOpenArt={setLightbox} />}
+          {route.page === 'about' && <About onHome={goHome} />}
         </motion.section>
       </AnimatePresence>
 
@@ -389,7 +389,7 @@ function Contact({ onBack }: { onBack: () => void }) {
   const row = (c: (typeof CONTACTS)[number]) => (
     <a key={c.id} className="ct-row" href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
       <span className="ct-icon" aria-hidden="true">
-        <ContactIcon id={c.id} size={26} />
+        <BrandIcon id={c.id} size={23} />
       </span>
       <span className="ct-text">
         <span className="ct-name">{c.label}</span>
@@ -472,75 +472,62 @@ function ProjectCard({ card, index, onOpen }: { card: Card; index: number; onOpe
 
 /* ---------- project page: the cover on one side, the write-up on the other ---------- */
 
-/** Everything in the project's gallery, laid out at once. */
-function Collage({ shots, onClose }: { shots: Card['images']; onClose: () => void }) {
+/** One picture, filling the screen. */
+function Expanded({ shot, onClose }: { shot: Card['images'][number]; onClose: () => void }) {
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   return (
-    <motion.div
-      className="pv-collage"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.16 } }}
-      onClick={onClose}
-    >
+    <motion.div className="lb-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.16 } }} onClick={onClose}>
+      <motion.figure
+        className="pv-big"
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.28, ease: [0.22, 1, 0.3, 1] }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {shot.video ? (
+          <video poster={base() + shot.src} aria-label={shot.caption} muted loop playsInline autoPlay={!reducedMotion} controls={reducedMotion} preload="metadata">
+            <source src={base() + shot.video + '.webm'} type="video/webm" />
+            <source src={base() + shot.video + '.mp4'} type="video/mp4" />
+          </video>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={base() + shot.src} alt={shot.caption} draggable={false} />
+        )}
+        <figcaption>
+          {shot.caption}
+          {shot.credit && !shot.credit.startsWith('own') && (
+            <>
+              {' '}
+              <a href={shot.credit} target="_blank" rel="noreferrer">
+                (source)
+              </a>
+            </>
+          )}
+        </figcaption>
+      </motion.figure>
       <button type="button" className="pv-close" onClick={onClose} aria-label="Close">
         Close
       </button>
-      <motion.div
-        className="pv-collage-grid"
-        initial={{ opacity: 0, scale: 0.97 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.3, 1] }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {shots.map((shot, i) => (
-          <figure key={shot.src} className={`pv-collage-item${i % 5 === 0 ? ' is-wide' : ''}`}>
-            {shot.video ? (
-              <video poster={base() + shot.src} aria-label={shot.caption} muted loop playsInline autoPlay={!reducedMotion} controls={reducedMotion} preload="metadata">
-                <source src={base() + shot.video + '.webm'} type="video/webm" />
-                <source src={base() + shot.video + '.mp4'} type="video/mp4" />
-              </video>
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={base() + shot.src} alt={shot.caption} loading={i < 3 ? undefined : 'lazy'} draggable={false} />
-            )}
-            <figcaption>
-              {shot.caption}
-              {shot.credit && !shot.credit.startsWith('own') && (
-                <>
-                  {' '}
-                  <a href={shot.credit} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
-                    (source)
-                  </a>
-                </>
-              )}
-            </figcaption>
-          </figure>
-        ))}
-      </motion.div>
     </motion.div>
   );
 }
 
 function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
   const ref = useDialog<HTMLDivElement>();
-  const [peek, setPeek] = useState(false);
-  const [collage, setCollage] = useState(false);
+  const [shown, setShown] = useState(0);
+  const [expanded, setExpanded] = useState<number | null>(null);
   const page = card.study?.page;
   const shots = card.images;
-  const cover = shots[0];
-  // the three behind the cover, which slide out from under it on hover
-  const behind = shots.slice(1, 4);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      if (collage) setCollage(false);
+      if (expanded !== null) setExpanded(null);
       else onClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [collage, onClose]);
+  }, [expanded, onClose]);
 
   return (
     <motion.div className="pv-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.2 } }}>
@@ -558,35 +545,38 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
       >
         <div className="pv-coverwrap">
-          <div
-            className="pv-cover"
-            onMouseEnter={() => setPeek(true)}
-            onMouseLeave={() => setPeek(false)}
-            onFocusCapture={() => setPeek(true)}
-            onBlurCapture={(e) => {
-              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setPeek(false);
-            }}
-          >
-            {behind.map((shot, i) => (
-              <motion.span
-                key={shot.src}
-                className="pv-behind"
-                style={{ zIndex: behind.length - i }}
-                aria-hidden="true"
-                initial={false}
-                animate={peek ? { x: `${-(i + 1) * 5}%`, y: `${-(i + 1) * 7}%`, rotate: -(i + 1) * 2, opacity: 1 } : { x: 0, y: 0, rotate: 0, opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: peek ? i * 0.045 : (behind.length - 1 - i) * 0.03 }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={base() + shot.src} alt="" draggable={false} />
-              </motion.span>
-            ))}
-            <button type="button" className="pv-cover-face" onClick={() => setCollage(true)} aria-label={`See all ${shots.length} images of ${card.title}`}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={base() + cover.src} alt={cover.caption} draggable={false} />
-            </button>
-          </div>
-          <p className="pv-cover-hint">{shots.length} images — click to see them all</p>
+          <button type="button" className="pv-shown" onClick={() => setExpanded(shown)} aria-label={`Expand: ${shots[shown].caption}`}>
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.img
+                key={shots[shown].src}
+                src={base() + shots[shown].src}
+                alt={shots[shown].caption}
+                draggable={false}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              />
+            </AnimatePresence>
+          </button>
+          {shots.length > 1 && (
+            <ul className="pv-strip">
+              {shots.map((shot, i) => (
+                <li key={shot.src}>
+                  <button
+                    type="button"
+                    className={`pv-thumb${i === shown ? ' is-on' : ''}`}
+                    aria-label={shot.caption}
+                    aria-current={i === shown}
+                    onClick={() => (i === shown ? setExpanded(i) : setShown(i))}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={base() + shot.src} alt="" loading="lazy" draggable={false} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="pv-text">
@@ -628,7 +618,7 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
         </div>
       </motion.div>
 
-      <AnimatePresence>{collage && <Collage key="collage" shots={shots} onClose={() => setCollage(false)} />}</AnimatePresence>
+      <AnimatePresence>{expanded !== null && <Expanded key="big" shot={shots[expanded]} onClose={() => setExpanded(null)} />}</AnimatePresence>
     </motion.div>
   );
 }

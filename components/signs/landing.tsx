@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/rea
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ART, CONTACTS, PROJECT_GROUPS, WORKED_WITH, type ArtItem, type Card } from './content';
 import { TopBar } from './topbar';
-import { ContactIcon } from './icons';
+import { BrandIcon } from './icons';
 
 /**
  * Home: the name set large, four pieces of work fanned out under it, and a
@@ -40,6 +40,9 @@ const FAN: Record<Side, string[]> = {
 };
 
 const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
+/** The card sitting on top of the squared-up deck. It is the only one you can
+ *  see while they are stacked, so it is the only one that has to travel. */
+const TOP = 3;
 const instagram = CONTACTS.find((c) => c.id === 'instagram');
 /** The two worth following on the engineering side, shown as marks rather than words. */
 const FOLLOW = CONTACTS.filter((c) => c.id === 'linkedin' || c.id === 'github');
@@ -79,6 +82,18 @@ function Tile({
       animate={reduce || seen ? rest : low}
       transition={{ duration: reduce ? 0.01 : 0.55, ease: [0.22, 1, 0.3, 1], delay: reduce ? 0 : (i % 3) * 0.08 }}
     >
+      {/* the same give the cards in the fan have: nudge it and it springs back.
+          The drag sits inside the reveal, so the two are not writing x and y
+          over the top of one another. */}
+      <motion.div
+        className="hm-tile-drag"
+        drag={!reduce}
+        dragConstraints={{ left: -14, right: 14, top: -14, bottom: 14 }}
+        dragElastic={0.2}
+        dragSnapToOrigin
+        dragTransition={{ bounceStiffness: 420, bounceDamping: 26 }}
+        transition={{ type: 'spring', stiffness: 340, damping: 24 }}
+      >
       <button type="button" onClick={onOpen} aria-label={`Open ${label}`}>
         <span className="hm-tile">
           {image && (
@@ -93,6 +108,7 @@ function Tile({
           </span>
         )}
       </button>
+      </motion.div>
     </motion.li>
   );
 }
@@ -129,19 +145,17 @@ export function Landing({
       return;
     }
     setStacked(true);
-    shuffleTimers.current.push(window.setTimeout(() => setPeeling(true), 290));
-    SEATS.forEach((_, i) => {
-      shuffleTimers.current.push(window.setTimeout(() => setTucked((t) => [...t, i]), 290 + i * 70 + 300));
-    });
     shuffleTimers.current.push(
-      // every face is behind its neighbour by now, so swapping the two over
-      // changes nothing you can see
+      window.setTimeout(() => setPeeling(true), 170),
+      // past the top of its arc: it goes behind, and the rest of its journey is hidden
+      window.setTimeout(() => setTucked([TOP]), 170 + 170),
+      // which is also why swapping the faces over here changes nothing you can see
       window.setTimeout(() => {
         setSide(next);
         setPeeling(false);
         setTucked([]);
-      }, 1110),
-      window.setTimeout(() => setStacked(false), 1170),
+      }, 530),
+      window.setTimeout(() => setStacked(false), 570),
     );
   };
   useEffect(() => () => shuffleTimers.current.forEach((t) => window.clearTimeout(t)), []);
@@ -190,8 +204,10 @@ export function Landing({
               }
               transition={
                 stacked
-                  ? { type: 'spring', stiffness: 460, damping: 38 }
-                  : { ...spring, delay: reduce || !fanIn ? 0 : 0.05 + i * 0.07 }
+                  ? { type: 'spring', stiffness: 620, damping: 42 }
+                  : stacked === false && fanIn
+                    ? { type: 'spring', stiffness: 420, damping: 30, delay: reduce ? 0 : i * 0.035 }
+                    : { ...spring, delay: reduce || !fanIn ? 0 : 0.05 + i * 0.07 }
               }
             >
               {/* nudgeable: it gives a little under the cursor and springs back */}
@@ -216,7 +232,7 @@ export function Landing({
                   draggable={false}
                   style={{ zIndex: tucked.includes(i) ? 0 : 2 }}
                   animate={
-                    peeling && !reduce
+                    peeling && !reduce && i === TOP
                       ? {
                           // out to the side, then back into the deck — but behind
                           // the face below, so it is gone the moment it returns
@@ -228,8 +244,8 @@ export function Landing({
                       : { x: '0%', y: '0%', rotate: 0, scale: 1 }
                   }
                   transition={
-                    peeling && !reduce
-                      ? { duration: 0.6, times: [0, 0.5, 1], ease: 'easeInOut', delay: i * 0.07 }
+                    peeling && !reduce && i === TOP
+                      ? { duration: 0.34, times: [0, 0.5, 1], ease: 'easeInOut' }
                       : { duration: 0 }
                   }
                 />
@@ -243,12 +259,12 @@ export function Landing({
             <Fragment key={s2}>
               {i === 1 && <span className="hm-role-and"> and </span>}
               <span className={`hm-role-word${side === s2 ? ' is-on' : ''}`}>
-                {s2 === 'engineering' ? 'Engineer' : 'Artist'}
+                <span className="hm-role-glyph">{s2 === 'engineering' ? 'Engineer' : 'Artist'}</span>
                 {side === s2 && (
                   <motion.span
                     layoutId="hm-role-bar"
                     className="hm-role-bar"
-                    transition={reduce ? { duration: 0.01 } : { duration: 0.32, ease: 'linear' }}
+                    transition={reduce ? { duration: 0.01 } : { layout: { duration: 0.26, ease: 'linear' }, duration: 0.26, ease: 'linear' }}
                   />
                 )}
               </span>
@@ -330,7 +346,7 @@ export function Landing({
             <p className="hm-foot-line">
               Follow me on{' '}
               <a className="hm-foot-ig" href={instagram?.href} target="_blank" rel="noreferrer">
-                <ContactIcon id="instagram" size={20} />
+                <BrandIcon id="instagram" size={19} />
                 {instagram?.handle}
               </a>
             </p>
@@ -342,7 +358,7 @@ export function Landing({
               {FOLLOW.map((c) => (
                 <li key={c.id}>
                   <a href={c.href} target="_blank" rel="noreferrer" aria-label={c.label}>
-                    <ContactIcon id={c.id} size={26} />
+                    <BrandIcon id={c.id} size={23} />
                   </a>
                 </li>
               ))}
