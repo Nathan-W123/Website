@@ -256,7 +256,7 @@ export const STUDIES: Record<string, Study> = {
     "brief": "A redesign of the north entry at UC Davis: a 55-ft steel-and-glass curtain wall carrying three automatic sliding doors, modelled in Fusion and then checked element by element against the 2025 CBC.",
     "page": {
       "body": [
-        "Olson Hall's north entry is a bank of doors you have to pull. The redesign replaces it with a 55-ft steel-and-glass curtain wall on three automatic sliding doors, and lays a paved bike path with parking along the north face.",
+        "Olson Hall's north entry is a bank of doors you have to pull. The redesign replaces it with a 55-ft steel-and-glass curtain wall on three automatic sliding doors, and runs a paved bike path with parking down the west side to meet it.",
         "Only the elements the redesign changes are checked, which is what the existing-building code asks for. Wind at 100 mph in Exposure C governs: −21.7 psf against +19.8, where the seismic demand on the same wall is 3.7 psf. The mullions, the head beam, the bracket anchors and the glass are all sized to it.",
         "The first glass selection failed. Quarter-inch lites deflect 0.89 in against a 0.75-in limit, so the panes are 5/16 in and come in at 0.37. The steel is nowhere near its limits — the worst ratio in the frame is 0.29 — and the existing lateral system picks up 0.5% more demand, well under the 10% that would force a seismic upgrade."
       ],
@@ -266,7 +266,7 @@ export const STUDIES: Record<string, Study> = {
         "The bike path is sized by the Caltrans gravel-equivalent method: 3 in of HMA over 9 in of Class 2 base."
       ]
     },
-    "problem": "Olson Hall's north entry is a bank of manual swing doors, and the approach to it has no bike parking. The redesign opens it up with a glazed curtain wall and automatic sliding doors, and paves a bike path with racks along the north face. The question the calculations answer is narrow: does anything the redesign adds or changes need more than it has, and does any of it push the existing building past a code threshold?",
+    "problem": "Olson Hall's north entry is a bank of manual swing doors, and the approach to it has no bike parking. The redesign opens it up with a glazed curtain wall and automatic sliding doors, and paves a bike path with racks down the west side, past the entry. The question the calculations answer is narrow: does anything the redesign adds or changes need more than it has, and does any of it push the existing building past a code threshold?",
     "built": "A Fusion model of the building, the new north lobby curtain wall and the reworked site, and a set of structural calculations covering only the changed elements: the 55.35 ft × 10.83 ft steel-and-glass wall with three automatic sliding doors, the removed door pairs in Halls 0100 and 0166, the 1-hour rated glass doors at stair 1ST2, the lobby sprinklers, and the bike path with its paved parking.",
     "how": [
       "Loads: 2025 CBC with ASCE/SEI 7-22, Risk Category III (Ie = 1.25). Wind V = 100 mph, Exposure C, Kh = 0.952 at 26.5 ft, giving −21.7 and +19.8 psf on the wall and −23.3 / +21.4 on a door leaf. Seismic is Site Class D, SDS = 0.86, SDC D, and works out at 3.7 psf, so wind governs.",
