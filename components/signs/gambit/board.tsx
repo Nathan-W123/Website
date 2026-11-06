@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Chessboard } from 'react-chessboard';
 import type { Square } from 'chess.js';
@@ -8,9 +8,10 @@ import { Chess, MATE_SCORE, MATE_THRESHOLD, SearchEngine, epAfter, keyOf, type E
 import { loadGambit } from './net';
 
 /**
- * The easter egg: play Gambit itself. The same network and the same search
- * the bot plays Lichess with, ported move for move and running in the
- * visitor's browser — nothing is sent anywhere.
+ * The easter egg: Gambit's project page opens on a live board instead of a
+ * picture, and it is the real bot — the same network and the same search it
+ * plays Lichess with, ported move for move and running in the visitor's
+ * browser. Nothing is sent anywhere.
  *
  * On Lichess the bot reaches depth 3 in ~600 ms of native CPU. Single-threaded
  * WebAssembly needs 1.3-2.0 s for that depth on a laptop (measured), so here it
@@ -30,13 +31,13 @@ const isPromotion = (g: Chess, from: string, to: string) => g.get(from as Square
 
 /** What the bot made of the position, in words a player would use. */
 function readout(r: SearchResult): string {
-  const depth = `looked ${r.depth} ${r.depth === 1 ? 'move' : 'moves'} deep, ${r.evaluations} positions`;
+  const depth = `Looked ${r.depth} ${r.depth === 1 ? 'move' : 'moves'} deep, ${r.evaluations} positions.`;
   if (Math.abs(r.score) >= MATE_THRESHOLD) {
     const n = Math.ceil((MATE_SCORE - Math.abs(r.score)) / 2);
-    return `${depth} · ${r.score > 0 ? `sees mate in ${n}` : `sees itself mated in ${n}`}`;
+    return `${depth} ${r.score > 0 ? `Sees mate in ${n}.` : `Sees itself mated in ${n}.`}`;
   }
   const v = Math.max(-1, Math.min(1, r.score));
-  return `${depth} · thinks it is ${v > 0.15 ? 'better' : v < -0.15 ? 'worse' : 'about level'} (${v >= 0 ? '+' : ''}${v.toFixed(2)})`;
+  return `${depth} Thinks it is ${v > 0.15 ? 'better' : v < -0.15 ? 'worse' : 'about level'} (${v >= 0 ? '+' : ''}${v.toFixed(2)}).`;
 }
 
 function verdict(g: Chess, you: 'w' | 'b'): string {
@@ -47,7 +48,7 @@ function verdict(g: Chess, you: 'w' | 'b'): string {
   return 'Draw by the fifty-move rule.';
 }
 
-export function GambitGame({ onClose }: { onClose: () => void }) {
+export function GambitBoard() {
   const reduce = useReducedMotion();
   const game = useRef(new Chess());
   const ep = useRef<string | null>(null); // python-chess's raw en-passant square, which the net was trained on
@@ -59,6 +60,7 @@ export function GambitGame({ onClose }: { onClose: () => void }) {
   const [fen, setFen] = useState(() => game.current.fen());
   const [you, setYou] = useState<'w' | 'b'>('w');
   const [phase, setPhase] = useState<Phase>('yours');
+  const [started, setStarted] = useState(false); // the invitation stays until the first move
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
@@ -79,6 +81,7 @@ export function GambitGame({ onClose }: { onClose: () => void }) {
     );
     return () => {
       live = false;
+      round.current += 1; // leaving the page abandons any search in flight
     };
   }, []);
 
@@ -128,6 +131,7 @@ export function GambitGame({ onClose }: { onClose: () => void }) {
       setSelected(null);
       setThought(null);
       setYou(side);
+      setStarted(true);
       setPhase('yours');
       if (side === 'b') void reply();
     },
@@ -140,6 +144,7 @@ export function GambitGame({ onClose }: { onClose: () => void }) {
     (from: string, to: string) => {
       if (!yourTurn || !play(from, to)) return false;
       setSelected(null);
+      setStarted(true);
       void reply();
       return true;
     },
@@ -172,6 +177,7 @@ export function GambitGame({ onClose }: { onClose: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fen, last, selected]);
 
+  const pct = `${Math.round(progress * 100)}%`;
   const status = failed
     ? `Gambit could not load (${failed}).`
     : phase === 'over'
@@ -179,73 +185,79 @@ export function GambitGame({ onClose }: { onClose: () => void }) {
       : phase === 'thinking'
         ? ready
           ? 'Gambit is thinking…'
-          : `Waking Gambit up… ${Math.round(progress * 100)}%`
-        : !ready
-          ? `Your move. Gambit is still waking up (${Math.round(progress * 100)}%).`
-          : 'Your move.';
+          : `Waking Gambit up… ${pct}`
+        : 'Your move.';
 
   return (
-    <motion.div
-      className="gb-overlay"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.2 } }}
-      transition={{ duration: reduce ? 0.01 : 0.25 }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="gb-sheet" role="dialog" aria-modal="true" aria-label="Play Gambit">
-        <motion.div className="gb-board" layoutId="card-gambit" transition={{ type: 'spring', stiffness: 260, damping: 30 }}>
-          <Chessboard
-            options={{
-              id: 'gambit',
-              position: fen,
-              boardOrientation: you === 'w' ? 'white' : 'black',
-              onPieceDrop: ({ sourceSquare, targetSquare }) => !!targetSquare && move(sourceSquare, targetSquare),
-              onSquareClick,
-              canDragPiece: ({ piece }) => yourTurn && piece.pieceType[0] === you,
-              squareStyles,
-              lightSquareStyle: { backgroundColor: '#efebe2' },
-              darkSquareStyle: { backgroundColor: '#bfb8aa' },
-              lightSquareNotationStyle: { color: '#8f887b', fontFamily: 'var(--body)', fontSize: 11, fontWeight: 600 },
-              darkSquareNotationStyle: { color: '#f3f0e8', fontFamily: 'var(--body)', fontSize: 11, fontWeight: 600 },
-              animationDurationInMs: reduce ? 0 : 220,
-              allowDrawingArrows: true,
-              boardStyle: { borderRadius: 12, overflow: 'hidden' },
-            }}
-          />
-          {!ready && !failed && (
-            <span className="gb-loading" aria-hidden="true">
-              <span style={{ transform: `scaleX(${progress})` }} />
-            </span>
+    <div className="gbp">
+      <div className="gbp-board">
+        <Chessboard
+          options={{
+            id: 'gambit',
+            position: fen,
+            boardOrientation: you === 'w' ? 'white' : 'black',
+            onPieceDrop: ({ sourceSquare, targetSquare }) => !!targetSquare && move(sourceSquare, targetSquare),
+            onSquareClick,
+            canDragPiece: ({ piece }) => yourTurn && piece.pieceType[0] === you,
+            squareStyles,
+            lightSquareStyle: { backgroundColor: '#efebe2' },
+            darkSquareStyle: { backgroundColor: '#bfb8aa' },
+            lightSquareNotationStyle: { color: '#8f887b', fontFamily: 'var(--body)', fontSize: 10, fontWeight: 600 },
+            darkSquareNotationStyle: { color: '#f3f0e8', fontFamily: 'var(--body)', fontSize: 10, fontWeight: 600 },
+            animationDurationInMs: reduce ? 0 : 220,
+            allowDrawingArrows: true,
+            boardStyle: { borderRadius: 8, overflow: 'hidden' },
+          }}
+        />
+
+        {/* the invitation: sits on the empty middle of the board until you move */}
+        <AnimatePresence>
+          {!started && (
+            <motion.div
+              className="gbp-invite"
+              aria-hidden="true"
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.18 } }}
+              transition={{ delay: reduce ? 0 : 0.35, duration: reduce ? 0.01 : 0.4, ease: [0.22, 1, 0.3, 1] }}
+            >
+              <span className="gbp-invite-pill">
+                <span className="gbp-invite-dot" />
+                Your move
+              </span>
+              <span className="gbp-invite-sub">Tap a piece to play the bot</span>
+            </motion.div>
           )}
-        </motion.div>
+        </AnimatePresence>
 
-        <div className="gb-side">
-          <h2 className="gb-title">Gambit</h2>
-          <p className="gb-line">
-            The real bot, running in your browser: the same 2M-parameter network and alpha-beta search that play on Lichess.
-          </p>
-          <p className={`gb-status${phase === 'over' ? ' is-over' : ''}`} aria-live="polite">
-            {status}
-          </p>
-          {thought && phase !== 'over' && <p className="gb-thought">Last move it {readout(thought)}.</p>}
-          <div className="gb-actions">
-            <button type="button" className="gb-btn" onClick={() => fresh(you)}>
-              New game
-            </button>
-            <button type="button" className="gb-btn" onClick={() => fresh(you === 'w' ? 'b' : 'w')}>
-              Play {you === 'w' ? 'Black' : 'White'}
-            </button>
-          </div>
-          <a className="gb-link" href="https://github.com/Nathan-W123/Gambit" target="_blank" rel="noreferrer">
-            How it works ↗
-          </a>
-        </div>
-
-        <button type="button" className="gb-close" onClick={onClose} aria-label="Close the board">
-          ×
-        </button>
+        {!ready && !failed && (
+          <span className="gbp-loading" aria-hidden="true">
+            <span style={{ transform: `scaleX(${progress})` }} />
+          </span>
+        )}
       </div>
-    </motion.div>
+
+      <div className="gbp-side">
+        <p className="gbp-kicker">Play it</p>
+        <p className={`gbp-status${phase === 'over' ? ' is-over' : ''}`} aria-live="polite">
+          {status}
+        </p>
+        <p className="gbp-thought">
+          {thought && phase !== 'over'
+            ? readout(thought)
+            : !ready && !failed
+              ? `The network is loading in your browser (${pct}). You can move already.`
+              : 'The real bot, running in your browser: the network and the search it plays Lichess with.'}
+        </p>
+        <div className="gbp-actions">
+          <button type="button" className="gbp-btn" onClick={() => fresh(you)}>
+            New game
+          </button>
+          <button type="button" className="gbp-btn" onClick={() => fresh(you === 'w' ? 'b' : 'w')}>
+            Play {you === 'w' ? 'Black' : 'White'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

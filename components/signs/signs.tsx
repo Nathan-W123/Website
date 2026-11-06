@@ -11,8 +11,9 @@ import { Landing } from './landing';
 import { About } from './about';
 import { Corner, type Side } from './corner';
 
-// the board, chess.js and the board component load only when someone flips the switch
-const GambitGame = lazy(() => import('./gambit/game').then((m) => ({ default: m.GambitGame })));
+// Gambit's project page opens on a live board; it, chess.js and the board
+// component load only when that page does
+const GambitBoard = lazy(() => import('./gambit/board').then((m) => ({ default: m.GambitBoard })));
 import { IndexCard, StickyBoard } from './notes';
 import { BrandIcon, ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
@@ -89,7 +90,6 @@ export default function Signs() {
   const reduce = useReducedMotion();
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
-  const [gambit, setGambit] = useState(false);
 
   const routeRef = useRef<Route>({ page: 'home' });
   const first = useRef(true);
@@ -158,19 +158,18 @@ export default function Signs() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (gambit) setGambit(false);
-        else if (lightbox) setLightbox(null);
+        if (lightbox) setLightbox(null);
         else if (project) setProject(null);
         else if (route.page !== 'home') window.history.back();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [gambit, lightbox, project, route]);
+  }, [lightbox, project, route]);
 
   return (
     <div className="sg-root">
-      <div className="sg-stage" inert={!!(project || lightbox || gambit)}>
+      <div className="sg-stage" inert={!!(project || lightbox)}>
       {/* Pages never print over each other. The old cross-fade eased out
           slowly while the new page came in fast, so the About text sat on top
           of the name and the fan for most of the swap. See pageMotion. */}
@@ -189,7 +188,7 @@ export default function Signs() {
           {plain(route) || <Scribble />}
           {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
           {route.page === 'home' && (
-            <Landing onOpenProject={setProject} onOpenArt={setLightbox} onSide={setSide} onPlayGambit={() => setGambit((on) => !on)} gambitOn={gambit} />
+            <Landing onOpenProject={setProject} onOpenArt={setLightbox} onSide={setSide} />
           )}
 
           {route.page === 'art' && !route.section && (
@@ -268,13 +267,6 @@ export default function Signs() {
 
       <AnimatePresence>{project && <ProjectView key={project.id} card={project} onClose={() => setProject(null)} />}</AnimatePresence>
 
-      <AnimatePresence>
-        {gambit && (
-          <Suspense key="gambit" fallback={null}>
-            <GambitGame onClose={() => setGambit(false)} />
-          </Suspense>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {lightbox && (
@@ -628,7 +620,11 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
   const [shown, setShown] = useState(0);
   const [expanded, setExpanded] = useState<number | null>(null);
   const page = card.study?.page;
-  const shots = card.images;
+  // Gambit's page leads with a board you can play rather than a picture; its
+  // thumbnail is the card's own board, and the pictures follow
+  const playable = card.id === 'gambit';
+  const shots = playable ? [{ src: `/tiles/${card.id}.webp`, caption: 'Play Gambit' }, ...card.images] : card.images;
+  const onBoard = playable && shown === 0;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -656,26 +652,48 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
       >
         <div className="pv-coverwrap">
-          <motion.button
-            type="button"
-            className="pv-shown"
-            layoutId={`card-${card.id}`}
-            onClick={() => setExpanded(shown)}
-            aria-label={`Expand: ${shots[shown].caption}`}
-          >
-            <AnimatePresence initial={false} mode="popLayout">
-              <motion.img
-                key={shots[shown].src}
-                src={base() + shots[shown].src}
-                alt={shots[shown].caption}
-                draggable={false}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-              />
-            </AnimatePresence>
-          </motion.button>
+          {playable ? (
+            <motion.div className={`pv-shown pv-shown--play${onBoard ? '' : ' is-picture'}`} layoutId={`card-${card.id}`}>
+              {/* the board stays mounted under the pictures, so a game survives a look at the photos */}
+              <div className="pv-play" hidden={!onBoard}>
+                <Suspense
+                  fallback={
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img className="pv-play-wait" src={base() + shots[0].src} alt="" draggable={false} />
+                  }
+                >
+                  <GambitBoard />
+                </Suspense>
+              </div>
+              {!onBoard && (
+                <button type="button" className="pv-shown-pic" onClick={() => setExpanded(shown)} aria-label={`Expand: ${shots[shown].caption}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img key={shots[shown].src} src={base() + shots[shown].src} alt={shots[shown].caption} draggable={false} />
+                </button>
+              )}
+            </motion.div>
+          ) : (
+            <motion.button
+              type="button"
+              className="pv-shown"
+              layoutId={`card-${card.id}`}
+              onClick={() => setExpanded(shown)}
+              aria-label={`Expand: ${shots[shown].caption}`}
+            >
+              <AnimatePresence initial={false} mode="popLayout">
+                <motion.img
+                  key={shots[shown].src}
+                  src={base() + shots[shown].src}
+                  alt={shots[shown].caption}
+                  draggable={false}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                />
+              </AnimatePresence>
+            </motion.button>
+          )}
           {shots.length > 1 && (
             <ul className="pv-strip">
               {shots.map((shot, i) => (
@@ -685,7 +703,7 @@ function ProjectView({ card, onClose }: { card: Card; onClose: () => void }) {
                     className={`pv-thumb${i === shown ? ' is-on' : ''}`}
                     aria-label={shot.caption}
                     aria-current={i === shown}
-                    onClick={() => (i === shown ? setExpanded(i) : setShown(i))}
+                    onClick={() => (i === shown ? !(playable && i === 0) && setExpanded(i) : setShown(i))}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={base() + shot.src} alt="" loading="lazy" draggable={false} />

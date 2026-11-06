@@ -67,8 +67,6 @@ function Tile({
   label,
   line,
   onOpen,
-  onPlay,
-  playing = false,
 }: {
   i: number;
   id: string;
@@ -76,9 +74,6 @@ function Tile({
   label: string;
   line?: string;
   onOpen: () => void;
-  /** only Gambit has one: a switch on the card that turns it into a board you can play */
-  onPlay?: () => void;
-  playing?: boolean;
 }) {
   const ref = useRef<HTMLLIElement>(null);
   // not `once`: it should lift every time it comes back onto the screen
@@ -93,7 +88,14 @@ function Tile({
       animate={reduce || seen ? rest : low}
       transition={{ duration: reduce ? 0.01 : 0.55, ease: [0.22, 1, 0.3, 1], delay: reduce ? 0 : (i % 3) * 0.08 }}
     >
-      <button type="button" onClick={onOpen} aria-label={`Open ${label}`}>
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`Open ${label}`}
+        // Gambit's page opens on a board you can play; start fetching it on the way in
+        onPointerEnter={id === 'gambit' ? () => void import('./gambit/board') : undefined}
+        onFocus={id === 'gambit' ? () => void import('./gambit/board') : undefined}
+      >
         {/* the same give the cards in the fan have: nudge it and it springs back.
             Only the picture moves — the name under it stays put. */}
         <motion.span
@@ -119,24 +121,6 @@ function Tile({
           </span>
         )}
       </button>
-      {onPlay && (
-        <button
-          type="button"
-          role="switch"
-          aria-checked={playing}
-          aria-label={`Play ${label}`}
-          title="Play me"
-          className={`hm-tile-play${playing ? ' is-on' : ''}`}
-          onClick={onPlay}
-          // start fetching the board while the pointer is still on its way
-          onPointerEnter={() => void import('./gambit/game')}
-          onFocus={() => void import('./gambit/game')}
-        >
-          <span className="hm-tile-play-knob" aria-hidden="true">
-            &#9822;
-          </span>
-        </button>
-      )}
     </motion.li>
   );
 }
@@ -145,11 +129,7 @@ export function Landing({
   onOpenProject,
   onOpenArt,
   onSide,
-  onPlayGambit,
-  gambitOn = false,
 }: {
-  onPlayGambit?: () => void;
-  gambitOn?: boolean;
   onOpenProject: (c: Card) => void;
   onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void;
   onSide: (s: Side) => void;
@@ -381,8 +361,6 @@ export function Landing({
                   label={c.title}
                   line={c.tag}
                   onOpen={() => onOpenProject(c)}
-                  onPlay={c.id === 'gambit' ? onPlayGambit : undefined}
-                  playing={c.id === 'gambit' && gambitOn}
                 />
               ))
             : ALL_ART.map((a, i) => (
