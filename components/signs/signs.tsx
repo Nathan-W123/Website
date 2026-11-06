@@ -159,9 +159,23 @@ export default function Signs() {
 
           {route.page === 'contact' && <Contact onBack={goHome} />}
 
-          {route.page === 'about' && <About onHome={goHome} side={side} />}
+          {route.page === 'about' && <About />}
         </motion.section>
       </AnimatePresence>
+
+      {/* The corner mark lives out here, above the page swap: the pages
+          themselves translate and scale on the way in and out, and a fixed
+          element inside one of those goes with it, which is what made the
+          mark jump between home and About. Out here it only ever spins. */}
+      {(route.page === 'home' || route.page === 'about') && (
+        <Corner
+          side={side}
+          href={route.page === 'about' ? '#/' : '#/about'}
+          label={route.page === 'about' ? 'Back home' : 'About me'}
+          say="Click me!"
+          turn={route.page}
+        />
+      )}
 
       <NameTag page={plain(route) ? 'art' : route.page} onHome={goHome} />
 

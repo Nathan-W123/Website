@@ -4,7 +4,6 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/rea
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ART, CONTACTS, PROJECT_GROUPS, WORKED_WITH, type ArtItem, type Card } from './content';
 import { BrandIcon } from './icons';
-import { Corner } from './corner';
 
 /**
  * Home: the name set large, four pieces of work fanned out under it, and a
@@ -49,19 +48,42 @@ const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
 const TOP = SEATS.reduce((best, seat, i) => (seat.z > SEATS[best].z ? i : best), 0);
 
 /**
- * Two bits of confetti off the outer edge of whichever word just won: away to
- * the left for Engineer, away to the right for Artist. `k` separates the pair
- * so they do not fly the same line.
+ * Confetti off the outer edge of whichever word just won: away to the left for
+ * Engineer, away to the right for Artist. Every piece gets its own throw, its
+ * own spin and its own silhouette — nothing here is a straight rectangle, and
+ * each one flips edge-on as it tumbles, the way a scrap of paper does.
  */
-const popsFor = (s: Side) => {
-  const out = s === 'engineering' ? -1 : 1;
-  return [0, 1].map((k) => ({
-    at: s === 'engineering' ? '1%' : '99%',
-    dx: out * (62 + k * 26),
-    dy: -38 - k * 22,
-    r: out * (130 + k * 70),
-  }));
+const PIECES = [
+  { shape: 'sliver', speed: 1.0, lift: 1.0, spin: 1.3, flip: 2.2, delay: 0, life: 0.95, tone: 0 },
+  { shape: 'leaf', speed: 0.76, lift: 1.26, spin: -1.6, flip: 1.3, delay: 0.05, life: 1.08, tone: 1 },
+  { shape: 'dot', speed: 1.28, lift: 0.74, spin: 0.7, flip: 0, delay: 0.02, life: 0.86, tone: 2 },
+  { shape: 'arc', speed: 0.6, lift: 1.46, spin: 2.0, flip: 0.9, delay: 0.09, life: 1.12, tone: 1 },
+  { shape: 'sliver', speed: 1.4, lift: 1.02, spin: -2.3, flip: 2.9, delay: 0.07, life: 1.0, tone: 2 },
+  { shape: 'leaf', speed: 0.94, lift: 1.6, spin: 1.5, flip: 1.7, delay: 0.13, life: 1.16, tone: 0 },
+];
+
+/**
+ * One throw, sampled across the flight. The old burst was four hand-placed
+ * corners with an ease between each, which kicked; this is a plain ballistic
+ * arc read off at ten points and played linearly, so the curve itself carries
+ * the timing. Every distance is a share of the 1em carrier, so the burst
+ * scales with the word it comes off.
+ */
+const STEPS = 10;
+const throwOf = (p: (typeof PIECES)[number], out: number) => {
+  const t = Array.from({ length: STEPS }, (_, i) => i / (STEPS - 1));
+  const pct = (v: number) => `${Math.round(v * 1000) / 10}%`;
+  return {
+    times: t,
+    x: t.map((u) => pct(out * 1.25 * p.speed * p.life * u * (1 - 0.22 * u))),
+    y: t.map((u) => pct(-2.1 * p.lift * p.life * u + 2.3 * (p.life * u) ** 2)),
+    rotate: t.map((u) => out * p.spin * 300 * u),
+    rotateY: t.map((u) => p.flip * 360 * u),
+    opacity: t.map((u) => (u < 0.08 ? u / 0.08 : u > 0.72 ? Math.max(0, (1 - u) / 0.28) : 1)),
+    scale: t.map((u) => 0.55 + 0.45 * Math.min(1, u / 0.14)),
+  };
 };
+
 const instagram = CONTACTS.find((c) => c.id === 'instagram');
 /** The two worth following on the engineering side, shown as marks rather than words. */
 const FOLLOW = CONTACTS.filter((c) => c.id === 'linkedin' || c.id === 'github');
@@ -192,15 +214,6 @@ export function Landing({
 
   return (
     <div className="hm">
-      {/* The same switch, pinned to the corner, so you can change sides from
-          anywhere down the page instead of scrolling back up to the pill. */}
-      <Corner
-        side={side}
-        href="#/about"
-        label="About me"
-        say={side === 'engineering' ? 'My nerdy side' : 'My artsy side'}
-      />
-
       <header className="hm-hero">
 
         {/* the name is the way in to About: it flies up and becomes that page's
@@ -304,23 +317,27 @@ export function Landing({
                 )}
                 {side === s2 &&
                   !reduce &&
-                  popsFor(s2).map((c, k) => (
-                    <motion.span
-                      key={`${side}-${k}`}
-                      className="hm-role-pop"
-                      style={{ left: c.at }}
-                      aria-hidden="true"
-                      initial={{ opacity: 0, x: 0, y: 0, rotate: 0, scale: 0.6 }}
-                      animate={{
-                        opacity: [0, 1, 1, 0],
-                        x: [0, c.dx * 0.45, c.dx * 0.8, c.dx],
-                        y: [0, c.dy, c.dy * 0.6, 18],
-                        rotate: [0, c.r * 0.35, c.r * 0.7, c.r],
-                        scale: [0.6, 1, 1, 0.85],
-                      }}
-                      transition={{ duration: 0.85, times: [0, 0.22, 0.6, 1], ease: 'easeOut' }}
-                    />
-                  ))}
+                  PIECES.map((p, k) => {
+                    const a = throwOf(p, s2 === 'engineering' ? -1 : 1);
+                    return (
+                      <motion.span
+                        key={`${side}-${k}`}
+                        className="hm-role-pop"
+                        style={{ left: s2 === 'engineering' ? '0%' : '100%' }}
+                        aria-hidden="true"
+                        initial={{ opacity: 0, x: 0, y: 0 }}
+                        animate={{ opacity: a.opacity, x: a.x, y: a.y }}
+                        transition={{ duration: p.life, times: a.times, ease: 'linear', delay: p.delay }}
+                      >
+                        <motion.span
+                          className={`hm-role-bit is-${p.shape} tone-${p.tone}`}
+                          initial={{ rotate: 0, rotateY: 0, scale: 0.55 }}
+                          animate={{ rotate: a.rotate, rotateY: a.rotateY, scale: a.scale }}
+                          transition={{ duration: p.life, times: a.times, ease: 'linear', delay: p.delay }}
+                        />
+                      </motion.span>
+                    );
+                  })}
               </span>
             </Fragment>
           ))}
@@ -375,8 +392,8 @@ export function Landing({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reduce ? 0.01 : 0.32, ease: 'easeOut' }}
       >
-        <h3 className="hm-work-title">Selected work</h3>
-        <p className="hm-work-sub">Scroll and stay awhile</p>
+        <h3 className="hm-work-title">{side === 'engineering' ? 'Selected projects' : 'Selected work'}</h3>
+        <p className="hm-work-sub">{side === 'engineering' ? 'A look into my mind' : 'Scroll and stay awhile'}</p>
         <ul className="hm-grid">
           {side === 'engineering'
             ? ALL_PROJECTS.map((c, i) => (

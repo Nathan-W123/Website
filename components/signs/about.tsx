@@ -1,40 +1,63 @@
 'use client';
 
+import { useReducedMotion } from 'motion/react';
 import { ABOUT, CONTACTS } from './content';
-import { Corner, type Side } from './corner';
 import { BrandIcon } from './icons';
 
+const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
+
 /**
- * About: a few paragraphs at a size you can actually read, and the ways to
- * reach me under them. No heading and nothing to scroll — it is five sentences.
+ * About: a few paragraphs at a size you can actually read, held to the left of
+ * the page, with the morphing ribbon on the right. No heading and nothing to
+ * scroll — it is five sentences. The corner mark belongs to the route shell,
+ * which is what keeps it still on the way in from the home page.
+ *
+ * The ribbon is Nathan's own animation, frame for frame: the 160-frame GIF
+ * re-encoded as a loop (8 s at 20 fps, same as the original) because the GIF
+ * itself is 10 MB, with its dark ground taken to white and its lines to the
+ * page's soft grey (work/ref/ribbon-recolour.mjs). With reduced motion it
+ * holds on the first frame.
  */
-export function About({ onHome, side }: { onHome: () => void; side: Side }) {
+export function About() {
+  const reduce = useReducedMotion();
   return (
     <div className="hm ab2">
-      <Corner side={side} onClick={onHome} label="Back home" say="Back home" />
-
       <div className="ab2-body">
-        {ABOUT.paragraphs.map((p) => (
-          <p key={p} className="ab2-line">
-            {p}
-          </p>
-        ))}
-        {/* out on the page: a row you have to keep hovered is a row you cannot click */}
-        <p className="ab2-line ab2-socials">
-          Find me on
-          {CONTACTS.map((c) => (
-            <a
-              key={c.id}
-              className="ab2-chip"
-              href={c.href}
-              target={c.href.startsWith('mailto:') ? undefined : '_blank'}
-              rel="noreferrer"
-              aria-label={c.label}
-            >
-              <BrandIcon id={c.id} size={23} />
-            </a>
+        <div className="ab2-col">
+          {ABOUT.paragraphs.map((p) => (
+            <p key={p} className="ab2-line">
+              {p}
+            </p>
           ))}
-        </p>
+          {/* out on the page: a row you have to keep hovered is a row you cannot click */}
+          <p className="ab2-line ab2-socials">
+            Find me on
+            {CONTACTS.map((c) => (
+              <a
+                key={c.id}
+                className="ab2-chip"
+                href={c.href}
+                target={c.href.startsWith('mailto:') ? undefined : '_blank'}
+                rel="noreferrer"
+                aria-label={c.label}
+              >
+                <BrandIcon id={c.id} size={23} />
+              </a>
+            ))}
+          </p>
+        </div>
+
+        <div className="ab2-art" aria-hidden="true">
+          {reduce ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="ab2-art-media" src={`${base()}/about/ribbon.webp`} alt="" />
+          ) : (
+            <video className="ab2-art-media" autoPlay muted loop playsInline preload="auto" poster={`${base()}/about/ribbon.webp`}>
+              <source src={`${base()}/about/ribbon.webm`} type="video/webm" />
+              <source src={`${base()}/about/ribbon.mp4`} type="video/mp4" />
+            </video>
+          )}
+        </div>
       </div>
     </div>
   );

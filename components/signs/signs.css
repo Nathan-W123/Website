@@ -790,7 +790,11 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-bottom: clamp(20px, 4vh, 48px);
+  /* The marks row at the foot of the hero is held open even when it is empty,
+     so the engineering side was centring 108px of nothing and carrying the
+     name and the fan half that above the middle. Balance it at the top. */
+  padding-top: min(164px, 18vh);
+  padding-bottom: 0;
 }
 .hm-meta {
   display: flex;
@@ -891,14 +895,39 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   border-radius: 999px;
   background: var(--role-bar);
 }
+/* the carrier is a 1em square, so every distance in the throw is a share of
+   the word's own size and the burst scales with the type */
 .hm-role-pop {
   position: absolute;
-  top: 0.16em;
-  width: 0.13em;
-  height: 0.19em;
-  border-radius: 0.03em;
-  background: var(--role-bar);
+  top: 0.24em;
+  width: 1em;
+  height: 1em;
+  margin-left: -0.5em;
+  display: grid;
+  place-items: center;
+  perspective: 300px;
   pointer-events: none;
+}
+/* the piece itself: a rounded grain, a petal, a dot or an open arc — and it
+   turns edge-on as it tumbles, which is what a scrap of paper does */
+.hm-role-bit {
+  display: block;
+  background: currentColor;
+  color: var(--role-bar);
+}
+.hm-role-bit.tone-1 { color: #d6d6d6; }
+.hm-role-bit.tone-2 { color: #a8a8a8; }
+.hm-role-bit.is-sliver { width: 0.17em; height: 0.055em; border-radius: 999px; }
+.hm-role-bit.is-leaf { width: 0.12em; height: 0.12em; border-radius: 72% 28% 70% 30% / 30% 68% 32% 70%; }
+.hm-role-bit.is-dot { width: 0.075em; height: 0.075em; border-radius: 50%; }
+.hm-role-bit.is-arc {
+  width: 0.17em;
+  height: 0.17em;
+  background: none;
+  border: 0.032em solid currentColor;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
 }
 
 .hm-role-and { font-size: 0.56em; }
@@ -1072,19 +1101,54 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
    Paragraphs at a size you can read, left on the page, all of them in ink.
    No heading, no scroll-driven highlight: the writing is short enough that
    neither earned its keep. */
-.ab2 { text-align: left; display: flex; flex-direction: column; min-height: 100svh; }
+/* no bottom padding here: .hm keeps 120px for the work below it, and on a
+   page with nothing below it that only pushes the words off centre */
+/* the cream is painted here as well as on the page: .hm is its own stacking
+   context, and the ribbon's multiply blend only sees what is painted inside it */
+.ab2 { text-align: left; display: flex; flex-direction: column; min-height: 100svh; padding-bottom: 0; background: var(--cream); }
 .ab2-back { margin: clamp(22px, 4vh, 44px) 0 0; }
 /* centred in what is left of the screen, and wide enough to carry type you can
    read across a room */
 .ab2-body {
-  display: flex;
+  display: grid;
   flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(16px, 2.4vh, 28px);
-  width: min(54ch, 100%);
-  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+  align-items: center;
+  gap: clamp(26px, 5vw, 76px);
+  width: 100%;
   padding: clamp(18px, 3.4vh, 40px) 0 clamp(24px, 4.6vh, 54px);
+}
+.ab2-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vh, 28px);
+  max-width: 54ch;
+}
+/* the ribbon: square, close to the 512px it was made at, and sized off the
+   column rather than the viewport so it never crowds the words */
+.ab2-art {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1;
+  justify-self: center;
+}
+/* grey lines on white, multiplied onto the cream: white times cream is the
+   cream itself, so the clip has no edge and the lines take the page's warmth */
+.ab2-art-media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+}
+@media (max-width: 880px) {
+  /* stacked, the column runs taller than the screen and starts at the top,
+     so it has to clear the corner mark pinned there */
+  .ab2-body { grid-template-columns: minmax(0, 1fr); gap: clamp(16px, 3.4vh, 34px); padding-top: 84px; }
+  .ab2-art { max-width: 300px; }
 }
 .ab2-line {
   margin: 0;
