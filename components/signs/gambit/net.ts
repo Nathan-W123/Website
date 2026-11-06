@@ -13,10 +13,12 @@ const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 let loading: Promise<Evaluate> | null = null;
 let listeners: ((f: number) => void)[] = [];
 
-async function fetchAll(urls: string[], onProgress: (f: number) => void): Promise<ArrayBuffer[]> {
+async function fetchAll(urls: string[], sizes: Record<string, number>, onProgress: (f: number) => void): Promise<ArrayBuffer[]> {
   const responses = await Promise.all(urls.map((u) => fetch(u)));
   for (const [i, r] of responses.entries()) if (!r.ok || !r.body) throw new Error(`could not load ${urls[i]} (${r.status})`);
-  const totals = responses.map((r) => Number(r.headers.get('content-length')) || 0);
+  // the true sizes from the build, since a gzipped response's Content-Length is
+  // the compressed size while the stream below counts the inflated bytes
+  const totals = responses.map((r, i) => sizes[urls[i].split('/').pop() as string] || Number(r.headers.get('content-length')) || 0);
   const known = totals.every((t) => t > 0);
   const total = totals.reduce((a, b) => a + b, 0);
   const got = responses.map(() => 0);
@@ -29,8 +31,7 @@ async function fetchAll(urls: string[], onProgress: (f: number) => void): Promis
         if (done) break;
         chunks.push(value);
         got[i] += value.length;
-        // a compressed response reports its compressed length but streams the
-        // inflated bytes, so the ratio can pass 1; it never reads past full
+        // and if a total was only a compressed length after all, never past full
         if (known) onProgress(Math.min(1, got.reduce((a, b) => a + b, 0) / total));
       }
       const out = new Uint8Array(got[i]);
@@ -63,7 +64,10 @@ export function loadGambit(onProgress: (f: number) => void): Promise<Evaluate> {
   listeners.push(onProgress);
   if (!loading) {
     loading = (async () => {
-      const [wasm, model] = await fetchAll([`${base()}/gambit/ort-wasm-simd-threaded.wasm`, `${base()}/gambit/gambit.onnx`], (f) =>
+      const sizes: Record<string, number> = await fetch(`${base()}/gambit/sizes.json`)
+        .then((r) => (r.ok ? r.json() : {}))
+        .catch(() => ({}));
+      const [wasm, model] = await fetchAll([`${base()}/gambit/ort-wasm-simd-threaded.wasm`, `${base()}/gambit/gambit.onnx`], sizes, (f) =>
         listeners.forEach((l) => l(f)),
       );
       const ort = await import('onnxruntime-web/wasm');
