@@ -46,6 +46,13 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: '/projects/formulate/3.webp', caption: 'Learned boiling point on 2,050 held-out compounds' },
     { src: '/projects/formulate/4.webp', caption: 'Expert uncertainty calibration vs 68% honesty line' },
   ],
+  "olson": [
+    { src: "/projects/olson/1.webp", caption: "The site: Olson Hall with the new north entry, bike path and bike parking" },
+    { src: "/projects/olson/2.webp", caption: "The north face, glazed, with the racks along the new path" },
+    { src: "/projects/olson/3.webp", caption: "The other approach, showing the entry against the existing building" },
+    { src: "/projects/olson/4.webp", caption: "Structural calculations: assumptions, wind, seismic and the glass check" },
+    { src: "/projects/olson/5.webp", caption: "Mullions, head beam, anchors, drift clearance and the results table" },
+  ],
   "high-risk-roads": [
     { src: "/projects/high-risk-roads/1.webp", caption: "The 11 flagged corridors across Sacramento" },
     { src: "/projects/high-risk-roads/2.webp", caption: "Every 2023 crash on the flagged roads" },

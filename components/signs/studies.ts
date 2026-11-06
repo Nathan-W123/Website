@@ -252,6 +252,49 @@ export const STUDIES: Record<string, Study> = {
       "PySCF / xtb / ASE / OpenMM",
     ],
   },
+  "olson": {
+    "brief": "A redesign of the north entry at UC Davis: a 55-ft steel-and-glass curtain wall carrying three automatic sliding doors, modelled in Fusion and then checked element by element against the 2025 CBC.",
+    "page": {
+      "body": [
+        "Olson Hall's north entry is a bank of doors you have to pull. The redesign replaces it with a 55-ft steel-and-glass curtain wall on three automatic sliding doors, and lays a paved bike path with parking along the north face.",
+        "Only the elements the redesign changes are checked, which is what the existing-building code asks for. Wind at 100 mph in Exposure C governs: −21.7 psf against +19.8, where the seismic demand on the same wall is 3.7 psf. The mullions, the head beam, the bracket anchors and the glass are all sized to it.",
+        "The first glass selection failed. Quarter-inch lites deflect 0.89 in against a 0.75-in limit, so the panes are 5/16 in and come in at 0.37. The steel is nowhere near its limits — the worst ratio in the frame is 0.29 — and the existing lateral system picks up 0.5% more demand, well under the 10% that would force a seismic upgrade."
+      ],
+      "choices": [
+        "Only the changed elements are checked, as the existing-building code allows.",
+        "Wind governs over seismic here, so the wall is sized to −21.7 psf and the seismic case is reported and set aside.",
+        "The bike path is sized by the Caltrans gravel-equivalent method: 3 in of HMA over 9 in of Class 2 base."
+      ]
+    },
+    "problem": "Olson Hall's north entry is a bank of manual swing doors, and the approach to it has no bike parking. The redesign opens it up with a glazed curtain wall and automatic sliding doors, and paves a bike path with racks along the north face. The question the calculations answer is narrow: does anything the redesign adds or changes need more than it has, and does any of it push the existing building past a code threshold?",
+    "built": "A Fusion model of the building, the new north lobby curtain wall and the reworked site, and a set of structural calculations covering only the changed elements: the 55.35 ft × 10.83 ft steel-and-glass wall with three automatic sliding doors, the removed door pairs in Halls 0100 and 0166, the 1-hour rated glass doors at stair 1ST2, the lobby sprinklers, and the bike path with its paved parking.",
+    "how": [
+      "Loads: 2025 CBC with ASCE/SEI 7-22, Risk Category III (Ie = 1.25). Wind V = 100 mph, Exposure C, Kh = 0.952 at 26.5 ft, giving −21.7 and +19.8 psf on the wall and −23.3 / +21.4 on a door leaf. Seismic is Site Class D, SDS = 0.86, SDC D, and works out at 3.7 psf, so wind governs.",
+      "Glass: the widest lite is 5.55 × 10.83 ft, fully tempered, checked by Roark Table 11.4 with all edges simply supported. At 1/4 in the stress is fine (2,509 psi against 11,200) but it deflects 0.89 in against a 0.75-in limit. At 5/16 in it is 1,411 psi and 0.37 in.",
+      "Frame: HSS 4×4×1/4 mullions at 0.10 bending and 0.14 deflection; a W8×10 head beam bent about its weak axis at 0.29 and 0.53; adhesive anchors at each column bracket at 0.29. Drift clearance is set against ASCE 7-22 §13.5.9, needing 0.60 in at the widest lite.",
+      "Site: the bike path is sized by the Caltrans gravel-equivalent method at TI 5.0 and R 10, coming out at 3 in of HMA over 9 in of Class 2 base. The parking strip slab is checked as a Westergaard edge load at 0.41, and the rack anchors at 0.42."
+    ],
+    "contribution": "A UWP 102E team project at UC Davis. The Fusion model and the structural calculations for the changed elements are the part written up here.",
+    "challenges": [
+      "The glass failed on the check that is easy to skip. Quarter-inch tempered lites are well inside their stress limit at the widest opening and still deflect 0.89 in, past the 0.75-in guide. Going to 5/16 in fixes it at 0.37, and the frame around it did not need to change.",
+      "Touching an existing building can trigger a seismic upgrade. Under CEBC §805.3 and §317.3.1 the trigger is a 10% increase in demand; the redesign adds 8.5 kips of wall against a 5,610-kip half-weight, which works out at 0.08% by weight and 0.5% by base shear. No upgrade."
+    ],
+    "results": [
+      "Glass: 5/16-in panes at 0.37 in deflection, against 0.89 in for the 1/4-in lites that were checked first. Edge clearance needs 0.60 in, so the spec is 5/8 in.",
+      "Steel and anchors: mullions 0.10 bending and 0.14 deflection, head beam 0.29 and 0.53, column bracket anchors 0.29, sprinkler hangers 400 lb, parking slab 0.41, rack anchors 0.42.",
+      "Existing building: +0.5% lateral demand against a 10% trigger, so no upgrade to the existing system is required."
+    ],
+    "tech": [
+      "Autodesk Fusion",
+      "2025 CBC",
+      "ASCE/SEI 7-22",
+      "AISC 360-22",
+      "ACI 318-19",
+      "2025 CEBC",
+      "NFPA 13",
+      "Caltrans gravel-equivalent"
+    ]
+  },
   "high-risk-roads": {
     page: {"body":["Which Sacramento streets are actually dangerous, as opposed to busy or long? Raw crash counts reward high-volume, high-mileage roads, which is a different question.","2023 collision records reduce to a crash rate per road using traffic volume and road length, and each rate is compared against a critical rate at 95 per cent confidence.","Of the fourteen roads that passed the thirty-crash screen, eleven sit above their critical rate and are flagged for engineering attention. Howe, Watt and Fulton fall below it."],"choices":["Freeways classified out by hand, so a road-design problem is not read off a highway.","A rate against a critical rate, so exposure is not mistaken for risk.","Road names were spelled three ways across three datasets, and joins dropped rows silently."]},
     brief: "Reduces 2023 Sacramento collision records to a crash rate per road and compares each one to a critical rate at 95 per cent confidence.",

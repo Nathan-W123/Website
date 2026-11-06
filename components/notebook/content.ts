@@ -214,6 +214,18 @@ export const CHAPTERS: Chapter[] = [
         href: 'https://github.com/Nathan-W123/Kumi',
       }),
       project('make', 'fluid', {
+        id: 'olson',
+        name: 'Olson Hall Entry',
+        tagline: 'A redesign of the north entry at UC Davis: a 55-ft steel-and-glass curtain wall on three automatic sliding doors, modelled and then checked element by element.',
+        stack: 'Fusion 360 · ASCE 7-22 · AISC 360-22 · ACI 318-19 · 2025 CBC',
+        notes: [
+          'Curtain wall, head beam, bracket anchors and glass sized against 100 mph wind in Exposure C',
+          'Quarter-inch glass fails deflection at 0.89 in; the panes are 5/16 in',
+          'Existing lateral system gains 0.5% demand, under the 10% that would trigger a seismic upgrade',
+        ],
+        href: 'https://a360.co/4A7rfNE',
+      }),
+      project('make', 'fluid', {
         id: 'high-risk-roads',
         name: 'High Risk Roads',
         tagline: 'Which Sacramento streets are dangerous once traffic and length are accounted for: crash rates against a 95% critical rate, mapped.',

@@ -89,6 +89,7 @@ const TAGS: Record<string, string> = {
   formulate: 'Formulation search',
   'black-hole': 'Relativistic ray tracer',
   'hf-scf': 'Hartree-Fock engine',
+  olson: 'Curtain wall redesign',
   'high-risk-roads': 'Traffic safety analysis',
 };
 
@@ -109,8 +110,8 @@ export const PROJECT_GROUPS: { id: string; label: string; cards: Card[] }[] = [
     cards: pick(['ignis', 'sparlab', 'aether6', 'quantize', 'aero', 'formulate', 'black-hole', 'hf-scf']).map(toCard),
   },
   {
-    id: 'gis',
-    label: 'GIS',
-    cards: pick(['high-risk-roads']).map(toCard),
+    id: 'civil',
+    label: 'Civil',
+    cards: pick(['olson', 'high-risk-roads']).map(toCard),
   },
 ];
