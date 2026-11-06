@@ -39,3 +39,6 @@ next-env.d.ts
 /sequence-work/
 /tsconfig.tsbuildinfo
 /.claude/
+
+# copied from node_modules at build time (scripts/copy-ort-wasm.mjs)
+public/gambit/ort-wasm-simd-threaded.wasm

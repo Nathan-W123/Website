@@ -21,6 +21,49 @@ export type Study = {
 };
 
 export const STUDIES: Record<string, Study> = {
+  "gambit": {
+    "page": {
+      "body": [
+        "Can a small network learn bullet chess from strong human games, and move fast enough for a 1+1 clock? Gambit is a 6x128 residual network trained on 5M positions from Lichess bullet games where both players were rated 2400+, and it plays over the Lichess Bot API.",
+        "The net predicts a distribution over 4,672 moves and the game's result. On 100,000 held-out positions it plays the human's move 48.2% of the time; Maia, the published reference for this approach, tops out near 50-55%. Illegal moves are masked before the softmax, so it cannot play one.",
+        "On instinct alone it hangs pieces to any two-move tactic, so an alpha-beta search looks at the policy's top few moves per ply and scores the leaves with the value head. Over 9 colour-reversed games at 600 ms a move, search beat the raw policy +8 =1 -0."
+      ],
+      "choices": [
+        "The board is always shown from the mover's side, which halves what the net has to learn.",
+        "Search buys depth by giving up width: the policy picks the 10, 6, 4, 3, 2 moves worth searching per ply.",
+        "A frontier node's children are evaluated in one batch, which is what makes the search affordable at all."
+      ]
+    },
+    "brief": "A neural network that plays bullet chess on Lichess: a 2M-parameter policy and value net trained on 5M positions from 2400+ rated games, with an alpha-beta search on top.",
+    "problem": "Can a network small enough to answer in milliseconds on a laptop CPU learn to play bullet chess from strong human games, and play it on a real clock? A 1+1 game leaves roughly 600 ms a move, and everything, search included, has to fit inside that.",
+    "built": "A data pipeline that streams Lichess database archives and keeps only bullet games with both players 2400+; a policy and value residual network and its trainer; a policy-guided alpha-beta search; an ONNX export for faster inference; and a bot that plays over the Lichess Bot API.",
+    "how": [
+      "Encoding: 18 planes of 8x8 from the mover's point of view (12 piece planes, 4 castling, en passant and the halfmove clock). Moves use the AlphaZero 73x64 = 4,672 scheme, indexed plane-major so the policy head is a 1x1 convolution with no dense layer.",
+      "Network: a 6-block, 128-channel residual CNN with 2,017,498 parameters, a policy head of 4,672 logits and a tanh value head.",
+      "Training: two epochs over 5M positions from the January 2024 Lichess database, bullet games with both players rated 2400+.",
+      "Search: iterative-deepening alpha-beta with a transposition table, widths of 10/6/4/3/2 moves per ply taken from the policy, frontier children evaluated in one batch, and two-fold repetition scored as a draw. Deliberately no quiescence search.",
+      "Inference: exported to ONNX, at 1.02 ms a position against 2.93 ms in torch, which takes search from depth 2 to depth 3 in 600 ms."
+    ],
+    "contribution": "Built end to end: data ingest, encoding, the network and its training, the search, the ONNX path and the Lichess bot.",
+    "challenges": [
+      "The raw policy hangs pieces to any two-move tactic. Search fixes that, but at shallow depth it also plays quiet openings the policy rates near zero, such as d3, b3 and h4, because the value head was trained on game results.",
+      "The value head explains only 13% of the variance in game results (value loss 0.779 against a predict-zero baseline of 0.894), close to the ceiling for that label: a result says who blundered later, not who stands better now."
+    ],
+    "results": [
+      "48.2% top-1 move agreement on 100,000 held-out positions after two epochs, up from 46.2% after one. Random over about 30 legal moves would be about 3%.",
+      "Openings are human: from the start e4 36%, d4 29%, Nf3 13%; after 1.e4 it answers c5 28%, e5 14%, e6 13%.",
+      "Simple tactics 4 of 4 as first choice, including mate in one at 18%.",
+      "Against engines rated 2200-3000 it has yet to score."
+    ],
+    "tech": [
+      "Python",
+      "PyTorch",
+      "python-chess",
+      "ONNX Runtime",
+      "Lichess Bot API",
+      "NumPy"
+    ]
+  },
   "siege": {
     page: {"body":["Can a policy learn Clash Royale from what a human player can see — which card, where, every half second, on an elixir budget? There was no simulator to train in, so the game had to be built first.","An 18x32 arena steps every 0.1 s and is deterministic given a seed. The policy reads a ten-channel grid and its hand, then picks a card and one of 144 cells, both masked for legality. PPO trains it against a league of its own past checkpoints.","On the live-legal observation tier it wins 95 to 100 per cent against five scripted archetype bots over 100 matches each, up from 38.5 per cent against the push bot earlier in the same run."],"choices":["Three observation tiers, so the live-legal one can be measured honestly.","Five scripted bots frozen byte-for-byte, so per-opponent history stays comparable.","The targeting bug that mattered was found by differential testing, not by unit tests."]},
     brief: "A Clash Royale battle simulator with 180 cards, a PPO self-play trainer, and a WebGL viewer that shows the policy network firing live.",

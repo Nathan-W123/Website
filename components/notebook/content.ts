@@ -192,6 +192,18 @@ export const CHAPTERS: Chapter[] = [
         notes: ["A C++ forming solver: moving rigid tools, frictional contact, Hill48 / Chaboche plasticity", "ML surrogates with uncertainty, an out-of-distribution check and a transfer model", "37 % less shape error than no correction, in one forming run instead of two"],
         href: "https://github.com/Nathan-W123/springback-precomp",
       }),
+      project('learn', 'umber', {
+        id: 'gambit',
+        name: 'Gambit',
+        tagline: 'A neural network that plays bullet chess on Lichess: a policy and value net trained on 5M positions from 2400+ rated games, with an alpha-beta search on top.',
+        stack: 'Python · PyTorch · python-chess · ONNX Runtime · Lichess Bot API',
+        notes: [
+          'A 6x128 residual policy/value net, 2.0M parameters, AlphaZero move encoding',
+          '48.2 % top-1 agreement with 2400+ players on 100,000 held-out positions',
+          'Alpha-beta over the net beat the raw policy +8 =1 -0 at 600 ms a move',
+        ],
+        href: 'https://github.com/Nathan-W123/Gambit',
+      }),
     ],
   },
   {

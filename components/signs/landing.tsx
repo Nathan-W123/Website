@@ -67,6 +67,8 @@ function Tile({
   label,
   line,
   onOpen,
+  onPlay,
+  playing = false,
 }: {
   i: number;
   id: string;
@@ -74,6 +76,9 @@ function Tile({
   label: string;
   line?: string;
   onOpen: () => void;
+  /** only Gambit has one: a switch on the card that turns it into a board you can play */
+  onPlay?: () => void;
+  playing?: boolean;
 }) {
   const ref = useRef<HTMLLIElement>(null);
   // not `once`: it should lift every time it comes back onto the screen
@@ -114,6 +119,24 @@ function Tile({
           </span>
         )}
       </button>
+      {onPlay && (
+        <button
+          type="button"
+          role="switch"
+          aria-checked={playing}
+          aria-label={`Play ${label}`}
+          title="Play me"
+          className={`hm-tile-play${playing ? ' is-on' : ''}`}
+          onClick={onPlay}
+          // start fetching the board while the pointer is still on its way
+          onPointerEnter={() => void import('./gambit/game')}
+          onFocus={() => void import('./gambit/game')}
+        >
+          <span className="hm-tile-play-knob" aria-hidden="true">
+            &#9822;
+          </span>
+        </button>
+      )}
     </motion.li>
   );
 }
@@ -122,7 +145,11 @@ export function Landing({
   onOpenProject,
   onOpenArt,
   onSide,
+  onPlayGambit,
+  gambitOn = false,
 }: {
+  onPlayGambit?: () => void;
+  gambitOn?: boolean;
   onOpenProject: (c: Card) => void;
   onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void;
   onSide: (s: Side) => void;
@@ -346,7 +373,17 @@ export function Landing({
           {side === 'engineering'
             ? ALL_PROJECTS.map((c, i) => (
                 /* the square tile, not the wide figure the case study uses */
-                <Tile key={c.id} i={i} id={c.id} image={`/tiles/${c.id}.webp`} label={c.title} line={c.tag} onOpen={() => onOpenProject(c)} />
+                <Tile
+                  key={c.id}
+                  i={i}
+                  id={c.id}
+                  image={`/tiles/${c.id}.webp`}
+                  label={c.title}
+                  line={c.tag}
+                  onOpen={() => onOpenProject(c)}
+                  onPlay={c.id === 'gambit' ? onPlayGambit : undefined}
+                  playing={c.id === 'gambit' && gambitOn}
+                />
               ))
             : ALL_ART.map((a, i) => (
                 <Tile

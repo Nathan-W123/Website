@@ -39,7 +39,7 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": [
+  "exclude": ["work", 
     "node_modules"
   ]
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
 import { ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } from './content';
@@ -10,6 +10,9 @@ import { HangingSign } from './hanging';
 import { Landing } from './landing';
 import { About } from './about';
 import { Corner, type Side } from './corner';
+
+// the board, chess.js and the board component load only when someone flips the switch
+const GambitGame = lazy(() => import('./gambit/game').then((m) => ({ default: m.GambitGame })));
 import { IndexCard, StickyBoard } from './notes';
 import { BrandIcon, ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
@@ -86,6 +89,7 @@ export default function Signs() {
   const reduce = useReducedMotion();
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
+  const [gambit, setGambit] = useState(false);
 
   const routeRef = useRef<Route>({ page: 'home' });
   const first = useRef(true);
@@ -154,18 +158,19 @@ export default function Signs() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (lightbox) setLightbox(null);
+        if (gambit) setGambit(false);
+        else if (lightbox) setLightbox(null);
         else if (project) setProject(null);
         else if (route.page !== 'home') window.history.back();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [lightbox, project, route]);
+  }, [gambit, lightbox, project, route]);
 
   return (
     <div className="sg-root">
-      <div className="sg-stage" inert={!!(project || lightbox)}>
+      <div className="sg-stage" inert={!!(project || lightbox || gambit)}>
       {/* Pages never print over each other. The old cross-fade eased out
           slowly while the new page came in fast, so the About text sat on top
           of the name and the fan for most of the swap. See pageMotion. */}
@@ -183,7 +188,9 @@ export default function Signs() {
         >
           {plain(route) || <Scribble />}
           {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
-          {route.page === 'home' && <Landing onOpenProject={setProject} onOpenArt={setLightbox} onSide={setSide} />}
+          {route.page === 'home' && (
+            <Landing onOpenProject={setProject} onOpenArt={setLightbox} onSide={setSide} onPlayGambit={() => setGambit((on) => !on)} gambitOn={gambit} />
+          )}
 
           {route.page === 'art' && !route.section && (
             <div className="sg-wall">
@@ -260,6 +267,14 @@ export default function Signs() {
       </div>
 
       <AnimatePresence>{project && <ProjectView key={project.id} card={project} onClose={() => setProject(null)} />}</AnimatePresence>
+
+      <AnimatePresence>
+        {gambit && (
+          <Suspense key="gambit" fallback={null}>
+            <GambitGame onClose={() => setGambit(false)} />
+          </Suspense>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {lightbox && (
