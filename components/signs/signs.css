@@ -777,7 +777,8 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
    shell above the pages, outside .hm, and without these it fell back to the
    old handwriting face, lost its border and went to the shell's black */
 .hm,
-.hm-corner-nav {
+.hm-corner-nav,
+.gbp-scrim {
   --ink: #363636;
   --role: #d2d2d2;
   --role-bar: #bdbdbd;
@@ -1792,9 +1793,11 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   border-radius: 8px;
   box-shadow: 0 10px 24px -18px rgba(0, 0, 0, 0.5);
 }
+/* ranks 6 and 5 only (25-50 % down the board): e4, d4 and every other first
+   move for White land on ranks 3 and 4, so the invitation never sits on one */
 .gbp-invite {
   position: absolute;
-  inset: 0;
+  inset: 25% 0 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1877,7 +1880,63 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   .gbp-board { width: 100%; height: auto; }
   .pv-play-wait { position: static; width: 100%; height: auto; }
 }
+/* the expand button: top of the panel beside the board, round like the corner mark */
+.gbp-expand,
+.gbp-shrink {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 6px 14px -10px rgba(0, 0, 0, 0.45);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.3, 1), border-color 0.2s ease;
+}
+.gbp-expand { align-self: flex-end; margin-bottom: auto; }
+.gbp-expand:hover,
+.gbp-shrink:hover { transform: scale(1.08); border-color: var(--ink); }
+.gbp-expand:focus-visible,
+.gbp-shrink:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.gbp-expand svg,
+.gbp-shrink svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* the big view: the same board and panel on the page's cream, as large as the
+   screen allows, over the project page */
+.gbp-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vh, 48px) clamp(16px, 4vw, 64px);
+  background: var(--cream);
+  overflow: auto;
+}
+.gbp-shrink { position: fixed; top: clamp(14px, 2.4vh, 26px); right: clamp(14px, 2.4vw, 30px); z-index: 2; }
+.gbp.is-big { position: relative; inset: auto; padding: 0; gap: clamp(22px, 3vw, 48px); align-items: flex-end; }
+.gbp.is-big .gbp-board { width: auto; height: min(84vh, calc(100vw - 440px)); border-radius: 12px; }
+.gbp.is-big .gbp-side { flex: none; width: min(280px, 26vw); }
+/* the panel's type steps up with the board, so it does not read as a footnote */
+.gbp.is-big .gbp-kicker { font-size: 12px; }
+.gbp.is-big .gbp-status { font-size: clamp(19px, 1.7vw, 24px); }
+.gbp.is-big .gbp-thought { font-size: 14px; }
+.gbp.is-big .gbp-btn { height: 34px; padding: 0 15px; font-size: 13.5px; }
+@media (max-width: 860px) {
+  .gbp.is-big { flex-direction: column; align-items: stretch; }
+  .gbp.is-big .gbp-board { width: min(calc(100vw - 32px), 66vh); height: auto; }
+  .gbp.is-big .gbp-side { width: auto; }
+}
+@media (max-width: 560px) {
+  .gbp:not(.is-big) .gbp-expand { position: absolute; top: 0; right: 0; }
+  .gbp-side { position: relative; }
+}
 @media (prefers-reduced-motion: reduce) {
   .gbp-invite-dot { animation: none; }
-  .gbp-btn { transition: none; }
+  .gbp-btn,
+  .gbp-expand,
+  .gbp-shrink { transition: none; }
 }

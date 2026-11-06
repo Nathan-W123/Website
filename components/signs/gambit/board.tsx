@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { Chessboard } from 'react-chessboard';
 import type { Square } from 'chess.js';
 import { Chess, MATE_SCORE, MATE_THRESHOLD, SearchEngine, epAfter, keyOf, type Evaluate, type SearchResult } from './engine';
@@ -67,6 +68,29 @@ export function GambitBoard() {
   const [last, setLast] = useState<[string, string] | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [thought, setThought] = useState<SearchResult | null>(null);
+  const [big, setBig] = useState(false);
+  const expandRef = useRef<HTMLButtonElement>(null);
+  const shrinkRef = useRef<HTMLButtonElement>(null);
+  const wasBig = useRef(false);
+
+  // Esc shrinks the big board before the project page gets to close itself:
+  // this listens in the capture phase and stops the key going any further
+  useEffect(() => {
+    if (!big) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      setBig(false);
+    };
+    window.addEventListener('keydown', onKey, true);
+    shrinkRef.current?.focus({ preventScroll: true });
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [big]);
+  useEffect(() => {
+    if (wasBig.current && !big) expandRef.current?.focus({ preventScroll: true });
+    wasBig.current = big;
+  }, [big]);
 
   useEffect(() => {
     let live = true;
@@ -155,7 +179,9 @@ export function GambitBoard() {
     ({ square, piece }: { square: string; piece: { pieceType: string } | null }) => {
       if (!yourTurn) return;
       if (selected && selected !== square && move(selected, square)) return;
-      setSelected(piece && piece.pieceType[0] === you && selected !== square ? square : null);
+      const pick = piece && piece.pieceType[0] === you && selected !== square ? square : null;
+      if (pick) setStarted(true); // the invitation goes the moment you touch a piece
+      setSelected(pick);
     },
     [yourTurn, selected, move, you],
   );
@@ -188,16 +214,19 @@ export function GambitBoard() {
           : `Waking Gambit up… ${pct}`
         : 'Your move.';
 
-  return (
-    <div className="gbp">
+  /** The board and its panel: inline in the frame, or in the big view. Same game either way. */
+  const layout = (isBig: boolean) => (
+    <div className={`gbp${isBig ? ' is-big' : ''}`}>
       <div className="gbp-board">
         <Chessboard
           options={{
-            id: 'gambit',
+            // two ids, because the big view fades out while the inline board is already back
+            id: isBig ? 'gambit-big' : 'gambit',
             position: fen,
             boardOrientation: you === 'w' ? 'white' : 'black',
             onPieceDrop: ({ sourceSquare, targetSquare }) => !!targetSquare && move(sourceSquare, targetSquare),
             onSquareClick,
+            onPieceDrag: () => setStarted(true),
             canDragPiece: ({ piece }) => yourTurn && piece.pieceType[0] === you,
             squareStyles,
             lightSquareStyle: { backgroundColor: '#efebe2' },
@@ -210,7 +239,8 @@ export function GambitBoard() {
           }}
         />
 
-        {/* the invitation: sits on the empty middle of the board until you move */}
+        {/* the invitation: on ranks 5-6, which no first move for White can reach,
+            and gone the moment you touch a piece, so it never hides a move */}
         <AnimatePresence>
           {!started && (
             <motion.div
@@ -238,6 +268,13 @@ export function GambitBoard() {
       </div>
 
       <div className="gbp-side">
+        {!isBig && (
+          <button ref={expandRef} type="button" className="gbp-expand" onClick={() => setBig(true)} aria-label="Expand the board" title="Expand">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+            </svg>
+          </button>
+        )}
         <p className="gbp-kicker">Play it</p>
         <p className={`gbp-status${phase === 'over' ? ' is-over' : ''}`} aria-live="polite">
           {status}
@@ -259,5 +296,47 @@ export function GambitBoard() {
         </div>
       </div>
     </div>
+  );
+
+  // the big view goes into the site's root, so it keeps the site's type, and
+  // sits over the project page; the game itself never leaves this component
+  const host = typeof document !== 'undefined' ? ((document.querySelector('.sg-root') as HTMLElement | null) ?? document.body) : null;
+  return (
+    <>
+      {!big && layout(false)}
+      {host &&
+        createPortal(
+          <AnimatePresence>
+            {big && (
+              <motion.div
+                key="big"
+                className="gbp-scrim"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Gambit, expanded"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.16 } }}
+                onClick={(e) => e.target === e.currentTarget && setBig(false)}
+              >
+                <button ref={shrinkRef} type="button" className="gbp-shrink" onClick={() => setBig(false)} aria-label="Shrink the board" title="Shrink">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" />
+                  </svg>
+                </button>
+                <motion.div
+                  className="gbp-bigwrap"
+                  initial={{ opacity: 0, scale: reduce ? 1 : 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: reduce ? 0.01 : 0.28, ease: [0.22, 1, 0.3, 1] }}
+                >
+                  {layout(true)}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          host,
+        )}
+    </>
   );
 }
