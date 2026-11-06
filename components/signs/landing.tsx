@@ -47,43 +47,6 @@ const other = (s: Side): Side => (s === 'art' ? 'engineering' : 'art');
  */
 const TOP = SEATS.reduce((best, seat, i) => (seat.z > SEATS[best].z ? i : best), 0);
 
-/**
- * Confetti off the outer edge of whichever word just won: away to the left for
- * Engineer, away to the right for Artist. Every piece gets its own throw, its
- * own spin and its own silhouette — nothing here is a straight rectangle, and
- * each one flips edge-on as it tumbles, the way a scrap of paper does.
- */
-const PIECES = [
-  { shape: 'sliver', speed: 1.0, lift: 1.0, spin: 1.3, flip: 2.2, delay: 0, life: 0.95, tone: 0 },
-  { shape: 'leaf', speed: 0.76, lift: 1.26, spin: -1.6, flip: 1.3, delay: 0.05, life: 1.08, tone: 1 },
-  { shape: 'dot', speed: 1.28, lift: 0.74, spin: 0.7, flip: 0, delay: 0.02, life: 0.86, tone: 2 },
-  { shape: 'arc', speed: 0.6, lift: 1.46, spin: 2.0, flip: 0.9, delay: 0.09, life: 1.12, tone: 1 },
-  { shape: 'sliver', speed: 1.4, lift: 1.02, spin: -2.3, flip: 2.9, delay: 0.07, life: 1.0, tone: 2 },
-  { shape: 'leaf', speed: 0.94, lift: 1.6, spin: 1.5, flip: 1.7, delay: 0.13, life: 1.16, tone: 0 },
-];
-
-/**
- * One throw, sampled across the flight. The old burst was four hand-placed
- * corners with an ease between each, which kicked; this is a plain ballistic
- * arc read off at ten points and played linearly, so the curve itself carries
- * the timing. Every distance is a share of the 1em carrier, so the burst
- * scales with the word it comes off.
- */
-const STEPS = 10;
-const throwOf = (p: (typeof PIECES)[number], out: number) => {
-  const t = Array.from({ length: STEPS }, (_, i) => i / (STEPS - 1));
-  const pct = (v: number) => `${Math.round(v * 1000) / 10}%`;
-  return {
-    times: t,
-    x: t.map((u) => pct(out * 1.25 * p.speed * p.life * u * (1 - 0.22 * u))),
-    y: t.map((u) => pct(-2.1 * p.lift * p.life * u + 2.3 * (p.life * u) ** 2)),
-    rotate: t.map((u) => out * p.spin * 300 * u),
-    rotateY: t.map((u) => p.flip * 360 * u),
-    opacity: t.map((u) => (u < 0.08 ? u / 0.08 : u > 0.72 ? Math.max(0, (1 - u) / 0.28) : 1)),
-    scale: t.map((u) => 0.55 + 0.45 * Math.min(1, u / 0.14)),
-  };
-};
-
 const instagram = CONTACTS.find((c) => c.id === 'instagram');
 /** The two worth following on the engineering side, shown as marks rather than words. */
 const FOLLOW = CONTACTS.filter((c) => c.id === 'linkedin' || c.id === 'github');
@@ -177,6 +140,14 @@ export function Landing({
   const [tucked, setTucked] = useState<number[]>([]);
   const shuffleTimers = useRef<number[]>([]);
   const reduce = useReducedMotion();
+  // warm the About ribbon's first frame (25 KB) once the page is idle, so it
+  // is already there when About fades in instead of popping in after the words
+  useEffect(() => {
+    const warm = () => { const img = new Image(); img.src = `${base()}/about/ribbon.webp`; };
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(warm);
+    else setTimeout(warm, 1500);
+  }, []);
   const fan = useRef<HTMLDivElement>(null);
   // the cards fly in from off the edges on load and again on the way back up
   const fanIn = useInView(fan, { amount: 0.35 });
@@ -315,29 +286,6 @@ export function Landing({
                     transition={reduce ? { duration: 0.01 } : { layout: { duration: 0.26, ease: 'linear' }, duration: 0.26, ease: 'linear' }}
                   />
                 )}
-                {side === s2 &&
-                  !reduce &&
-                  PIECES.map((p, k) => {
-                    const a = throwOf(p, s2 === 'engineering' ? -1 : 1);
-                    return (
-                      <motion.span
-                        key={`${side}-${k}`}
-                        className="hm-role-pop"
-                        style={{ left: s2 === 'engineering' ? '0%' : '100%' }}
-                        aria-hidden="true"
-                        initial={{ opacity: 0, x: 0, y: 0 }}
-                        animate={{ opacity: a.opacity, x: a.x, y: a.y }}
-                        transition={{ duration: p.life, times: a.times, ease: 'linear', delay: p.delay }}
-                      >
-                        <motion.span
-                          className={`hm-role-bit is-${p.shape} tone-${p.tone}`}
-                          initial={{ rotate: 0, rotateY: 0, scale: 0.55 }}
-                          animate={{ rotate: a.rotate, rotateY: a.rotateY, scale: a.scale }}
-                          transition={{ duration: p.life, times: a.times, ease: 'linear', delay: p.delay }}
-                        />
-                      </motion.span>
-                    );
-                  })}
               </span>
             </Fragment>
           ))}

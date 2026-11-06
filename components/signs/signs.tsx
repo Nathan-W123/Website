@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
 import { ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } from './content';
@@ -42,6 +42,43 @@ const parse = (hash: string): Route => {
 const routeKey = (r: Route) => (r.page === 'art' ? `art/${r.section ?? ''}` : r.page === 'projects' ? `projects/${r.group ?? ''}` : r.page);
 /** The pages in the new, plain language: no paper, no pencil, no tag. */
 const plain = (r: Route) => r.page === 'home' || r.page === 'about' || r.page === 'contact';
+/** Which way the current page change is going, read by entering and leaving pages alike. */
+type Trip = { from: string; to: string };
+const SHEET: [number, number, number, number] = [0.22, 1, 0.3, 1];
+const DROP: [number, number, number, number] = [0.55, 0, 0.75, 0.2];
+/**
+ * About is a sheet pulled up from below, over the home page, which holds still
+ * underneath until it is covered; leaving About, the sheet drops away and the
+ * page under it is simply there. Every other change is a quick dissolve out and
+ * a short rise in after it, so two pages never print over each other.
+ */
+const pageMotion = (reduce: boolean) => ({
+  enter: ({ from, to }: Trip) =>
+    reduce ? { opacity: 0 } : to === 'about' ? { y: '100%', opacity: 1 } : from === 'about' ? { y: 0, opacity: 1 } : { y: 14, opacity: 0 },
+  show: ({ from, to }: Trip) => ({
+    y: 0,
+    opacity: 1,
+    transition: reduce
+      ? { duration: 0.01 }
+      : to === 'about'
+        ? { duration: 0.62, ease: SHEET }
+        : from === 'about'
+          ? { duration: 0 }
+          : { duration: 0.34, ease: SHEET, delay: 0.14 },
+  }),
+  leave: ({ from, to }: Trip) =>
+    reduce
+      ? { opacity: 0, transition: { duration: 0.01 } }
+      : from === 'about'
+        ? { y: '100%', transition: { duration: 0.5, ease: DROP } }
+        : to === 'about'
+          ? // hold still under the rising sheet. 1 to 0.999 is invisible, but it is a
+            // real change: 1 to 1 counts as already done, and the page under the
+            // sheet was being removed the instant About started to rise
+            { opacity: 0.999, transition: { duration: 0.62 } }
+          : { opacity: 0, transition: { duration: 0.16, ease: 'easeOut' as const } },
+});
+
 export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
   // which half the landing page is showing, so About can wear the same mark
@@ -78,6 +115,38 @@ export default function Signs() {
   const go = useCallback((hash: string) => {
     window.location.hash = hash;
   }, []);
+
+  // where this page change is coming from and going to: entering pages read it
+  // when they mount, leaving pages through AnimatePresence's custom
+  const lastKey = useRef(routeKey(route));
+  const trip = useMemo<Trip>(() => ({ from: lastKey.current, to: routeKey(route) }), [route]);
+  useEffect(() => {
+    lastKey.current = routeKey(route);
+  }, [route]);
+  const motionFor = useMemo(() => pageMotion(!!reduce), [reduce]);
+
+  // the corner's Gallery and Contact bubbles land on a section of the home page,
+  // going home first when they are pressed from somewhere else
+  const pendingJump = useRef<string | null>(null);
+  const jump = useCallback(
+    (sel: string) => {
+      if (route.page === 'home') {
+        document.querySelector(sel)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      } else {
+        pendingJump.current = sel;
+        go('#/');
+      }
+    },
+    [route.page, reduce, go],
+  );
+  useEffect(() => {
+    if (route.page !== 'home' || !pendingJump.current) return;
+    const sel = pendingJump.current;
+    pendingJump.current = null;
+    // home is already there under the About sheet as it drops away, so jump at once
+    const t = window.setTimeout(() => document.querySelector(sel)?.scrollIntoView({ behavior: 'auto', block: 'start' }), 20);
+    return () => window.clearTimeout(t);
+  }, [route]);
   const goHome = useCallback(() => {
     window.location.hash = '#/';
   }, []);
@@ -97,14 +166,20 @@ export default function Signs() {
   return (
     <div className="sg-root">
       <div className="sg-stage" inert={!!(project || lightbox)}>
-      <AnimatePresence mode="sync" initial={false}>
+      {/* Pages never print over each other. The old cross-fade eased out
+          slowly while the new page came in fast, so the About text sat on top
+          of the name and the fan for most of the swap. See pageMotion. */}
+      <AnimatePresence mode="sync" initial={false} custom={trip}>
         <motion.section
           key={routeKey(route)}
-          className={`sg-page${plain(route) ? ' sg-page--plain' : ''}`}
-          initial={reduce ? false : { opacity: 0, y: 26 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={reduce ? { opacity: 0 } : { opacity: 0, y: 44, scale: 0.985, transition: { duration: 0.3, ease: 'easeIn' } }}
-          transition={{ duration: reduce ? 0.01 : 0.36, ease: [0.22, 1, 0.3, 1] }}
+          className={`sg-page${plain(route) ? ' sg-page--plain' : ''}${route.page === 'about' ? ' sg-page--sheet' : ''}`}
+          custom={trip}
+          variants={motionFor}
+          initial="enter"
+          animate="show"
+          exit="leave"
+          // the sheet stays on top both ways: rising over home, and dropping off it
+          style={{ zIndex: route.page === 'about' ? 5 : 1 }}
         >
           {plain(route) || <Scribble />}
           {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
@@ -166,14 +241,17 @@ export default function Signs() {
       {/* The corner mark lives out here, above the page swap: the pages
           themselves translate and scale on the way in and out, and a fixed
           element inside one of those goes with it, which is what made the
-          mark jump between home and About. Out here it only ever spins. */}
+          mark jump between home and About. */}
       {(route.page === 'home' || route.page === 'about') && (
         <Corner
           side={side}
           href={route.page === 'about' ? '#/' : '#/about'}
           label={route.page === 'about' ? 'Back home' : 'About me'}
-          say="Click me!"
-          turn={route.page}
+          items={[
+            route.page === 'about' ? { label: 'Home', href: '#/' } : { label: 'About', href: '#/about' },
+            { label: 'Gallery', onClick: () => jump('.hm-work') },
+            { label: 'Contact', onClick: () => jump('.hm-foot') },
+          ]}
         />
       )}
 

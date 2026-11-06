@@ -564,6 +564,15 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .sg-close:focus-visible, .sg-pv-arrow:focus-visible, .sg-back:focus-visible, .ld-cue:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
 /* pages, name and speed lines share the stage under the overlays */
 .sg-stage { display: contents; }
+/* About comes up over the home page like a sheet, so its top edge throws a
+   soft shadow onto the page beneath while it moves (off screen once it is up) */
+.sg-page--sheet { box-shadow: 0 -22px 44px -26px rgba(0, 0, 0, 0.3); }
+/* Nothing on the site takes typing, so no text should show a blinking caret.
+   It appears when the browser's caret browsing is on (F7 in Chrome and Edge),
+   which a page cannot turn off, but it can make the caret invisible. Real
+   fields would get it back. */
+.sg-root { caret-color: transparent; }
+.sg-root :is(input, textarea, select, [contenteditable]:not([contenteditable='false'])) { caret-color: auto; }
 .sg-lb-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: nowrap; }
 /* sticky notes: a yellow sheet with a folded corner, a solid shadow and a strip of tape (the layers are
    separate spans so the tape can hang past the edge without being clipped by the folded corner) */
@@ -764,7 +773,11 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   background-color: #f7f6f1;
   cursor: auto;
 }
-.hm {
+/* the tokens and the type, shared with the corner nav: it lives in the route
+   shell above the pages, outside .hm, and without these it fell back to the
+   old handwriting face, lost its border and went to the shell's black */
+.hm,
+.hm-corner-nav {
   --ink: #363636;
   --role: #d2d2d2;
   --role-bar: #bdbdbd;
@@ -774,13 +787,15 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   --cream: #f7f6f1;
   --disp: var(--font-jost, 'Jost'), 'Futura', 'Century Gothic', system-ui, sans-serif;
   --body: var(--font-inter, 'Inter'), system-ui, -apple-system, sans-serif;
+  font-family: var(--body);
+  color: var(--ink);
+}
+.hm {
   position: relative;
   z-index: 2;
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 24px 120px;
-  font-family: var(--body);
-  color: var(--ink);
   text-align: center;
 }
 
@@ -895,41 +910,6 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   border-radius: 999px;
   background: var(--role-bar);
 }
-/* the carrier is a 1em square, so every distance in the throw is a share of
-   the word's own size and the burst scales with the type */
-.hm-role-pop {
-  position: absolute;
-  top: 0.24em;
-  width: 1em;
-  height: 1em;
-  margin-left: -0.5em;
-  display: grid;
-  place-items: center;
-  perspective: 300px;
-  pointer-events: none;
-}
-/* the piece itself: a rounded grain, a petal, a dot or an open arc — and it
-   turns edge-on as it tumbles, which is what a scrap of paper does */
-.hm-role-bit {
-  display: block;
-  background: currentColor;
-  color: var(--role-bar);
-}
-.hm-role-bit.tone-1 { color: #d6d6d6; }
-.hm-role-bit.tone-2 { color: #a8a8a8; }
-.hm-role-bit.is-sliver { width: 0.17em; height: 0.055em; border-radius: 999px; }
-.hm-role-bit.is-leaf { width: 0.12em; height: 0.12em; border-radius: 72% 28% 70% 30% / 30% 68% 32% 70%; }
-.hm-role-bit.is-dot { width: 0.075em; height: 0.075em; border-radius: 50%; }
-.hm-role-bit.is-arc {
-  width: 0.17em;
-  height: 0.17em;
-  background: none;
-  border: 0.032em solid currentColor;
-  border-right-color: transparent;
-  border-bottom-color: transparent;
-  border-radius: 50%;
-}
-
 .hm-role-and { font-size: 0.56em; }
 
 /* ---- the switch: no label, because the underline above says which side you are on ---- */
@@ -1143,6 +1123,10 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   height: 100%;
   object-fit: cover;
   mix-blend-mode: multiply;
+  /* it is a picture that moves: the browser's video hover controls and the
+     right-click menu have no business here */
+  pointer-events: none;
+  user-select: none;
 }
 @media (max-width: 880px) {
   /* stacked, the column runs taller than the screen and starts at the top,
@@ -1577,11 +1561,15 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-name-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; border-radius: 4px; }
 
 /* ---- the corner switch: the pill again, within reach anywhere down the page ---- */
-.hm-corner {
+/* the corner: the mark, and the bubbles that slide out of it on hover */
+.hm-corner-nav {
   position: fixed;
   top: clamp(16px, 2.4vh, 28px);
   left: clamp(16px, 2.4vw, 34px);
   z-index: 40;
+}
+.hm-corner {
+  position: relative;
   display: grid;
   place-items: center;
   width: 54px;
@@ -1646,26 +1634,74 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   background: var(--ink);
   transform-origin: left;
 }
-/* and says which side you are on, in from the right, set like the work subtitle */
-.hm-corner-say {
+/* The bubbles: round, parked behind the mark, and burst out along a quarter arc
+   (right, diagonal, down) when the corner is hovered or tabbed into. --c is the
+   mark's centre, --x/--y each bubble's place, both set off that centre. */
+.hm-corner-nav { --c: 27px; }
+.hm-corner { z-index: 2; }
+.hm-corner-bubbles { margin: 0; padding: 0; list-style: none; }
+/* while it is open, an invisible disc around the mark keeps the hover alive on
+   the way from the mark out to a bubble; closed, it lets the page have the pointer */
+.hm-corner-nav::before {
+  content: '';
   position: absolute;
-  left: calc(100% + 12px);
-  top: 50%;
-  font-family: var(--body);
-  font-size: 15px;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--ink-soft);
+  left: calc(var(--c) - 140px);
+  top: calc(var(--c) - 140px);
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hm-corner-nav:hover::before,
+.hm-corner-nav:focus-within::before { pointer-events: auto; }
+.hm-bubble {
+  position: absolute;
+  left: var(--c);
+  top: var(--c);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  /* smaller than the mark they come out of */
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: #fcfcfa;
+  box-shadow: 0 8px 18px -14px rgba(0, 0, 0, 0.5);
+  font: 500 10px/1 var(--body);
+  letter-spacing: 0;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
   opacity: 0;
   pointer-events: none;
-  transform: translate(10px, -50%);
-  transition: opacity 0.28s ease, transform 0.4s cubic-bezier(0.22, 1, 0.3, 1);
+  transform: translate(-50%, -50%) scale(0.3);
+  transition: transform 0.34s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
-.hm-corner:hover .hm-corner-say,
-.hm-corner:focus-visible .hm-corner-say { opacity: 1; transform: translate(0, -50%); }
+.hm-corner-nav:hover .hm-bubble,
+.hm-corner-nav:focus-within .hm-bubble {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1);
+  /* out with a little overshoot, each one a beat after the last */
+  transition: transform 0.46s cubic-bezier(0.34, 1.5, 0.64, 1), opacity 0.18s ease, border-color 0.2s ease, background 0.2s ease;
+  transition-delay: calc(var(--i) * 55ms);
+}
+.hm-corner-nav .hm-bubble:hover { border-color: var(--ink); background: #fff; }
+.hm-bubble:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+@media (max-width: 560px) {
+  .hm-corner-nav { --c: 23px; }
+  .hm-bubble { width: 40px; height: 40px; font-size: 9.5px; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .hm-corner-say { transition: none; }
+  .hm-bubble,
+  .hm-corner-nav:hover .hm-bubble,
+  .hm-corner-nav:focus-within .hm-bubble { transition: opacity 0.01s; transition-delay: 0s; }
 }
+/* the jump targets clear the top of the screen rather than butting into it */
+.hm-work,
+.hm-foot { scroll-margin-top: 40px; }
 
 /* ---- About: a picture set into a phrase, and a few more on hover ---- */
 .ab2-spot { position: relative; }

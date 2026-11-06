@@ -1,46 +1,35 @@
 'use client';
 
-import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'motion/react';
-import { useEffect, useRef } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import type { CSSProperties } from 'react';
 
 /**
- * The mark pinned to the top-left corner. It wears whichever side you are on —
- * a contour integral for the engineering half, a brush for the art half — and
- * it never changes sides itself: on the home page it opens About, and on About
- * it takes you back.
+ * The mark pinned to the top-left corner, and the way round the site from it.
+ * It wears whichever side you are on — a contour integral for the engineering
+ * half, a brush for the art half — and it never changes sides itself: on the
+ * home page it opens About, and on About it takes you back.
  *
- * The route shell renders this once, above the page swap, so going between the
- * two never unmounts it and it has nothing to jump from. `turn` changes with
- * the route, and the mark answers by winding into itself and back out.
+ * Hovering it (or tabbing to it) bursts a few round bubbles out from behind it,
+ * fanned on a quarter arc into the page: the other places worth going. The
+ * route shell renders this once, above the page swap, so moving between pages
+ * never unmounts it.
  */
+
+/** how far the bubbles' centres sit from the mark's centre, in px */
+const REACH = 76;
 
 const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
 
 export type Side = 'engineering' | 'art';
+export type Bubble = { label: string; href?: string; onClick?: () => void };
 
-export function Corner({ side, href, label, say, turn = 0 }: { side: Side; href: string; label: string; say: string; turn?: number | string }) {
+export function Corner({ side, href, label, items }: { side: Side; href: string; label: string; items: Bubble[] }) {
   const reduce = useReducedMotion();
-  const spin = useAnimationControls();
-  const first = useRef(true);
-
-  useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
-    if (reduce) return;
-    // in on itself, then out again: a whole turn with the scale pinched at the
-    // half, which reads as a spiral rather than a spin
-    spin.start({
-      rotate: [0, 180, 360],
-      scale: [1, 0.38, 1],
-      transition: { duration: 0.74, times: [0, 0.5, 1], ease: [0.55, 0, 0.3, 1] },
-    });
-  }, [turn, reduce, spin]);
-
-  const inside = (
-    <>
-      <motion.span className="hm-corner-turn" animate={spin}>
+  return (
+    <nav className="hm-corner-nav" aria-label="Site">
+      {/* always an anchor, never sometimes a button: swapping the element type
+          would remount it on every page change */}
+      <a className="hm-corner" href={href} aria-label={label}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={side}
@@ -61,17 +50,27 @@ export function Corner({ side, href, label, say, turn = 0 }: { side: Side; href:
             )}
           </motion.span>
         </AnimatePresence>
-      </motion.span>
-      <span className="hm-corner-say" aria-hidden="true">
-        {say}
-      </span>
-    </>
-  );
-  // always an anchor, never sometimes a button: swapping the element type
-  // would remount the whole thing and undo the point of hoisting it
-  return (
-    <a className="hm-corner" href={href} aria-label={label}>
-      {inside}
-    </a>
+      </a>
+      <ul className="hm-corner-bubbles">
+        {items.map((it, i) => {
+          // spread across a quarter turn, from straight right to straight down
+          const a = ((items.length === 1 ? 45 : (i * 90) / (items.length - 1)) * Math.PI) / 180;
+          const at = { '--i': i, '--x': `${Math.round(Math.cos(a) * REACH)}px`, '--y': `${Math.round(Math.sin(a) * REACH)}px` } as CSSProperties;
+          return (
+          <li key={it.label} style={at}>
+            {it.href ? (
+              <a className="hm-bubble" href={it.href}>
+                {it.label}
+              </a>
+            ) : (
+              <button type="button" className="hm-bubble" onClick={it.onClick}>
+                {it.label}
+              </button>
+            )}
+          </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }
