@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { createPortal } from 'react-dom';
 import { Chessboard } from 'react-chessboard';
 import type { Square } from 'chess.js';
-import { Chess, MATE_SCORE, MATE_THRESHOLD, SearchEngine, epAfter, keyOf, type Evaluate, type SearchResult } from './engine';
+import { Chess, SearchEngine, epAfter, keyOf, type Evaluate } from './engine';
 import { loadGambit } from './net';
 
 /**
@@ -29,17 +29,6 @@ const RING: CSSProperties = { background: `radial-gradient(circle, transparent 5
 const CHECK: CSSProperties = { background: 'radial-gradient(circle, rgba(196, 74, 60, 0.6) 0%, rgba(196, 74, 60, 0.22) 52%, transparent 74%)' };
 
 const isPromotion = (g: Chess, from: string, to: string) => g.get(from as Square)?.type === 'p' && (to[1] === '8' || to[1] === '1');
-
-/** What the bot made of the position, in words a player would use. */
-function readout(r: SearchResult): string {
-  const depth = `Looked ${r.depth} ${r.depth === 1 ? 'move' : 'moves'} deep, ${r.evaluations} positions.`;
-  if (Math.abs(r.score) >= MATE_THRESHOLD) {
-    const n = Math.ceil((MATE_SCORE - Math.abs(r.score)) / 2);
-    return `${depth} ${r.score > 0 ? `Sees mate in ${n}.` : `Sees itself mated in ${n}.`}`;
-  }
-  const v = Math.max(-1, Math.min(1, r.score));
-  return `${depth} Thinks it is ${v > 0.15 ? 'better' : v < -0.15 ? 'worse' : 'about level'} (${v >= 0 ? '+' : ''}${v.toFixed(2)}).`;
-}
 
 function verdict(g: Chess, you: 'w' | 'b'): string {
   if (g.isCheckmate()) return g.turn() === you ? 'Checkmate. Gambit wins.' : 'Checkmate. You beat Gambit.';
@@ -67,7 +56,6 @@ export function GambitBoard() {
   const [failed, setFailed] = useState<string | null>(null);
   const [last, setLast] = useState<[string, string] | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
-  const [thought, setThought] = useState<SearchResult | null>(null);
   const [big, setBig] = useState(false);
   const expandRef = useRef<HTMLButtonElement>(null);
   const shrinkRef = useRef<HTMLButtonElement>(null);
@@ -140,7 +128,6 @@ export function GambitBoard() {
     const result = await engine.current.search(g.fen(), ep.current, [...keys.current], THINK_MS);
     if (r0 !== round.current) return;
     play(result.move.slice(0, 2), result.move.slice(2, 4), result.move[4]);
-    setThought(result);
     setPhase(game.current.isGameOver() ? 'over' : 'yours');
   }, [play]);
 
@@ -153,7 +140,6 @@ export function GambitBoard() {
       setFen(game.current.fen());
       setLast(null);
       setSelected(null);
-      setThought(null);
       setYou(side);
       setStarted(true);
       setPhase('yours');
@@ -203,18 +189,16 @@ export function GambitBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fen, last, selected]);
 
-  const pct = `${Math.round(progress * 100)}%`;
   const status = failed
     ? `Gambit could not load (${failed}).`
     : phase === 'over'
       ? verdict(game.current, you)
       : phase === 'thinking'
-        ? ready
-          ? 'Gambit is thinking…'
-          : `Waking Gambit up… ${pct}`
+        ? 'Gambit is thinking.'
         : 'Your move.';
+  const pill = { initial: { opacity: 0, scale: 0.92 }, animate: { opacity: 1, scale: 1 }, exit: { opacity: 0, scale: 0.96, transition: { duration: 0.18 } } };
 
-  /** The board and its panel: inline in the frame, or in the big view. Same game either way. */
+  /** The board on its own: inline in the frame, or in the big view. Same game either way. */
   const layout = (isBig: boolean) => (
     <div className={`gbp${isBig ? ' is-big' : ''}`}>
       <div className="gbp-board">
@@ -239,23 +223,34 @@ export function GambitBoard() {
           }}
         />
 
-        {/* the invitation: on ranks 5-6, which no first move for White can reach,
-            and gone the moment you touch a piece, so it never hides a move */}
+        {/* the middle of the board: "Your move" until you touch a piece (it is
+            gone before a move dot can appear under it), and the result, which
+            starts another game, once one ends */}
         <AnimatePresence>
-          {!started && (
+          {!started && !failed && (
             <motion.div
+              key="invite"
               className="gbp-invite"
               aria-hidden="true"
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.18 } }}
+              {...pill}
               transition={{ delay: reduce ? 0 : 0.35, duration: reduce ? 0.01 : 0.4, ease: [0.22, 1, 0.3, 1] }}
             >
               <span className="gbp-invite-pill">
                 <span className="gbp-invite-dot" />
                 Your move
               </span>
-              <span className="gbp-invite-sub">Tap a piece to play the bot</span>
+            </motion.div>
+          )}
+          {(phase === 'over' || failed) && (
+            <motion.div key="end" className="gbp-invite" {...pill} transition={{ duration: reduce ? 0.01 : 0.35, ease: [0.22, 1, 0.3, 1] }}>
+              {failed ? (
+                <span className="gbp-invite-pill">Gambit could not load</span>
+              ) : (
+                <button type="button" className="gbp-invite-pill is-end" onClick={() => fresh(you)}>
+                  {verdict(game.current, you)}
+                  <span className="gbp-again">Play again</span>
+                </button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -267,34 +262,27 @@ export function GambitBoard() {
         )}
       </div>
 
-      <div className="gbp-side">
-        {!isBig && (
-          <button ref={expandRef} type="button" className="gbp-expand" onClick={() => setBig(true)} aria-label="Expand the board" title="Expand">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-            </svg>
-          </button>
+      {/* Gambit thinking, without words: three dots under the board */}
+      <AnimatePresence>
+        {phase === 'thinking' && (
+          <motion.span key="thinking" className="gbp-thinking" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <i />
+            <i />
+            <i />
+          </motion.span>
         )}
-        <p className="gbp-kicker">Play it</p>
-        <p className={`gbp-status${phase === 'over' ? ' is-over' : ''}`} aria-live="polite">
-          {status}
-        </p>
-        <p className="gbp-thought">
-          {thought && phase !== 'over'
-            ? readout(thought)
-            : !ready && !failed
-              ? `The network is loading in your browser (${pct}). You can move already.`
-              : 'The real bot, running in your browser: the network and the search it plays Lichess with.'}
-        </p>
-        <div className="gbp-actions">
-          <button type="button" className="gbp-btn" onClick={() => fresh(you)}>
-            New game
-          </button>
-          <button type="button" className="gbp-btn" onClick={() => fresh(you === 'w' ? 'b' : 'w')}>
-            Play {you === 'w' ? 'Black' : 'White'}
-          </button>
-        </div>
-      </div>
+      </AnimatePresence>
+
+      {!isBig && (
+        <button ref={expandRef} type="button" className="gbp-expand" onClick={() => setBig(true)} aria-label="Expand the board" title="Expand">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+          </svg>
+        </button>
+      )}
+      <span className="gbp-sr" aria-live="polite">
+        {status}
+      </span>
     </div>
   );
 
