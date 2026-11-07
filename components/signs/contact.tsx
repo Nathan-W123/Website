@@ -6,7 +6,8 @@ import { BrandIcon } from './icons';
 
 /**
  * Contact, in About's language: a few lines at a size you can read, the
- * address as a link in its sentence, the same row of marks, and the ribbon.
+ * address as a link in its sentence, the same row of marks, and Nathan's
+ * infinity ribbon where About has the morphing one.
  * An NFC tag points straight here, so it is also a front door; the corner's
  * Home bubble is the way into the rest of the site.
  */
@@ -36,7 +37,7 @@ export function Contact() {
             ))}
           </p>
         </div>
-        <RibbonArt />
+        <RibbonArt name="contact/infinity" />
       </div>
     </div>
   );
