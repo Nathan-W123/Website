@@ -9,13 +9,14 @@ import { Scribble } from './scribble';
 import { HangingSign } from './hanging';
 import { Landing } from './landing';
 import { About } from './about';
+import { Contact } from './contact';
 import { Corner, type Side } from './corner';
 
 // Gambit's project page opens on a live board; it, chess.js and the board
 // component load only when that page does
 const GambitBoard = lazy(() => import('./gambit/board').then((m) => ({ default: m.GambitBoard })));
 import { IndexCard, StickyBoard } from './notes';
-import { BrandIcon, ContactIcon } from './icons';
+import { ContactIcon } from './icons';
 import { TONE_DARK, outline, shadow, tone } from './ink';
 import './signs.css';
 
@@ -48,38 +49,43 @@ const routeKey = (r: Route) => (r.page === 'art' ? `art/${r.section ?? ''}` : r.
 const plain = (r: Route) => r.page === 'home' || r.page === 'about' || r.page === 'contact';
 /** Which way the current page change is going, read by entering and leaving pages alike. */
 type Trip = { from: string; to: string };
+/** The pages that arrive as a sheet pulled up from below. */
+const isSheet = (key: string) => key === 'about' || key === 'contact';
 const SHEET: [number, number, number, number] = [0.22, 1, 0.3, 1];
 const DROP: [number, number, number, number] = [0.55, 0, 0.75, 0.2];
 /**
- * About is a sheet pulled up from below, over the home page, which holds still
- * underneath until it is covered; leaving About, the sheet drops away and the
- * page under it is simply there. Every other change is a quick dissolve out and
- * a short rise in after it, so two pages never print over each other.
+ * About and Contact are sheets pulled up from below, over a page that holds
+ * still underneath until it is covered (from one sheet to the other, the new
+ * one rises over the old). Leaving them for anywhere else, the sheet drops
+ * away and the page under it is simply there. Every other change is a quick
+ * dissolve out and a short rise in after it, so two pages never print over
+ * each other.
  */
 const pageMotion = (reduce: boolean) => ({
   enter: ({ from, to }: Trip) =>
-    reduce ? { opacity: 0 } : to === 'about' ? { y: '100%', opacity: 1 } : from === 'about' ? { y: 0, opacity: 1 } : { y: 14, opacity: 0 },
+    reduce ? { opacity: 0 } : isSheet(to) ? { y: '100%', opacity: 1 } : isSheet(from) ? { y: 0, opacity: 1 } : { y: 14, opacity: 0 },
   show: ({ from, to }: Trip) => ({
     y: 0,
     opacity: 1,
     transition: reduce
       ? { duration: 0.01 }
-      : to === 'about'
+      : isSheet(to)
         ? { duration: 0.62, ease: SHEET }
-        : from === 'about'
+        : isSheet(from)
           ? { duration: 0 }
           : { duration: 0.34, ease: SHEET, delay: 0.14 },
   }),
   leave: ({ from, to }: Trip) =>
     reduce
       ? { opacity: 0, transition: { duration: 0.01 } }
-      : from === 'about'
-        ? { y: '100%', transition: { duration: 0.5, ease: DROP } }
-        : to === 'about'
-          ? // hold still under the rising sheet. 1 to 0.999 is invisible, but it is a
-            // real change: 1 to 1 counts as already done, and the page under the
-            // sheet was being removed the instant About started to rise
-            { opacity: 0.999, transition: { duration: 0.62 } }
+      : isSheet(to)
+        ? // hold still under the rising sheet, and step below it (zIndex snaps,
+          // it does not tween). 1 to 0.999 is invisible, but it is a real change:
+          // 1 to 1 counts as already done, and the page under the sheet was being
+          // removed the instant the sheet started to rise
+          { zIndex: 4, opacity: 0.999, transition: { duration: 0.62 } }
+        : isSheet(from)
+          ? { y: '100%', transition: { duration: 0.5, ease: DROP } }
           : { opacity: 0, transition: { duration: 0.16, ease: 'easeOut' as const } },
 });
 
@@ -176,14 +182,14 @@ export default function Signs() {
       <AnimatePresence mode="sync" initial={false} custom={trip}>
         <motion.section
           key={routeKey(route)}
-          className={`sg-page${plain(route) ? ' sg-page--plain' : ''}${route.page === 'about' ? ' sg-page--sheet' : ''}`}
+          className={`sg-page${plain(route) ? ' sg-page--plain' : ''}${isSheet(route.page) ? ' sg-page--sheet' : ''}`}
           custom={trip}
           variants={motionFor}
           initial="enter"
           animate="show"
           exit="leave"
           // the sheet stays on top both ways: rising over home, and dropping off it
-          style={{ zIndex: route.page === 'about' ? 5 : 1 }}
+          style={{ zIndex: isSheet(route.page) ? 5 : 1 }}
         >
           {plain(route) || <Scribble />}
           {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
@@ -238,7 +244,7 @@ export default function Signs() {
 
           {route.page === 'projects' && route.group && <Cards group={route.group} onBack={() => go('#/projects')} onOpen={setProject} />}
 
-          {route.page === 'contact' && <Contact onBack={goHome} />}
+          {route.page === 'contact' && <Contact />}
 
           {route.page === 'about' && <About />}
         </motion.section>
@@ -248,15 +254,14 @@ export default function Signs() {
           themselves translate and scale on the way in and out, and a fixed
           element inside one of those goes with it, which is what made the
           mark jump between home and About. */}
-      {(route.page === 'home' || route.page === 'about') && (
+      {(route.page === 'home' || route.page === 'about' || route.page === 'contact') && (
         <Corner
           side={side}
-          href={route.page === 'about' ? '#/' : '#/about'}
-          label={route.page === 'about' ? 'Back home' : 'About me'}
           items={[
-            route.page === 'about' ? { label: 'Home', href: '#/' } : { label: 'About', href: '#/about' },
+            ...(route.page !== 'home' ? [{ label: 'Home', href: '#/' }] : []),
+            ...(route.page !== 'about' ? [{ label: 'About', href: '#/about' }] : []),
             { label: 'Gallery', onClick: () => jump('.hm-work') },
-            { label: 'Contact', onClick: () => jump('.hm-foot') },
+            ...(route.page !== 'contact' ? [{ label: 'Contact', href: '#/contact' }] : []),
           ]}
         />
       )}
@@ -472,50 +477,6 @@ function useAutoScroll(enabled: boolean, key: string) {
     };
   }, [enabled, key]);
   return ref;
-}
-
-/** What each way of reaching me is for, under its name. */
-const CONTACT_SUB: Record<string, string> = {
-  email: 'the surest way to reach me',
-  instagram: 'the art, as it gets made',
-  linkedin: 'the professional side',
-  github: 'everything here, in source',
-};
-
-function Contact({ onBack }: { onBack: () => void }) {
-  // email first and across the full width: it is the one that actually gets read
-  const email = CONTACTS.find((c) => c.id === 'email');
-  const rest = CONTACTS.filter((c) => c.id !== 'email');
-  const row = (c: (typeof CONTACTS)[number]) => (
-    <a key={c.id} className="ct-row" href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel="noreferrer">
-      <span className="ct-icon" aria-hidden="true">
-        <BrandIcon id={c.id} size={23} />
-      </span>
-      <span className="ct-text">
-        <span className="ct-name">{c.label}</span>
-        <span className="ct-sub">{c.id === 'email' ? c.handle : CONTACT_SUB[c.id]}</span>
-      </span>
-    </a>
-  );
-  return (
-    <div className="hm ct">
-      {/* nothing links here — the NFC tag does — so this is the way into the site */}
-      <button type="button" className="ct-home" onClick={onBack}>
-        Nathan Ward
-      </button>
-      <motion.div
-        className="ct-card"
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.3, 1], delay: 0.12 }}
-      >
-        <h1 className="ct-title">Say hi</h1>
-        <p className="ct-line">Happy to talk simulation, machine learning, commissions and anything else.</p>
-        {email && row(email)}
-        <div className="ct-pair">{rest.map(row)}</div>
-      </motion.div>
-    </div>
-  );
 }
 
 function Cards({ group, onBack, onOpen }: { group: string; onBack: () => void; onOpen: (c: Card) => void }) {
