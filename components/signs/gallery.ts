@@ -11,15 +11,15 @@ export type Shot = { src: string; caption: string; credit?: string; video?: stri
 export const GALLERY: Record<string, Shot[]> = {
   'siege': [
     { src: '/projects/siege/5.webp', caption: 'What the policy sees: a box per unit, red for the opponent, over an official Supercell screenshot', credit: 'https://apps.apple.com/us/app/clash-royale/id1053012308' },
-    { src: '/projects/siege/2.webp', caption: 'Live WebGL viewer of the policy network mid-match' },
-    { src: '/projects/siege/3.webp', caption: 'Architecture diagram: 2.68M-parameter policy network' },
+    { src: '/projects/siege/2.webp', caption: 'The policy network layer by layer, read from the trained checkpoint: 2.68M parameters' },
+    { src: '/projects/siege/3.webp', caption: 'Where the parameters are: one projection layer holds 88 % of them' },
     { src: '/projects/siege/4.webp', caption: 'Self-play training curve vs five scripted archetypes' },
   ],
   'gambit': [
     { src: '/projects/gambit/1.webp', caption: 'Gambit playing itself: alpha-beta at 100 ms a move, with the depth and evaluation logged for every move' },
-    { src: '/projects/gambit/2.webp', caption: 'The training curve: move agreement on 100,000 held-out positions, 48.2 % after two epochs' },
-    { src: '/projects/gambit/3.webp', caption: 'What it learned: human opening choices, and search beating the raw policy +8 =1 -0' },
-    { src: '/projects/gambit/4.webp', caption: "The board and the checkpoint's own report: tactics 4 of 4 as first choice" },
+    { src: '/projects/gambit/2.webp', caption: 'The training log: 47.3 % move agreement on 100,000 held-out positions after two passes, 48.2 % on the last 4,096-position check' },
+    { src: '/projects/gambit/3.webp', caption: "The policy head's opening choices from the trained checkpoint, with no search" },
+    { src: '/projects/gambit/4.webp', caption: 'Four sanity-check positions: the right move is the first choice in all four' },
   ],
   'black-hole': [
     { src: '/projects/black-hole/1.webp', caption: 'Lensed accretion disk at 80° inclination' },
