@@ -10,7 +10,7 @@ import { HangingSign } from './hanging';
 import { Landing } from './landing';
 import { About } from './about';
 import { Contact } from './contact';
-import { Corner, type Side } from './corner';
+import { Nav } from './nav';
 
 // Gambit's project page opens on a live board; it, chess.js and the board
 // component load only when that page does
@@ -92,7 +92,6 @@ const pageMotion = (reduce: boolean) => ({
 export default function Signs() {
   const [route, setRoute] = useState<Route>({ page: 'home' });
   // which half the landing page is showing, so About can wear the same mark
-  const [side, setSide] = useState<Side>('engineering');
   const reduce = useReducedMotion();
   const [lightbox, setLightbox] = useState<{ image: string; caption: string; materials?: string[] } | null>(null);
   const [project, setProject] = useState<Card | null>(null);
@@ -135,28 +134,6 @@ export default function Signs() {
   }, [route]);
   const motionFor = useMemo(() => pageMotion(!!reduce), [reduce]);
 
-  // the corner's Gallery and Contact bubbles land on a section of the home page,
-  // going home first when they are pressed from somewhere else
-  const pendingJump = useRef<string | null>(null);
-  const jump = useCallback(
-    (sel: string) => {
-      if (route.page === 'home') {
-        document.querySelector(sel)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-      } else {
-        pendingJump.current = sel;
-        go('#/');
-      }
-    },
-    [route.page, reduce, go],
-  );
-  useEffect(() => {
-    if (route.page !== 'home' || !pendingJump.current) return;
-    const sel = pendingJump.current;
-    pendingJump.current = null;
-    // home is already there under the About sheet as it drops away, so jump at once
-    const t = window.setTimeout(() => document.querySelector(sel)?.scrollIntoView({ behavior: 'auto', block: 'start' }), 20);
-    return () => window.clearTimeout(t);
-  }, [route]);
   const goHome = useCallback(() => {
     window.location.hash = '#/';
   }, []);
@@ -194,7 +171,7 @@ export default function Signs() {
           {plain(route) || <Scribble />}
           {plain(route) || <Doodles seed={routeKey(route).length * 7 + 1} />}
           {route.page === 'home' && (
-            <Landing onOpenProject={setProject} onOpenArt={setLightbox} onSide={setSide} />
+            <Landing onOpenProject={setProject} onOpenArt={setLightbox} />
           )}
 
           {route.page === 'art' && !route.section && (
@@ -250,21 +227,10 @@ export default function Signs() {
         </motion.section>
       </AnimatePresence>
 
-      {/* The corner mark lives out here, above the page swap: the pages
-          themselves translate and scale on the way in and out, and a fixed
-          element inside one of those goes with it, which is what made the
-          mark jump between home and About. */}
-      {(route.page === 'home' || route.page === 'about' || route.page === 'contact') && (
-        <Corner
-          side={side}
-          items={[
-            ...(route.page !== 'home' ? [{ label: 'Home', href: '#/' }] : []),
-            ...(route.page !== 'about' ? [{ label: 'About', href: '#/about' }] : []),
-            { label: 'Gallery', onClick: () => jump('.hm-work') },
-            ...(route.page !== 'contact' ? [{ label: 'Contact', href: '#/contact' }] : []),
-          ]}
-        />
-      )}
+      {/* The bar lives out here, above the page swap: the pages themselves
+          move on the way in and out, and a fixed element inside one of them
+          goes with it, which is what used to make the corner mark jump. */}
+      {(route.page === 'home' || route.page === 'about' || route.page === 'contact') && <Nav page={route.page} />}
 
       <NameTag page={plain(route) ? 'art' : route.page} onHome={goHome} />
 

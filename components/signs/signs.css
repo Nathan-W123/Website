@@ -769,16 +769,21 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
    colour. Lives inside .sg-page, so it covers the ruled paper over.
    =================================================================== */
 .sg-page--plain {
+  /* the bar stops short of the scrollbar, so these pages keep its gutter even
+     when they are too short to scroll: the bar is one width on all of them */
+  scrollbar-gutter: stable;
   background-image: none;
   background-color: #f7f6f1;
   cursor: auto;
 }
-/* the tokens and the type, shared with the corner nav: it lives in the route
-   shell above the pages, outside .hm, and without these it fell back to the
-   old handwriting face, lost its border and went to the shell's black */
+/* the tokens and the type, shared with the nav bar: it lives in the route
+   shell above the pages, outside .hm, and without these it would fall back to
+   the old handwriting face and the shell's black. --bar is the bar's height,
+   which the pages under it leave clear. */
 .hm,
-.hm-corner-nav,
+.hm-nav,
 .gbp-scrim {
+  --bar: 60px;
   --ink: #363636;
   --role: #d2d2d2;
   --role-bar: #bdbdbd;
@@ -1086,7 +1091,7 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
    page with nothing below it that only pushes the words off centre */
 /* the cream is painted here as well as on the page: .hm is its own stacking
    context, and the ribbon's multiply blend only sees what is painted inside it */
-.ab2 { text-align: left; display: flex; flex-direction: column; min-height: 100svh; padding-bottom: 0; background: var(--cream); }
+.ab2 { text-align: left; display: flex; flex-direction: column; min-height: 100svh; padding-top: var(--bar); padding-bottom: 0; background: var(--cream); }
 .ab2-back { margin: clamp(22px, 4vh, 44px) 0 0; }
 /* centred in what is left of the screen, and wide enough to carry type you can
    read across a room */
@@ -1132,10 +1137,10 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 /* Stacked only on a phone: a portrait tablet still has room for the words
    beside the art. Stacked, the two rows are packed into the middle together;
    left to stretch, they split the screen's height, and the words sat in the
-   top half with the art adrift in the bottom one. The top padding clears the
-   corner mark. */
+   top half with the art adrift in the bottom one. The top padding, with the
+   bar's, keeps the words clear of the bar. */
 @media (max-width: 700px) {
-  .ab2-body { grid-template-columns: minmax(0, 1fr); align-content: center; gap: clamp(16px, 3.4vh, 34px); padding-top: 84px; }
+  .ab2-body { grid-template-columns: minmax(0, 1fr); align-content: center; gap: clamp(16px, 3.4vh, 34px); padding-top: 30px; }
   .ab2-art { max-width: 300px; }
 }
 .ab2-line {
@@ -1505,66 +1510,74 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-name-link:hover { opacity: 0.6; }
 .hm-name-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; border-radius: 4px; }
 
-/* ---- the corner switch: the pill again, within reach anywhere down the page ---- */
-/* the corner: the mark, and the bubbles that slide out of it on hover */
-.hm-corner-nav {
+/* ---- the bar: frosted glass across the top, About and Contact in the middle ---- */
+.hm-nav {
   position: fixed;
-  top: clamp(16px, 2.4vh, 28px);
-  left: clamp(16px, 2.4vw, 34px);
+  top: 0;
+  left: 0;
+  right: var(--sbw, 0px);
   z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--bar);
+  padding: 0 clamp(16px, 2.4vw, 34px);
+  background: rgba(247, 246, 241, 0.64);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  border-bottom: 1px solid rgba(54, 54, 54, 0.08);
 }
-.hm-corner {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-  padding: 0;
-  border: 1px solid var(--rule);
-  border-radius: 50%;
-  background: #fcfcfa;
+/* without a blur behind it, a see-through bar is just a smear over the words */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .hm-nav { background: rgba(247, 246, 241, 0.96); }
+}
+.hm-nav-links { display: flex; gap: clamp(30px, 3.6vw, 52px); margin: 0; padding: 0; list-style: none; }
+.hm-nav-link,
+.hm-nav-home {
   color: var(--ink);
-  cursor: pointer;
-  box-shadow: 0 10px 22px -16px rgba(0, 0, 0, 0.5);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.3, 1), border-color 0.25s ease, background 0.25s ease;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
 }
-.hm-corner:hover { transform: translateY(-3px) scale(1.05); border-color: var(--ink); background: #fff; }
-.hm-corner:active { transform: translateY(-1px) scale(0.98); }
-.hm-corner:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
-.hm-corner-mark { display: grid; place-items: center; width: 26px; height: 26px; }
-/* the brush is a picture, masked rather than drawn, so it still takes the colour
-   around it and changes with hover like the integral does */
-.hm-corner-brush {
+.hm-nav-link {
   display: block;
-  width: 26px;
-  height: 26px;
-  background: currentColor;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  padding: 6px 2px;
+  font-family: var(--disp);
+  font-size: 16.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
-/* the contour integral, set in the display face so it matches the headings */
-.hm-corner-int { font-family: var(--disp); font-size: 29px; font-weight: 500; line-height: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .hm-corner { transition: none; }
-  .hm-corner:hover { transform: none; }
+/* the page you are on is underlined, the way the hero underlines its side */
+.hm-nav-link[aria-current='page'] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
 }
-@media (max-width: 560px) {
-  .hm-corner { width: 46px; height: 46px; }
-}
-
-/* the shuffle takes about two thirds of a second, so the corner says so */
-.hm-corner-ring {
+.hm-nav-home {
   position: absolute;
-  inset: -1px;
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
-  transform: rotate(-90deg);
-  pointer-events: none;
-  color: var(--ink);
+  left: clamp(16px, 2.4vw, 34px);
+  top: 0;
+  bottom: 0;
+  height: fit-content;
+  margin: auto 0;
+  font-family: var(--disp);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.hm-nav-link:hover,
+.hm-nav-home:hover { opacity: 0.6; }
+.hm-nav-link:focus-visible,
+.hm-nav-home:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 4px; }
+/* on a phone the name and a centred pair would collide, so off the home page
+   the pair moves over to the right */
+@media (max-width: 600px) {
+  .hm,
+  .hm-nav { --bar: 54px; }
+  .hm-nav-links { gap: 26px; }
+  .hm-nav-link { font-size: 15.5px; }
+  .hm-nav-home { font-size: 13.5px; }
+  .hm-nav.is-sub { justify-content: flex-end; }
 }
 
 /* the shuffle takes about two thirds of a second, and the pill is what starts
@@ -1579,77 +1592,6 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   background: var(--ink);
   transform-origin: left;
 }
-/* The bubbles: round, parked behind the mark, and burst out along a quarter arc
-   (right, diagonal, down) when the corner is hovered or tabbed into. --c is the
-   mark's centre, --x/--y each bubble's place, both set off that centre. */
-.hm-corner-nav { --c: 27px; }
-.hm-corner { z-index: 2; }
-.hm-corner-bubbles { margin: 0; padding: 0; list-style: none; }
-/* while it is open, an invisible disc around the mark keeps the hover alive on
-   the way from the mark out to a bubble; closed, it lets the page have the pointer */
-.hm-corner-nav::before {
-  content: '';
-  position: absolute;
-  left: calc(var(--c) - 140px);
-  top: calc(var(--c) - 140px);
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  pointer-events: none;
-}
-.hm-corner-nav:hover::before,
-.hm-corner-nav:focus-within::before { pointer-events: auto; }
-.hm-bubble {
-  position: absolute;
-  left: var(--c);
-  top: var(--c);
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  /* smaller than the mark they come out of */
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid var(--rule);
-  border-radius: 50%;
-  background: #fcfcfa;
-  box-shadow: 0 8px 18px -14px rgba(0, 0, 0, 0.5);
-  font: 500 10px/1 var(--body);
-  letter-spacing: 0;
-  color: var(--ink);
-  text-decoration: none;
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, -50%) scale(0.3);
-  transition: transform 0.34s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
-.hm-corner-nav:hover .hm-bubble,
-.hm-corner-nav:focus-within .hm-bubble,
-.hm-corner-nav.is-open .hm-bubble {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1);
-  /* out with a little overshoot, each one a beat after the last */
-  transition: transform 0.46s cubic-bezier(0.34, 1.5, 0.64, 1), opacity 0.18s ease, border-color 0.2s ease, background 0.2s ease;
-  transition-delay: calc(var(--i) * 55ms);
-}
-.hm-corner-nav .hm-bubble:hover { border-color: var(--ink); background: #fff; }
-.hm-bubble:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-@media (max-width: 560px) {
-  .hm-corner-nav { --c: 23px; }
-  .hm-bubble { width: 40px; height: 40px; font-size: 9.5px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hm-bubble,
-  .hm-corner-nav:hover .hm-bubble,
-  .hm-corner-nav:focus-within .hm-bubble,
-  .hm-corner-nav.is-open .hm-bubble { transition: opacity 0.01s; transition-delay: 0s; }
-}
-/* the jump targets clear the top of the screen rather than butting into it */
-.hm-work,
-.hm-foot { scroll-margin-top: 40px; }
-
 /* ---- About: a picture set into a phrase, and a few more on hover ---- */
 .ab2-spot { position: relative; }
 .ab2-spot-mark {

@@ -128,11 +128,9 @@ function Tile({
 export function Landing({
   onOpenProject,
   onOpenArt,
-  onSide,
 }: {
   onOpenProject: (c: Card) => void;
   onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void;
-  onSide: (s: Side) => void;
 }) {
   const [side, setSide] = useState<Side>('engineering');
   // mid-shuffle the four cards are squared into one deck; the pictures change
@@ -164,7 +162,6 @@ export function Landing({
     const next = other(side);
     if (reduce) {
       setSide(next);
-      onSide(next);
       return;
     }
     setStacked(true);
@@ -175,7 +172,6 @@ export function Landing({
       // which is also why swapping the faces over here changes nothing you can see
       window.setTimeout(() => {
         setSide(next);
-        onSide(next);
         setPeeling(false);
         setTucked([]);
       }, 630),

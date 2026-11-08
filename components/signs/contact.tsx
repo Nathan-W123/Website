@@ -10,13 +10,13 @@ import { PUZZLE_HTML, PUZZLE_STRING } from './puzzle';
  * Contact, in About's language: a few lines at one size, the same row of
  * marks, and Nathan's infinity ribbon where About has the morphing one.
  *
- * The email address is not on the page, or anywhere else on the site: it is
- * the answer to the puzzle, which sits in the column as one more line, at the
- * lines' size and on their left edge. The integral works out to exactly 2,
+ * The email address is not on this page (About has it): here it is the answer
+ * to the puzzle, which sits in the column as one more line, at the lines' size
+ * and on their left edge. The integral works out to exactly 2,
  * which picks the order of the scrambled characters.
  *
- * An NFC tag points straight here, so it is also a front door; the corner's
- * Home bubble is the way into the rest of the site.
+ * An NFC tag points straight here, so it is also a front door; the name at
+ * the left of the bar is the way into the rest of the site.
  */
 export function Contact() {
   return (
@@ -24,7 +24,7 @@ export function Contact() {
       <div className="ab2-body">
         <div className="ab2-col">
           <p className="ab2-line">Say hi.</p>
-          <p className="ab2-line">Email is the quickest way to reach me.</p>
+          <p className="ab2-line">Find my email by solving this problem.</p>
           <p className="ab2-line">
             Let <code className="ab2-code">s = {PUZZLE_STRING}</code>, where <i>s</i>[<i>j</i>] is its <i>j</i>&#8209;th
             character, counting from&nbsp;1. Evaluate

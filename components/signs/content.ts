@@ -43,8 +43,11 @@ export const CONTACTS = [
   { id: 'instagram', label: 'Instagram', handle: '@naze_draws', href: 'https://instagram.com/naze_draws' },
   { id: 'linkedin', label: 'LinkedIn', handle: 'linkedin.com/in/nathan-ward-', href: 'https://www.linkedin.com/in/nathan-ward-' },
   { id: 'github', label: 'GitHub', handle: 'Nathan-W123', href: 'https://github.com/Nathan-W123' },
-  // no email here on purpose: the address is only had by solving the puzzle on the Contact page
+  // no email in this list: Contact shows these marks and keeps the address behind its puzzle
 ];
+
+/** The address, for About's row of marks; Contact makes you solve for it. */
+export const EMAIL = { id: 'email', label: 'Email', handle: 'ncward@ucdavis.edu', href: 'mailto:ncward@ucdavis.edu' };
 
 /** What the pieces are made with, shown beside an expanded artwork. */
 const MARKERS = ['Copic markers', 'Copic blender card', 'Sakura Jelly Roll pen', '0.3 mm and 0.5 mm Micron fineliners'];

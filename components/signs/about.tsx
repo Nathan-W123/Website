@@ -2,7 +2,7 @@
 
 import { useReducedMotion } from 'motion/react';
 import { useEffect, useState } from 'react';
-import { ABOUT, CONTACTS } from './content';
+import { ABOUT, CONTACTS, EMAIL } from './content';
 import { BrandIcon } from './icons';
 
 const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
@@ -59,7 +59,7 @@ export function RibbonArt({ name = 'about/ribbon' }: { name?: string }) {
 /**
  * About: a few paragraphs at a size you can actually read, held to the left of
  * the page, with the morphing ribbon on the right. No heading and nothing to
- * scroll — it is five sentences. The corner nav belongs to the route shell,
+ * scroll — it is five sentences. The nav bar belongs to the route shell,
  * which is what keeps it still on the way in from the home page.
  */
 export function About() {
@@ -75,7 +75,7 @@ export function About() {
           {/* out on the page: a row you have to keep hovered is a row you cannot click */}
           <p className="ab2-line ab2-socials">
             Find me on
-            {CONTACTS.map((c) => (
+            {[...CONTACTS, EMAIL].map((c) => (
               <a
                 key={c.id}
                 className="ab2-chip"
