@@ -1129,10 +1129,13 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   pointer-events: none;
   user-select: none;
 }
-@media (max-width: 880px) {
-  /* stacked, the column runs taller than the screen and starts at the top,
-     so it has to clear the corner mark pinned there */
-  .ab2-body { grid-template-columns: minmax(0, 1fr); gap: clamp(16px, 3.4vh, 34px); padding-top: 84px; }
+/* Stacked only on a phone: a portrait tablet still has room for the words
+   beside the art. Stacked, the two rows are packed into the middle together;
+   left to stretch, they split the screen's height, and the words sat in the
+   top half with the art adrift in the bottom one. The top padding clears the
+   corner mark. */
+@media (max-width: 700px) {
+  .ab2-body { grid-template-columns: minmax(0, 1fr); align-content: center; gap: clamp(16px, 3.4vh, 34px); padding-top: 84px; }
   .ab2-art { max-width: 300px; }
 }
 .ab2-line {
@@ -1144,18 +1147,37 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   text-wrap: pretty;
 }
 
-/* a link inside a sentence: the address on Contact */
-.ab2-link {
+/* the email, as a puzzle: a quiet card holding the problem, its formula and
+   a line on what Concat and mod mean. The formula scrolls sideways rather
+   than spilling if a screen is too narrow for it. */
+.ab2-puzzle {
+  padding: clamp(14px, 1.6vw, 22px) clamp(16px, 1.8vw, 24px);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: #fcfcfa;
+  box-shadow: 0 10px 24px -20px rgba(0, 0, 0, 0.4);
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.55;
   color: var(--ink);
-  text-decoration-line: underline;
-  text-decoration-thickness: 0.07em;
-  text-decoration-color: rgba(54, 54, 54, 0.28);
-  text-underline-offset: 0.18em;
-  overflow-wrap: anywhere;
-  transition: text-decoration-color 0.2s ease;
 }
-.ab2-link:hover { text-decoration-color: var(--ink); }
-.ab2-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 3px; }
+.ab2-puzzle p { margin: 0; }
+.ab2-puzzle code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: #f1efe8;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.95em;
+}
+.ab2-formula { overflow-x: auto; overflow-y: hidden; }
+.ab2-formula .katex-display { margin: 0.7em 0; }
+.ab2-formula .katex { font-size: 1.12em; color: var(--ink); }
+.ab2-puzzle-note { font-size: 0.86em; color: var(--ink-soft); }
+/* a phone is narrower than the formula at full size: a little less padding
+   and a slightly smaller formula, so it fits instead of scrolling */
+@media (max-width: 700px) {
+  .ab2-puzzle { padding: 14px 12px; }
+  .ab2-formula .katex { font-size: 1em; }
+}
 
 /* the socials: out on the page, not behind a hover */
 .ab2-socials { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }

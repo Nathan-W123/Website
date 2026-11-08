@@ -10,7 +10,10 @@ import { Rough } from '@/components/sketch/rough';
 
 export const CONTACT = {
   name: 'Nathan W.',
-  email: 'ncward@ucdavis.edu',
+  // the address itself is only had by solving the puzzle on the Contact page,
+  // so the room points there instead of printing it
+  email: 'solve for my email',
+  emailHref: '/#/contact',
   github: 'https://github.com/Nathan-W123',
 };
 
@@ -82,7 +85,7 @@ export function WallWhiteboard({ x, y, w, h, wall }: { x: number; y: number; w: 
         <g className="lf-marker" filter="url(#lf-ink)">
           <text x={fr + 26} y={fr + 78} className="lf-marker-name-lg" transform={`rotate(-1.4 ${fr + 26} ${fr + 78})`}>{CONTACT.name}</text>
           <path d={`M ${fr + 28} ${fr + 92} q 60 7 120 0 t 96 3`} fill="none" stroke="#3a2a3a" strokeWidth={2.6} strokeLinecap="round" opacity={0.75} />
-          <a href={`mailto:${CONTACT.email}`} className="lf-marker-link">
+          <a href={CONTACT.emailHref} className="lf-marker-link">
             <text x={fr + 28} y={fr + 150} className="lf-marker-line-lg" transform={`rotate(0.5 ${fr + 28} ${fr + 150})`}>{CONTACT.email}</text>
           </a>
           <a href={CONTACT.github} target="_blank" rel="noreferrer" className="lf-marker-link">
@@ -102,7 +105,7 @@ export function BoardWriting({ x, y, w, h }: { x: number; y: number; w: number; 
     <g className="lf-marker lf-board-ink" filter="url(#lf-watercolor-ink)">
       <text x={gx} y={y + h * 0.3} className="lf-board-name" transform={`rotate(-1.6 ${gx} ${y + h * 0.3})`}>{CONTACT.name}</text>
       <path d={`M ${gx + 2} ${y + h * 0.36} q ${w * 0.16} 6 ${w * 0.32} 0 t ${w * 0.24} 2`} fill="none" stroke="#c9553f" strokeWidth={3} strokeLinecap="round" opacity={0.9} />
-      <a href={`mailto:${CONTACT.email}`} className="lf-marker-link">
+      <a href={CONTACT.emailHref} className="lf-marker-link">
         <text x={gx + 2} y={y + h * 0.56} className="lf-board-line" transform={`rotate(0.7 ${gx} ${y + h * 0.56})`}>{CONTACT.email}</text>
       </a>
       <a href={CONTACT.github} target="_blank" rel="noreferrer" className="lf-marker-link">
@@ -229,7 +232,7 @@ export function DeskWhiteboard({ x, y, w = 250, h = 180 }: { x: number; y: numbe
       <rect x={w * 0.14} y={h - 3} width={w * 0.72} height={11} rx={3} fill="url(#lf-frame-wood)" stroke={LINE} strokeWidth={2} />
       <g className="lf-marker">
         <text x={fr + 14} y={fr + 44} className="lf-marker-name" transform={`rotate(-1.5 ${fr + 14} ${fr + 44})`}>{CONTACT.name}</text>
-        <a href={`mailto:${CONTACT.email}`} className="lf-marker-link">
+        <a href={CONTACT.emailHref} className="lf-marker-link">
           <text x={fr + 14} y={fr + 84} className="lf-marker-line" transform={`rotate(0.6 ${fr + 14} ${fr + 84})`}>{CONTACT.email}</text>
         </a>
         <a href={CONTACT.github} target="_blank" rel="noreferrer" className="lf-marker-link">
