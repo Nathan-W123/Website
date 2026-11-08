@@ -1147,37 +1147,21 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   text-wrap: pretty;
 }
 
-/* the email, as a puzzle: a quiet card holding the problem, its formula and
-   a line on what Concat and mod mean. The formula scrolls sideways rather
-   than spilling if a screen is too narrow for it. */
-.ab2-puzzle {
-  padding: clamp(14px, 1.6vw, 22px) clamp(16px, 1.8vw, 24px);
-  border: 1px solid var(--rule);
-  border-radius: 16px;
-  background: #fcfcfa;
-  box-shadow: 0 10px 24px -20px rgba(0, 0, 0, 0.4);
-  font-size: clamp(14px, 1.15vw, 17px);
-  line-height: 1.55;
-  color: var(--ink);
-}
-.ab2-puzzle p { margin: 0; }
-.ab2-puzzle code {
-  padding: 1px 6px;
-  border-radius: 6px;
-  background: #f1efe8;
+/* The email puzzle, flush in the column: no card, the same left edge as the
+   lines around it. */
+.ab2-code {
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.95em;
+  font-size: 0.86em;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
-.ab2-formula { overflow-x: auto; overflow-y: hidden; }
-.ab2-formula .katex-display { margin: 0.7em 0; }
-.ab2-formula .katex { font-size: 1.12em; color: var(--ink); }
-.ab2-puzzle-note { font-size: 0.86em; color: var(--ink-soft); }
-/* a phone is narrower than the formula at full size: a little less padding
-   and a slightly smaller formula, so it fits instead of scrolling */
-@media (max-width: 700px) {
-  .ab2-puzzle { padding: 14px 12px; }
-  .ab2-formula .katex { font-size: 1em; }
-}
+/* The formula sits on the words' left edge and is never wider than the
+   column: KaTeX sizes everything in em and this formula is about 22.5 em wide,
+   so its em is the lines' size, capped at 4.4% of the column (container units). */
+.ab2-formula { container-type: inline-size; }
+.ab2-formula .katex-display { margin: 0; text-align: left; }
+.ab2-formula .katex-display > .katex { text-align: left; }
+.ab2-formula .katex { font-size: min(clamp(19px, 1.85vw, 27px), 4.4cqi); color: var(--ink); }
 
 /* the socials: out on the page, not behind a hover */
 .ab2-socials { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
