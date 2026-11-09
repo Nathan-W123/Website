@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/rea
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ART, CONTACTS, PROJECT_GROUPS, WORKED_WITH, type ArtItem, type Card } from './content';
 import { BrandIcon } from './icons';
+import { SendOff } from './sendoff';
 
 /**
  * Home: the name set large, four pieces of work fanned out under it, and a
@@ -403,6 +404,9 @@ export function Landing({
           </>
         )}
       </motion.footer>
+
+      {/* the last thing on the page, the same on both sides, so it stays put when the side changes */}
+      <SendOff />
     </div>
   );
 }

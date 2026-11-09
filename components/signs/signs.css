@@ -840,7 +840,9 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
   z-index: 2;
   max-width: calc(1280 * var(--uv));
   margin: 0 auto;
-  padding: 0 calc(24 * var(--uv)) calc(120 * var(--uv));
+  /* the room at the foot of the page, which the send-off sits in */
+  --foot-pad: calc(120 * var(--uv));
+  padding: 0 calc(24 * var(--uv)) var(--foot-pad);
   text-align: center;
 }
 
@@ -1116,7 +1118,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 }
 
 @media (max-width: 560px) {
-  .hm { padding: 0 18px 84px; }
+  .hm { --foot-pad: 84px; padding: 0 18px var(--foot-pad); }
   .hm-hero { min-height: calc(100svh - 40px); }
   .hm-fan { --cw: 29vw; margin-top: 22px; }
   .hm-grid { gap: 16px; }
@@ -1545,6 +1547,84 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 @media (prefers-reduced-motion: reduce) {
   .hm-social a { transition: none; }
   .hm-social a:hover { transform: none; }
+}
+
+/* ---- the send-off at the foot of the home page: a paper plane holding its
+   course while the clouds go by, over a line in the site's own type. It sits
+   in the room the page already keeps under the follow marks (--foot-pad),
+   placed rather than stacked, so the page is no taller and the scroll ends
+   where it always did. ---- */
+.hm-sendoff {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% - var(--foot-pad));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: calc(14 * var(--uv));
+  pointer-events: none;
+}
+.hm-sendoff-sky {
+  display: block;
+  width: calc(150 * var(--uv));
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* a warm grey that still reads at 4.9:1 on the cream (the soft grey is 3.1) */
+.hm-sendoff-line {
+  margin: calc(4 * var(--ut)) 0 0;
+  font-family: var(--disp);
+  font-weight: 500;
+  font-size: calc(14 * var(--ut));
+  letter-spacing: 0.01em;
+  color: #6f6a65;
+}
+.hm-cloud { fill: none; stroke: #cfcac2; stroke-width: 1.1; stroke-linejoin: round; }
+.hm-plane polygon { stroke: #8f8a85; stroke-width: 1; stroke-linejoin: round; }
+.hm-plane-sheet { fill: #fbfaf8; }
+.hm-plane-wing { fill: #efe3e0; }
+.hm-plane-keel { fill: #e6d6d2; }
+.hm-plane-trail { fill: none; stroke: #a39e99; stroke-width: 1.3; stroke-linecap: round; }
+.hm-plane,
+.hm-plane-trail,
+.hm-cloud-run { transform-box: fill-box; transform-origin: center; }
+/* the plane rides a slow swell, nose lifting as it rises, and its trail
+   brightens with each push; the clouds pass from right to left, each at its
+   own pace, fading in and out at the ends of their run. The animations wait
+   (paused) until the send-off is on screen. */
+.hm-plane { animation: hm-plane-ride 4.2s ease-in-out infinite; }
+.hm-plane-trail { animation: hm-plane-trail 4.2s ease-in-out infinite; }
+.hm-cloud-run { animation: hm-cloud-pass var(--t, 20s) linear var(--d, 0s) infinite; }
+.hm-sendoff:not(.is-running) .hm-plane,
+.hm-sendoff:not(.is-running) .hm-plane-trail,
+.hm-sendoff:not(.is-running) .hm-cloud-run { animation-play-state: paused; }
+@keyframes hm-plane-ride {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(2px, -4.5px) rotate(-3deg); }
+}
+@keyframes hm-plane-trail {
+  0%, 100% { opacity: 0.45; transform: translateX(0); }
+  50% { opacity: 0.95; transform: translateX(-3px); }
+}
+@keyframes hm-cloud-pass {
+  0% { transform: translateX(38px); opacity: 0; }
+  14% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { transform: translateX(-38px); opacity: 0; }
+}
+/* a phone keeps 84px under the marks, so the scene and its line come down a size */
+@media (max-width: 560px) {
+  .hm-sendoff { padding-top: 10px; }
+  .hm-sendoff-sky { width: 128px; }
+  .hm-sendoff-line { font-size: 13px; }
+}
+/* held still: the scene exactly as drawn */
+@media (prefers-reduced-motion: reduce) {
+  .hm-plane,
+  .hm-plane-trail,
+  .hm-cloud-run { animation: none; }
 }
 
 /* a gallery tile gives under the cursor too, and springs back */
