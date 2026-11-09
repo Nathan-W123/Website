@@ -133,6 +133,9 @@ export function Landing({
   onOpenArt: (v: { image: string; caption: string; materials?: string[] }) => void;
 }) {
   const [side, setSide] = useState<Side>('engineering');
+  // the side the switch is set to: it answers the click at once, and the cards
+  // catch up with it at the end of the shuffle
+  const [chosen, setChosen] = useState<Side>('engineering');
   // mid-shuffle the four cards are squared into one deck; the pictures change
   // underneath while they are stacked, then the deck is dealt back out
   const [stacked, setStacked] = useState(false);
@@ -160,6 +163,7 @@ export function Landing({
   const flip = () => {
     if (stacked) return;
     const next = other(side);
+    setChosen(next);
     if (reduce) {
       setSide(next);
       return;
@@ -299,20 +303,11 @@ export function Landing({
           type="button"
           className="hm-switch"
           role="switch"
-          aria-checked={side === 'art'}
-          aria-label={side === 'art' ? 'Showing art. Switch to engineering.' : 'Showing engineering. Switch to art.'}
+          aria-checked={chosen === 'art'}
+          aria-label={chosen === 'art' ? 'Showing art. Switch to engineering.' : 'Showing engineering. Switch to art.'}
           onClick={flip}
         >
           <span className="hm-switch-knob" aria-hidden="true" />
-          {stacked && !reduce && (
-            <motion.span
-              className="hm-switch-run"
-              aria-hidden="true"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.67, ease: 'linear' }}
-            />
-          )}
         </button>
 
         <div className="hm-clients-slot">
