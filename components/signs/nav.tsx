@@ -12,7 +12,7 @@ const LINKS: { page: Page; label: string; href: string }[] = [
 ];
 
 // the page on screen: during a swap the incoming one is the last in the DOM
-const currentPage = () => [...document.querySelectorAll<HTMLElement>('.sg-page--plain')].pop();
+const currentPage = () => [...document.querySelectorAll<HTMLElement>('.sg-page--plain:not(.sg-boot)')].pop();
 
 /**
  * The bar across the top of home, About and Contact: frosted glass, with the

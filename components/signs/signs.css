@@ -567,6 +567,22 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 /* About comes up over the home page like a sheet, so its top edge throws a
    soft shadow onto the page beneath while it moves (off screen once it is up) */
 .sg-page--sheet { box-shadow: 0 -22px 44px -26px rgba(0, 0, 0, 0.3); }
+/* A visit straight to About or Contact (the NFC tag opens Contact). The HTML
+   is the home page, so copies of both sheets ship in it, and the head script
+   marks the one the address asks for before anything is drawn: that page is
+   simply there from the first paint, over home, and the real one takes its
+   place where it stands once the script has loaded. */
+.sg-boot { display: none; z-index: 6; }
+html[data-boot='about'] .sg-boot[data-boot-page='about'],
+html[data-boot='contact'] .sg-boot[data-boot-page='contact'] { display: block; }
+/* until then the bar is home's, so it marks the right page from here */
+html[data-boot] .hm-nav-link[aria-current='page'] { text-decoration: none; }
+html[data-boot='about'] .hm-nav-link[href='#/about'],
+html[data-boot='contact'] .hm-nav-link[href='#/contact'] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
+}
 /* Nothing on the site takes typing, so no text should show a blinking caret.
    It appears when the browser's caret browsing is on (F7 in Chrome and Edge),
    which a page cannot turn off, but it can make the caret invisible. Real

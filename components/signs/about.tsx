@@ -32,7 +32,7 @@ export function RibbonArt({ name = 'about/ribbon' }: { name?: string }) {
     <div className="ab2-art" aria-hidden="true">
       {reduce || !live ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img className="ab2-art-media" src={`${base()}/${name}.webp`} alt="" />
+        <img className="ab2-art-media" src={`${base()}/${name}.webp`} alt="" loading="lazy" decoding="async" />
       ) : (
         // decoration, not a player: no picture-in-picture button on hover, no cast
         // button, and (in the CSS) no pointer at all, so no context menu either

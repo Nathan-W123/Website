@@ -45,13 +45,28 @@ export const metadata: Metadata = {
   },
 };
 
+// The HTML is the home page, so a visit that comes straight to About or
+// Contact (the NFC tag opens Contact) used to show home until the script
+// loaded, and then the sheet rose over it. This runs before anything is
+// drawn and marks the page the address asks for; the copies of About and
+// Contact that ship in the HTML show by it until the script takes over
+// (.sg-boot in components/signs). It follows the address until then too.
+const BOOT =
+  "(function(){var d=document.documentElement;function s(){var p=location.hash.slice(1).split('/').filter(Boolean)[0];" +
+  "if(p==='about'||p==='contact')d.setAttribute('data-boot',p);else d.removeAttribute('data-boot')}" +
+  "s();window.__sgBoot=s;addEventListener('hashchange',s)})();";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // the head script adds data-boot before React sees the page
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: BOOT }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

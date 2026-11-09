@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Rough } from '@/components/sketch/rough';
 import { ART, CONTACTS, NAME, PROJECT_GROUPS, WORKED_WITH, type Card } from './content';
@@ -23,6 +23,8 @@ import './signs.css';
 declare global {
   interface Window {
     __SIGNS_BASE?: string;
+    /** the head script's address follower (app/layout.tsx), retired once the routes are live */
+    __sgBoot?: () => void;
   }
 }
 const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
@@ -51,6 +53,11 @@ const plain = (r: Route) => r.page === 'home' || r.page === 'about' || r.page ==
 type Trip = { from: string; to: string };
 /** The pages that arrive as a sheet pulled up from below. */
 const isSheet = (key: string) => key === 'about' || key === 'contact';
+/**
+ * Where the first page of a visit straight to a sheet comes "from": its copy
+ * in the HTML is already on screen (see .sg-boot), so nothing moves at all.
+ */
+const BOOT = 'boot';
 const SHEET: [number, number, number, number] = [0.22, 1, 0.3, 1];
 const DROP: [number, number, number, number] = [0.55, 0, 0.75, 0.2];
 /**
@@ -63,11 +70,13 @@ const DROP: [number, number, number, number] = [0.55, 0, 0.75, 0.2];
  */
 const pageMotion = (reduce: boolean) => ({
   enter: ({ from, to }: Trip) =>
-    reduce ? { opacity: 0 } : isSheet(to) ? { y: '100%', opacity: 1 } : isSheet(from) ? { y: 0, opacity: 1 } : { y: 14, opacity: 0 },
+    from === BOOT ? { y: 0, opacity: 1 } : reduce ? { opacity: 0 } : isSheet(to) ? { y: '100%', opacity: 1 } : isSheet(from) ? { y: 0, opacity: 1 } : { y: 14, opacity: 0 },
   show: ({ from, to }: Trip) => ({
     y: 0,
     opacity: 1,
-    transition: reduce
+    transition: from === BOOT
+      ? { duration: 0 }
+      : reduce
       ? { duration: 0.01 }
       : isSheet(to)
         ? { duration: 0.62, ease: SHEET }
@@ -76,7 +85,9 @@ const pageMotion = (reduce: boolean) => ({
           : { duration: 0.34, ease: SHEET, delay: 0.14 },
   }),
   leave: ({ from, to }: Trip) =>
-    reduce
+    from === BOOT
+      ? { opacity: 0, transition: { duration: 0 } }
+      : reduce
       ? { opacity: 0, transition: { duration: 0.01 } }
       : isSheet(to)
         ? // hold still under the rising sheet, and step below it (zIndex snaps,
@@ -98,14 +109,28 @@ export default function Signs() {
 
   const routeRef = useRef<Route>({ page: 'home' });
   const first = useRef(true);
+  // the copies of About and Contact that ship in the HTML for a visit straight
+  // to one of them (.sg-boot); they go once the routes are live
+  const [booted, setBooted] = useState(false);
+  const bootScroll = useRef(0);
+  // set when the first page is a sheet whose copy is on screen; read by the
+  // trip below (lastKey cannot carry it: its own effect resets it on mount)
+  const fromBoot = useRef(false);
 
   useEffect(() => {
     const apply = () => {
       const cur = routeRef.current;
       const next = parse(window.location.hash);
       if (routeKey(cur) === routeKey(next) && !first.current) return;
+      if (first.current && isSheet(routeKey(next))) {
+        // came straight to a sheet, whose copy is on screen: the real one takes
+        // its place where it stands, scrolled to where the copy was
+        fromBoot.current = true;
+        bootScroll.current = document.querySelector<HTMLElement>(`.sg-boot[data-boot-page="${next.page}"]`)?.scrollTop ?? 0;
+      }
       routeRef.current = next;
       setRoute(next);
+      setBooted(true);
       first.current = false;
     };
     apply();
@@ -128,11 +153,24 @@ export default function Signs() {
   // where this page change is coming from and going to: entering pages read it
   // when they mount, leaving pages through AnimatePresence's custom
   const lastKey = useRef(routeKey(route));
-  const trip = useMemo<Trip>(() => ({ from: lastKey.current, to: routeKey(route) }), [route]);
+  const trip = useMemo<Trip>(() => ({ from: fromBoot.current ? BOOT : lastKey.current, to: routeKey(route) }), [route]);
   useEffect(() => {
     lastKey.current = routeKey(route);
   }, [route]);
   const motionFor = useMemo(() => pageMotion(!!reduce), [reduce]);
+
+  // the routes are live: the head script stops following the address, and the
+  // real page (mounted in the same commit as the copy went) gets its scroll
+  useLayoutEffect(() => {
+    if (!booted) return;
+    fromBoot.current = false;
+    document.documentElement.removeAttribute('data-boot');
+    if (window.__sgBoot) window.removeEventListener('hashchange', window.__sgBoot);
+    if (bootScroll.current) {
+      const pg = [...document.querySelectorAll<HTMLElement>('.sg-page--plain:not(.sg-boot)')].pop();
+      if (pg) pg.scrollTop = bootScroll.current;
+    }
+  }, [booted]);
 
   const goHome = useCallback(() => {
     window.location.hash = '#/';
@@ -153,6 +191,16 @@ export default function Signs() {
   return (
     <div className="sg-root">
       <div className="sg-stage" inert={!!(project || lightbox)}>
+      {/* A visit straight to About or Contact: copies of both ship in the HTML
+          and the one the address asks for shows from the first paint (BOOT in
+          app/layout.tsx, .sg-boot in signs.css), over home, until the routes
+          are live and the real page has taken its place. */}
+      {!booted &&
+        (['about', 'contact'] as const).map((pg) => (
+          <section key={pg} className="sg-page sg-page--plain sg-boot" data-boot-page={pg}>
+            {pg === 'about' ? <About /> : <Contact />}
+          </section>
+        ))}
       {/* Pages never print over each other. The old cross-fade eased out
           slowly while the new page came in fast, so the About text sat on top
           of the name and the fan for most of the swap. See pageMotion. */}
