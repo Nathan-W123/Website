@@ -803,6 +803,18 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
   background-color: #f7f6f1;
   cursor: auto;
 }
+/* One design pixel. The pages are drawn for a laptop screen (1440 x 900);
+   past that they grow with the screen, by whichever of its width or height
+   runs out first, so a big monitor shows the same page larger rather than a
+   small one adrift in the middle. At 1440 x 900 and below it is exactly 1px,
+   so phones, tablets and laptops are untouched. --uv carries the pictures and
+   the display type (the name, the cards, the ribbon, the work), --ut the
+   words and the controls (the bar, the lines, the marks). */
+:root {
+  --u: max(1px, min(100vw / 1440, 100vh / 900));
+  --uv: var(--u);
+  --ut: var(--u);
+}
 /* the tokens and the type, shared with the nav bar: it lives in the route
    shell above the pages, outside .hm, and without these it would fall back to
    the old handwriting face and the shell's black. --bar is the bar's height,
@@ -810,7 +822,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm,
 .hm-nav,
 .gbp-scrim {
-  --bar: 60px;
+  --bar: calc(60 * var(--ut));
   --ink: #363636;
   --role: #d2d2d2;
   --role-bar: #bdbdbd;
@@ -826,31 +838,31 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm {
   position: relative;
   z-index: 2;
-  max-width: 1280px;
+  max-width: calc(1280 * var(--uv));
   margin: 0 auto;
-  padding: 0 24px 120px;
+  padding: 0 calc(24 * var(--uv)) calc(120 * var(--uv));
   text-align: center;
 }
 
 /* ---- hero: tall enough that the work below it starts off the screen ---- */
 .hm-hero {
-  min-height: calc(100svh - 54px);
+  min-height: calc(100svh - 54 * var(--ut));
   display: flex;
   flex-direction: column;
   justify-content: center;
   /* The marks row at the foot of the hero is held open even when it is empty,
      so the engineering side was centring 108px of nothing and carrying the
      name and the fan half that above the middle. Balance it at the top. */
-  padding-top: min(164px, 18vh);
+  padding-top: min(calc(164 * var(--uv)), 18vh);
   padding-bottom: 0;
 }
 .hm-meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin: 0 0 clamp(18px, 5vh, 52px);
+  gap: calc(4 * var(--ut));
+  margin: 0 0 clamp(18px, 5vh, calc(52 * var(--uv)));
   font-family: var(--disp);
-  font-size: 12px;
+  font-size: calc(12 * var(--ut));
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -864,7 +876,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
   font-family: var(--disp);
   font-weight: 700;
   /* sized so the word sits about as wide as the fan under it */
-  font-size: clamp(2rem, 6.4vw, 5.1rem);
+  font-size: clamp(2rem, 6.4vw, calc(81.6 * var(--uv)));
   line-height: 0.95;
   letter-spacing: -0.024em;
   text-transform: uppercase;
@@ -875,10 +887,10 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 /* the four pieces, fanned out and overlapping under the name */
 /* --cw is the card width; everything in the fan is measured off it */
 .hm-fan {
-  --cw: clamp(140px, 16.5vw, 212px);
+  --cw: clamp(140px, 16.5vw, calc(212 * var(--uv)));
   position: relative;
   height: calc(var(--cw) * 1.46);
-  margin: clamp(0px, 0.6vw, 10px) auto clamp(4px, 1vw, 18px);
+  margin: clamp(0px, 0.6vw, calc(10 * var(--uv))) auto clamp(4px, 1vw, calc(18 * var(--uv)));
 }
 .hm-fan-seat {
   position: absolute;
@@ -893,7 +905,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm-fan-card {
   width: 100%;
   height: 100%;
-  border-radius: clamp(12px, 1.3vw, 18px);
+  border-radius: clamp(12px, 1.3vw, calc(18 * var(--uv)));
   /* visible, so a face peeling off the top of the deck is seen past the edge */
   overflow: visible;
   cursor: grab;
@@ -914,7 +926,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
   display: block;
   user-select: none;
   background: #fff;
-  box-shadow: 0 16px 34px -16px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 calc(16 * var(--uv)) calc(34 * var(--uv)) calc(-16 * var(--uv)) rgba(0, 0, 0, 0.28);
 }
 .hm-fan-face.is-under { z-index: 1; }
 .hm-fan-face.is-over { z-index: 2; }
@@ -923,7 +935,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
   margin: 0;
   font-family: var(--disp);
   font-weight: 700;
-  font-size: clamp(1.9rem, 6.4vw, 5.1rem);
+  font-size: clamp(1.9rem, 6.4vw, calc(81.6 * var(--uv)));
   line-height: 0.98;
   letter-spacing: -0.022em;
   text-transform: uppercase;
@@ -949,9 +961,9 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm-switch {
   position: relative;
   display: block;
-  width: 54px;
-  height: 25px;
-  margin: clamp(22px, 3.6vh, 40px) auto 0;
+  width: calc(54 * var(--uv));
+  height: calc(25 * var(--uv));
+  margin: clamp(22px, 3.6vh, calc(40 * var(--uv))) auto 0;
   padding: 0;
   border: 1px solid var(--rule);
   border-radius: 999px;
@@ -963,35 +975,35 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm-switch:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 .hm-switch-knob {
   display: block;
-  width: 19px;
-  height: 19px;
-  margin: 3px;
+  width: calc(19 * var(--uv));
+  height: calc(19 * var(--uv));
+  margin: calc(3 * var(--uv));
   border-radius: 50%;
   background: var(--ink);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
   transition: transform 0.34s cubic-bezier(0.22, 1, 0.3, 1), background 0.3s ease;
 }
-.hm-switch[aria-checked='true'] .hm-switch-knob { transform: translateX(29px); background: #fff; }
+.hm-switch[aria-checked='true'] .hm-switch-knob { transform: translateX(calc(29 * var(--uv))); background: #fff; }
 
 /* ---- the work ---- */
-.hm-work { padding-top: clamp(64px, 12vh, 132px); }
+.hm-work { padding-top: clamp(64px, 12vh, calc(132 * var(--uv))); }
 .hm-work-title {
   margin: 0;
   font-family: var(--disp);
   font-weight: 700;
-  font-size: clamp(1.9rem, 6vw, 4.4rem);
+  font-size: clamp(1.9rem, 6vw, calc(70.4 * var(--uv)));
   line-height: 1;
   letter-spacing: -0.02em;
   text-transform: uppercase;
 }
-.hm-work-sub { margin: 10px 0 0; font-size: 15px; color: var(--ink-soft); }
+.hm-work-sub { margin: calc(10 * var(--ut)) 0 0; font-size: calc(15 * var(--ut)); color: var(--ink-soft); }
 
 .hm-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(22px, 3vw, 46px);
-  max-width: 880px;
-  margin: clamp(34px, 6vh, 64px) auto 0;
+  gap: clamp(22px, 3vw, calc(46 * var(--uv)));
+  max-width: calc(880 * var(--uv));
+  margin: clamp(34px, 6vh, calc(64 * var(--uv))) auto 0;
   padding: 0;
   list-style: none;
 }
@@ -1009,10 +1021,10 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm-tile {
   display: block;
   aspect-ratio: 1;
-  border-radius: clamp(14px, 1.8vw, 26px);
+  border-radius: clamp(14px, 1.8vw, calc(26 * var(--uv)));
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 14px 28px -20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 calc(14 * var(--uv)) calc(28 * var(--uv)) calc(-20 * var(--uv)) rgba(0, 0, 0, 0.4);
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.3, 1), box-shadow 0.45s ease;
 }
 /* the picture is a touch larger than its tile, so it has somewhere to go */
@@ -1038,11 +1050,11 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm-grid button:active .hm-tile { transform: translateY(-4px) scale(1.005); transition-duration: 0.12s; }
 .hm-grid button:focus-visible .hm-tile { outline: 2px solid var(--ink); outline-offset: 5px; }
 
-.hm-tile-text { display: block; margin-top: 12px; }
+.hm-tile-text { display: block; margin-top: calc(12 * var(--ut)); }
 .hm-tile-name {
   display: block;
   font-family: var(--disp);
-  font-size: 12px;
+  font-size: calc(12 * var(--ut));
   font-weight: 600;
   letter-spacing: 0.085em;
   text-transform: uppercase;
@@ -1050,8 +1062,8 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 }
 .hm-tile-line {
   display: block;
-  margin-top: 4px;
-  font-size: 13px;
+  margin-top: calc(4 * var(--ut));
+  font-size: calc(13 * var(--ut));
   line-height: 1.45;
   color: var(--ink-soft);
   transition: color 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.3, 1);
@@ -1075,19 +1087,19 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 }
 
 /* ---- contact ---- */
-.hm-foot { padding-top: clamp(76px, 14vh, 150px); }
+.hm-foot { padding-top: clamp(76px, 14vh, calc(150 * var(--uv))); }
 .hm-contacts {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px 30px;
-  margin: 26px 0 0;
+  gap: calc(10 * var(--ut)) calc(30 * var(--ut));
+  margin: calc(26 * var(--ut)) 0 0;
   padding: 0;
   list-style: none;
 }
 .hm-contacts a {
   font-family: var(--disp);
-  font-size: 12px;
+  font-size: calc(12 * var(--ut));
   font-weight: 600;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -1109,6 +1121,19 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
   .hm-fan { --cw: 29vw; margin-top: 22px; }
   .hm-grid { gap: 16px; }
 }
+/* A phone held sideways: the hero is sized off the screen's height as well as
+   its width, so the name, the cards, the two words and the switch all fit
+   between the bar and the foot of the screen. The spacer that balances the
+   empty marks row on a tall screen goes, and so does the row's held height:
+   on the art side its list simply follows the switch. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .hm-hero { min-height: 100svh; padding-top: var(--bar); }
+  .hm-name,
+  .hm-role { font-size: clamp(1.5rem, min(6.4vw, 11vh), 5.1rem); }
+  .hm-fan { --cw: clamp(72px, min(16.5vw, 26vh), 212px); }
+  .hm-switch { margin-top: clamp(10px, 3vh, 22px); }
+  .hm-clients-slot { min-height: 0; margin-top: clamp(8px, 2.4vh, 22px); }
+}
 
 /* ---------------------------------------------------------------- About ----
    Paragraphs at a size you can read, left on the page, all of them in ink.
@@ -1119,7 +1144,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 /* the cream is painted here as well as on the page: .hm is its own stacking
    context, and the ribbon's multiply blend only sees what is painted inside it */
 .ab2 { text-align: left; display: flex; flex-direction: column; min-height: 100svh; padding-top: var(--bar); padding-bottom: 0; background: var(--cream); }
-.ab2-back { margin: clamp(22px, 4vh, 44px) 0 0; }
+.ab2-back { margin: clamp(22px, 4vh, calc(44 * var(--ut))) 0 0; }
 /* centred in what is left of the screen, and wide enough to carry type you can
    read across a room */
 .ab2-body {
@@ -1127,22 +1152,25 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
   flex: 1;
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
   align-items: center;
-  gap: clamp(26px, 5vw, 76px);
+  gap: clamp(26px, 5vw, calc(76 * var(--uv)));
   width: 100%;
-  padding: clamp(18px, 3.4vh, 40px) 0 clamp(24px, 4.6vh, 54px);
+  padding: clamp(18px, 3.4vh, calc(40 * var(--uv))) 0 clamp(24px, 4.6vh, calc(54 * var(--uv)));
 }
 .ab2-col {
   display: flex;
   flex-direction: column;
-  gap: clamp(16px, 2.4vh, 28px);
+  gap: clamp(16px, 2.4vh, calc(28 * var(--ut)));
   max-width: 54ch;
+  /* 54ch is measured in this box's own type, not the lines': it grows with the
+     words, so the lines break where they do on a laptop */
+  font-size: calc(16 * var(--ut));
 }
 /* the ribbon: square, close to the 512px it was made at, and sized off the
    column rather than the viewport so it never crowds the words */
 .ab2-art {
   position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: calc(480 * var(--uv));
   aspect-ratio: 1;
   justify-self: center;
 }
@@ -1172,7 +1200,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 }
 .ab2-line {
   margin: 0;
-  font-size: clamp(19px, 1.85vw, 27px);
+  font-size: clamp(19px, 1.85vw, calc(27 * var(--ut)));
   line-height: 1.5;
   letter-spacing: -0.008em;
   color: var(--ink);
@@ -1193,23 +1221,26 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .ab2-formula { container-type: inline-size; }
 .ab2-formula .katex-display { margin: 0; text-align: left; }
 .ab2-formula .katex-display > .katex { text-align: left; }
-.ab2-formula .katex { font-size: min(clamp(19px, 1.85vw, 27px), 4.4cqi); color: var(--ink); }
+.ab2-formula .katex { font-size: min(clamp(19px, 1.85vw, calc(27 * var(--ut))), 4.4cqi); color: var(--ink); }
 
 /* the socials: out on the page, not behind a hover */
-.ab2-socials { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.ab2-socials { display: flex; align-items: center; flex-wrap: wrap; gap: calc(12 * var(--ut)); }
 .ab2-chip {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  width: calc(46 * var(--ut));
+  height: calc(46 * var(--ut));
   border: 1px solid var(--rule);
-  border-radius: 11px;
+  border-radius: calc(11 * var(--ut));
   background: #fcfcfa;
   color: var(--ink);
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.3, 1), border-color 0.2s ease, background 0.2s ease;
 }
 .ab2-chip:hover { transform: translateY(-3px); border-color: var(--ink); background: #fff; }
 .ab2-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* the marks are drawn 23px; they grow with the words past laptop size */
+.ab2-chip .bi,
+.hm-social .bi { width: calc(23 * var(--ut)); height: calc(23 * var(--ut)); }
 @media (prefers-reduced-motion: reduce) {
   .ab2-chip,
   .ab2-spot-mark > img { transition: none; }
@@ -1462,15 +1493,15 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 /* who the art has been for: only on the art side, in from the left and out to
    the right. The slot holds its height either way so nothing above it moves. */
 .hm-clients-slot {
-  min-height: 78px;
-  margin-top: clamp(22px, 3.4vh, 40px);
+  min-height: calc(78 * var(--ut));
+  margin-top: clamp(22px, 3.4vh, calc(40 * var(--uv)));
   overflow: hidden;
 }
-.hm-clients { display: flex; flex-direction: column; gap: 7px; }
+.hm-clients { display: flex; flex-direction: column; gap: calc(7 * var(--ut)); }
 .hm-clients-title {
   margin: 0;
   font-family: var(--disp);
-  font-size: 13px;
+  font-size: calc(13 * var(--ut));
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1479,7 +1510,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm-clients-list {
   margin: 0;
   font-family: var(--disp);
-  font-size: 13px;
+  font-size: calc(13 * var(--ut));
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1494,16 +1525,16 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 .hm-social {
   display: flex;
   justify-content: center;
-  gap: 22px;
-  margin: clamp(18px, 3vh, 30px) 0 0;
+  gap: calc(22 * var(--ut));
+  margin: clamp(18px, 3vh, calc(30 * var(--ut))) 0 0;
   padding: 0;
   list-style: none;
 }
 .hm-social a {
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: calc(52 * var(--ut));
+  height: calc(52 * var(--ut));
   border: 1px solid var(--rule);
   border-radius: 50%;
   color: var(--ink);
@@ -1548,7 +1579,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
   align-items: center;
   justify-content: center;
   height: var(--bar);
-  padding: 0 clamp(16px, 2.4vw, 34px);
+  padding: 0 clamp(16px, 2.4vw, calc(34 * var(--ut)));
   background: rgba(247, 246, 241, 0.64);
   -webkit-backdrop-filter: blur(18px) saturate(1.3);
   backdrop-filter: blur(18px) saturate(1.3);
@@ -1558,15 +1589,15 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .hm-nav { background: rgba(247, 246, 241, 0.96); }
 }
-.hm-nav-links { display: flex; gap: clamp(30px, 3.6vw, 52px); margin: 0; padding: 0; list-style: none; }
+.hm-nav-links { display: flex; gap: clamp(30px, 3.6vw, calc(52 * var(--ut))); margin: 0; padding: 0; list-style: none; }
 .hm-nav-link {
   color: var(--ink);
   text-decoration: none;
   transition: opacity 0.2s ease;
   display: block;
-  padding: 6px 2px;
+  padding: calc(6 * var(--ut)) calc(2 * var(--ut));
   font-family: var(--disp);
-  font-size: 16.5px;
+  font-size: calc(16.5 * var(--ut));
   font-weight: 500;
   letter-spacing: 0.01em;
 }
@@ -1582,7 +1613,7 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after {
   left: 0;
   right: 0;
   top: 100%;
-  height: 2px;
+  height: calc(2 * var(--ut));
   border-radius: 999px;
   background: var(--ink);
 }
@@ -1836,4 +1867,3 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after {
   .gbp-shrink,
   .gbp-invite-pill.is-end { transition: none; }
 }
-
