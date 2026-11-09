@@ -278,7 +278,7 @@ export default function Signs() {
       {/* The bar lives out here, above the page swap: the pages themselves
           move on the way in and out, and a fixed element inside one of them
           goes with it, which is what used to make the corner mark jump. */}
-      {(route.page === 'home' || route.page === 'about' || route.page === 'contact') && <Nav page={route.page} />}
+      {(route.page === 'home' || route.page === 'about' || route.page === 'contact') && <Nav page={route.page} instant={trip.from === BOOT} />}
 
       <NameTag page={plain(route) ? 'art' : route.page} onHome={goHome} />
 

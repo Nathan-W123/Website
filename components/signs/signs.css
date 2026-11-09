@@ -575,14 +575,12 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .sg-boot { display: none; z-index: 6; }
 html[data-boot='about'] .sg-boot[data-boot-page='about'],
 html[data-boot='contact'] .sg-boot[data-boot-page='contact'] { display: block; }
-/* until then the bar is home's, so it marks the right page from here */
-html[data-boot] .hm-nav-link[aria-current='page'] { text-decoration: none; }
-html[data-boot='about'] .hm-nav-link[href='#/about'],
-html[data-boot='contact'] .hm-nav-link[href='#/contact'] {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 7px;
-}
+/* until then the bar is home's, with its underline under Home, so that one
+   is hidden and the same line is drawn under the page the address asks for
+   (the geometry is .hm-nav-bar's) */
+html[data-boot] .hm-nav-bar { visibility: hidden; }
+html[data-boot='about'] .hm-nav-link[href='#/about'] .hm-nav-text::after,
+html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { content: ''; }
 /* Nothing on the site takes typing, so no text should show a blinking caret.
    It appears when the browser's caret browsing is on (F7 in Chrome and Edge),
    which a page cannot turn off, but it can make the caret invisible. Real
@@ -1559,11 +1557,21 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] {
   font-weight: 500;
   letter-spacing: 0.01em;
 }
-/* the page you are on is underlined, the way the hero underlines its side */
-.hm-nav-link[aria-current='page'] {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 7px;
+/* the page you are on is underlined, the way the hero underlines its side,
+   and the line travels to the next page you pick as the hero's does: one
+   element, a 2px rule on the rows the text underline used (7px below the
+   baseline, which is the foot of the word's box at this size) */
+.hm-nav-text { position: relative; display: inline-block; }
+.hm-nav-bar,
+html[data-boot='about'] .hm-nav-link[href='#/about'] .hm-nav-text::after,
+html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--ink);
 }
 .hm-nav-link:hover { opacity: 0.6; }
 .hm-nav-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 4px; }
@@ -1576,6 +1584,10 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] {
   .hm-nav { --bar: 54px; }
   .hm-nav-links { gap: 26px; }
   .hm-nav-link { font-size: 15.5px; }
+  /* at the smaller size the baseline sits a pixel higher in the box */
+  .hm-nav-bar,
+  html[data-boot='about'] .hm-nav-link[href='#/about'] .hm-nav-text::after,
+  html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { top: calc(100% + 1px); }
 }
 
 

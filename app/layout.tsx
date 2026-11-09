@@ -51,10 +51,16 @@ export const metadata: Metadata = {
 // drawn and marks the page the address asks for; the copies of About and
 // Contact that ship in the HTML show by it until the script takes over
 // (.sg-boot in components/signs). It follows the address until then too.
+// It also measures the scrollbar gutter the pages keep (overflow auto with
+// scrollbar-gutter: stable, as on .sg-page--plain), which the nav bar stops
+// short of (--sbw); left to the script, the bar was drawn full width and
+// then narrowed once the script had measured it.
 const BOOT =
   "(function(){var d=document.documentElement;function s(){var p=location.hash.slice(1).split('/').filter(Boolean)[0];" +
   "if(p==='about'||p==='contact')d.setAttribute('data-boot',p);else d.removeAttribute('data-boot')}" +
-  "s();window.__sgBoot=s;addEventListener('hashchange',s)})();";
+  "s();window.__sgBoot=s;addEventListener('hashchange',s);" +
+  "var t=document.createElement('div');t.style.cssText='position:absolute;top:-200px;width:100px;height:100px;overflow-y:auto;scrollbar-gutter:stable';" +
+  "d.appendChild(t);var g=t.offsetWidth-t.clientWidth;d.removeChild(t);d.style.setProperty('--sbw',g+'px')})();";
 
 export default function RootLayout({
   children,

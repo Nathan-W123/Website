@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, type MouseEvent } from 'react';
 
 type Page = 'home' | 'about' | 'contact';
@@ -21,10 +21,16 @@ const currentPage = () => [...document.querySelectorAll<HTMLElement>('.sg-page--
  * is the way back from About and Contact, which are sheets over home, and
  * from Contact when the NFC tag lands you there first.
  *
+ * The underline is one element that travels to the page you pick, the way
+ * the hero's Engineer/Artist underline travels to its side, at the same pace.
+ * It jumps instead when motion is unwanted, and when `instant` is set: the
+ * first page of a visit straight to About or Contact, whose underline was
+ * already drawn there before the script loaded.
+ *
  * The route shell renders it once, above the page swap, so it holds still
  * while the sheets rise and drop beneath it.
  */
-export function Nav({ page }: { page: Page }) {
+export function Nav({ page, instant = false }: { page: Page; instant?: boolean }) {
   const reduce = useReducedMotion();
 
   // The pages scroll in boxes of their own rather than the window, so a
@@ -62,7 +68,19 @@ export function Nav({ page }: { page: Page }) {
               aria-current={page === l.page ? 'page' : undefined}
               onClick={page === l.page ? toTop : undefined}
             >
-              {l.label}
+              <span className="hm-nav-text">
+                {l.label}
+                {page === l.page && (
+                  <motion.span
+                    layoutId="hm-nav-bar"
+                    className="hm-nav-bar"
+                    aria-hidden="true"
+                    transition={
+                      instant ? { duration: 0 } : reduce ? { duration: 0.01 } : { layout: { duration: 0.26, ease: 'linear' }, duration: 0.26, ease: 'linear' }
+                    }
+                  />
+                )}
+              </span>
             </a>
           </li>
         ))}
