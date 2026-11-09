@@ -15,8 +15,8 @@ import { PUZZLE_HTML, PUZZLE_STRING } from './puzzle';
  * and on their left edge. The integral works out to exactly 2,
  * which picks the order of the scrambled characters.
  *
- * An NFC tag points straight here, so it is also a front door; the name at
- * the left of the bar is the way into the rest of the site.
+ * An NFC tag points straight here, so it is also a front door; Home in the
+ * bar is the way into the rest of the site.
  */
 export function Contact() {
   return (

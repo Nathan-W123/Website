@@ -1510,7 +1510,7 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .hm-name-link:hover { opacity: 0.6; }
 .hm-name-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; border-radius: 4px; }
 
-/* ---- the bar: frosted glass across the top, About and Contact in the middle ---- */
+/* ---- the bar: frosted glass across the top, Home, About and Contact in the middle ---- */
 .hm-nav {
   position: fixed;
   top: 0;
@@ -1532,13 +1532,10 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   .hm-nav { background: rgba(247, 246, 241, 0.96); }
 }
 .hm-nav-links { display: flex; gap: clamp(30px, 3.6vw, 52px); margin: 0; padding: 0; list-style: none; }
-.hm-nav-link,
-.hm-nav-home {
+.hm-nav-link {
   color: var(--ink);
   text-decoration: none;
   transition: opacity 0.2s ease;
-}
-.hm-nav-link {
   display: block;
   padding: 6px 2px;
   font-family: var(--disp);
@@ -1552,32 +1549,17 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   text-decoration-thickness: 2px;
   text-underline-offset: 7px;
 }
-.hm-nav-home {
-  position: absolute;
-  left: clamp(16px, 2.4vw, 34px);
-  top: 0;
-  bottom: 0;
-  height: fit-content;
-  margin: auto 0;
-  font-family: var(--disp);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.hm-nav-link:hover { opacity: 0.6; }
+.hm-nav-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 4px; }
+/* a finger needs a taller target than a pointer: 44px tall, with the words where they were */
+@media (max-width: 600px), (pointer: coarse) {
+  .hm-nav-link { padding-block: 11px; }
 }
-.hm-nav-link:hover,
-.hm-nav-home:hover { opacity: 0.6; }
-.hm-nav-link:focus-visible,
-.hm-nav-home:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 4px; }
-/* on a phone the name and a centred pair would collide, so off the home page
-   the pair moves over to the right */
 @media (max-width: 600px) {
   .hm,
   .hm-nav { --bar: 54px; }
   .hm-nav-links { gap: 26px; }
   .hm-nav-link { font-size: 15.5px; }
-  .hm-nav-home { font-size: 13.5px; }
-  .hm-nav.is-sub { justify-content: flex-end; }
 }
 
 
@@ -1813,3 +1795,4 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
   .gbp-shrink,
   .gbp-invite-pill.is-end { transition: none; }
 }
+
