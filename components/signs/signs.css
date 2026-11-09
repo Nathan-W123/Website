@@ -1550,81 +1550,80 @@ html[data-boot='contact'] .hm-nav-link[href='#/contact'] .hm-nav-text::after { c
 }
 
 /* ---- the send-off at the foot of the home page: a paper plane holding its
-   course while the clouds go by, over a line in the site's own type. It sits
-   in the room the page already keeps under the follow marks (--foot-pad),
-   placed rather than stacked, so the page is no taller and the scroll ends
-   where it always did. ---- */
+   course while the clouds go by. It sits in the room the page already keeps
+   under the follow marks (--foot-pad), placed rather than stacked, so the
+   page is no taller and the scroll ends where it always did. ---- */
 .hm-sendoff {
   position: absolute;
   left: 0;
   right: 0;
   top: calc(100% - var(--foot-pad));
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: calc(14 * var(--uv));
+  justify-content: center;
+  padding-top: calc(10 * var(--uv));
   pointer-events: none;
 }
+/* the clouds come in at the right edge and go out at the left, fading as they
+   do; the plane flies in the middle, clear of the fade */
 .hm-sendoff-sky {
   display: block;
-  width: calc(150 * var(--uv));
+  width: calc(190 * var(--uv));
   max-width: 100%;
   height: auto;
-  overflow: visible;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
 }
-/* a warm grey that still reads at 4.9:1 on the cream (the soft grey is 3.1) */
-.hm-sendoff-line {
-  margin: calc(4 * var(--ut)) 0 0;
-  font-family: var(--disp);
-  font-weight: 500;
-  font-size: calc(14 * var(--ut));
-  letter-spacing: 0.01em;
-  color: #6f6a65;
-}
-.hm-cloud { fill: none; stroke: #cfcac2; stroke-width: 1.1; stroke-linejoin: round; }
-.hm-plane polygon { stroke: #8f8a85; stroke-width: 1; stroke-linejoin: round; }
-.hm-plane-sheet { fill: #fbfaf8; }
-.hm-plane-wing { fill: #efe3e0; }
-.hm-plane-keel { fill: #e6d6d2; }
-.hm-plane-trail { fill: none; stroke: #a39e99; stroke-width: 1.3; stroke-linecap: round; }
-.hm-plane,
-.hm-plane-trail,
-.hm-cloud-run { transform-box: fill-box; transform-origin: center; }
-/* the plane rides a slow swell, nose lifting as it rises, and its trail
-   brightens with each push; the clouds pass from right to left, each at its
-   own pace, fading in and out at the ends of their run. The animations wait
-   (paused) until the send-off is on screen. */
-.hm-plane { animation: hm-plane-ride 4.2s ease-in-out infinite; }
-.hm-plane-trail { animation: hm-plane-trail 4.2s ease-in-out infinite; }
-.hm-cloud-run { animation: hm-cloud-pass var(--t, 20s) linear var(--d, 0s) infinite; }
-.hm-sendoff:not(.is-running) .hm-plane,
-.hm-sendoff:not(.is-running) .hm-plane-trail,
+.hm-cloud { fill: none; stroke: #d6d3cc; stroke-width: 1.1; stroke-linejoin: round; }
+.hm-plane-sway polygon,
+.hm-plane-fold { stroke: #8c8782; stroke-width: 1; stroke-linejoin: round; }
+.hm-plane-sheet,
+.hm-plane-wing { fill: #f6eee8; }
+.hm-plane-fold { fill: none; stroke-width: 0.8; }
+.hm-plane-keel { fill: #cfe3df; }
+.hm-dash { fill: none; stroke: #a49d93; stroke-width: 1.7; stroke-linecap: round; }
+.hm-plane-sway,
+.hm-dash { transform-box: fill-box; transform-origin: center; }
+/* the plane wanders: forward and back on one rhythm, up and down with a tilt
+   of the nose on another, so the path never quite repeats; the streaks run
+   back off its tail and fade; the clouds cross the whole sky, each at its own
+   pace. All of it waits (paused) until the send-off is on screen. */
+.hm-plane-drift { animation: hm-plane-drift 6.4s ease-in-out infinite alternate; }
+.hm-plane-sway { animation: hm-plane-sway 4.2s ease-in-out infinite alternate; }
+.hm-dash { animation: hm-dash var(--t, 1.6s) ease-out var(--d, 0s) infinite; }
+.hm-cloud-run { animation: hm-cloud-cross var(--t, 16s) linear var(--d, 0s) infinite; }
+.hm-sendoff:not(.is-running) .hm-plane-drift,
+.hm-sendoff:not(.is-running) .hm-plane-sway,
+.hm-sendoff:not(.is-running) .hm-dash,
 .hm-sendoff:not(.is-running) .hm-cloud-run { animation-play-state: paused; }
-@keyframes hm-plane-ride {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(2px, -4.5px) rotate(-3deg); }
+@keyframes hm-plane-drift {
+  from { transform: translateX(-8px); }
+  to { transform: translateX(8px); }
 }
-@keyframes hm-plane-trail {
-  0%, 100% { opacity: 0.45; transform: translateX(0); }
-  50% { opacity: 0.95; transform: translateX(-3px); }
+@keyframes hm-plane-sway {
+  from { transform: translateY(4px) rotate(2deg); }
+  to { transform: translateY(-4px) rotate(-2.5deg); }
 }
-@keyframes hm-cloud-pass {
-  0% { transform: translateX(38px); opacity: 0; }
-  14% { opacity: 1; }
-  86% { opacity: 1; }
-  100% { transform: translateX(-38px); opacity: 0; }
+@keyframes hm-dash {
+  0% { transform: translateX(4px); opacity: 0; }
+  20% { opacity: 0.95; }
+  100% { transform: translateX(-26px); opacity: 0; }
 }
-/* a phone keeps 84px under the marks, so the scene and its line come down a size */
+@keyframes hm-cloud-cross {
+  from { transform: translateX(0); }
+  to { transform: translateX(-290px); }
+}
+/* a phone keeps 84px under the marks, so the scene comes down a size */
 @media (max-width: 560px) {
-  .hm-sendoff { padding-top: 10px; }
-  .hm-sendoff-sky { width: 128px; }
-  .hm-sendoff-line { font-size: 13px; }
+  .hm-sendoff { padding-top: 8px; }
+  .hm-sendoff-sky { width: 160px; }
 }
-/* held still: the scene exactly as drawn */
+/* held still: the plane in the middle, two streaks, the clouds where they were drawn */
 @media (prefers-reduced-motion: reduce) {
-  .hm-plane,
-  .hm-plane-trail,
-  .hm-cloud-run { animation: none; }
+  .hm-plane-drift,
+  .hm-plane-sway,
+  .hm-dash { animation: none; }
+  .hm-cloud-run { animation: none; transform: translateX(var(--rest, -120px)); }
 }
 
 /* a gallery tile gives under the cursor too, and springs back */
