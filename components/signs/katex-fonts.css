@@ -1,0 +1,34 @@
+/* The four KaTeX faces the Contact puzzle uses, from fixed addresses in
+   public/fonts/katex (copied from katex 0.16.47) instead of the bundler's
+   hashed ones, so the head script in app/layout.tsx can ask for them as early
+   as the stylesheets on a visit straight to Contact (the NFC tag) and the
+   formula is whole in the first frame. Same descriptors as katex.min.css,
+   which this follows, so these are the faces used. */
+@font-face {
+  font-display: block;
+  font-family: KaTeX_Main;
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/katex/KaTeX_Main-Regular.woff2) format('woff2');
+}
+@font-face {
+  font-display: block;
+  font-family: KaTeX_Math;
+  font-style: italic;
+  font-weight: 400;
+  src: url(/fonts/katex/KaTeX_Math-Italic.woff2) format('woff2');
+}
+@font-face {
+  font-display: block;
+  font-family: KaTeX_Size2;
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/katex/KaTeX_Size2-Regular.woff2) format('woff2');
+}
+@font-face {
+  font-display: block;
+  font-family: KaTeX_Size4;
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/katex/KaTeX_Size4-Regular.woff2) format('woff2');
+}

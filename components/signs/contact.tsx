@@ -1,6 +1,7 @@
 'use client';
 
 import 'katex/dist/katex.min.css';
+import './katex-fonts.css';
 import { RibbonArt } from './about';
 import { CONTACTS } from './content';
 import { BrandIcon } from './icons';
