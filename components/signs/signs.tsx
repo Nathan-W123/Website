@@ -198,7 +198,7 @@ export default function Signs() {
       {!booted &&
         (['about', 'contact'] as const).map((pg) => (
           <section key={pg} className="sg-page sg-page--plain sg-boot" data-boot-page={pg}>
-            {pg === 'about' ? <About /> : <Contact />}
+            {pg === 'about' ? <About copy /> : <Contact copy />}
           </section>
         ))}
       {/* Pages never print over each other. The old cross-fade eased out

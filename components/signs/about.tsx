@@ -20,19 +20,26 @@ const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
  * Those pages arrive as a sheet pulled up from below; starting a video decoder
  * in the same frame made the first step of that rise stall, so the ribbon rides
  * up as its own first frame and only turns into the video once the sheet lands.
+ *
+ * In the copies of About and Contact that ship in the HTML for a visit straight
+ * to one of them (`copy`), the box is drawn empty: the copy on show paints the
+ * first frame as a background (.sg-boot in signs.css), which is only fetched
+ * for that copy, and the head script asks for it early. The page that takes
+ * over then finds the picture already loaded.
  */
-export function RibbonArt({ name = 'about/ribbon' }: { name?: string }) {
+export function RibbonArt({ name = 'about/ribbon', copy = false }: { name?: string; copy?: boolean }) {
   const reduce = useReducedMotion();
   const [live, setLive] = useState(false);
   useEffect(() => {
     const t = window.setTimeout(() => setLive(true), 700);
     return () => window.clearTimeout(t);
   }, []);
+  if (copy) return <div className="ab2-art" aria-hidden="true" />;
   return (
     <div className="ab2-art" aria-hidden="true">
       {reduce || !live ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img className="ab2-art-media" src={`${base()}/${name}.webp`} alt="" loading="lazy" decoding="async" />
+        <img className="ab2-art-media" src={`${base()}/${name}.webp`} alt="" />
       ) : (
         // decoration, not a player: no picture-in-picture button on hover, no cast
         // button, and (in the CSS) no pointer at all, so no context menu either
@@ -62,7 +69,7 @@ export function RibbonArt({ name = 'about/ribbon' }: { name?: string }) {
  * scroll — it is five sentences. The nav bar belongs to the route shell,
  * which is what keeps it still on the way in from the home page.
  */
-export function About() {
+export function About({ copy = false }: { copy?: boolean }) {
   return (
     <div className="hm ab2">
       <div className="ab2-body">
@@ -89,7 +96,7 @@ export function About() {
             ))}
           </p>
         </div>
-        <RibbonArt />
+        <RibbonArt copy={copy} />
       </div>
     </div>
   );

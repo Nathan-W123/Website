@@ -575,6 +575,19 @@ a.ch-sign:focus-visible .ch-content { outline: 3px dashed var(--ink); outline-of
 .sg-boot { display: none; z-index: 6; }
 html[data-boot='about'] .sg-boot[data-boot-page='about'],
 html[data-boot='contact'] .sg-boot[data-boot-page='contact'] { display: block; }
+/* the copy on show draws the art's first frame itself, as the page's <img>
+   would (the box is square and so is the picture); a background is only
+   fetched when it is drawn, so the copy not on show costs nothing */
+html[data-boot='about'] .sg-boot[data-boot-page='about'] .ab2-art::before,
+html[data-boot='contact'] .sg-boot[data-boot-page='contact'] .ab2-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: center / cover no-repeat;
+  mix-blend-mode: multiply;
+}
+html[data-boot='about'] .sg-boot[data-boot-page='about'] .ab2-art::before { background-image: url(/about/ribbon.webp); }
+html[data-boot='contact'] .sg-boot[data-boot-page='contact'] .ab2-art::before { background-image: url(/contact/infinity.webp); }
 /* until then the bar is home's, with its underline under Home, so that one
    is hidden and the same line is drawn under the page the address asks for
    (the geometry is .hm-nav-bar's) */

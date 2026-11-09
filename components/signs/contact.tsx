@@ -19,7 +19,7 @@ import { PUZZLE_HTML, PUZZLE_STRING } from './puzzle';
  * An NFC tag points straight here, so it is also a front door; Home in the
  * bar is the way into the rest of the site.
  */
-export function Contact() {
+export function Contact({ copy = false }: { copy?: boolean }) {
   return (
     <div className="hm ab2">
       <div className="ab2-body">
@@ -40,7 +40,7 @@ export function Contact() {
             ))}
           </p>
         </div>
-        <RibbonArt name="contact/infinity" />
+        <RibbonArt name="contact/infinity" copy={copy} />
       </div>
     </div>
   );

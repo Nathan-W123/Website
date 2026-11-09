@@ -57,7 +57,9 @@ export const metadata: Metadata = {
 // then narrowed once the script had measured it.
 // On a visit straight to Contact it asks for the puzzle's four KaTeX fonts
 // at once (components/signs/katex-fonts.css), so they arrive with the
-// stylesheets and the formula is whole in the first frame.
+// stylesheets and the formula is whole in the first frame. On a visit
+// straight to About or Contact it also asks for that page's art's first
+// frame, which the copy on show draws from the first paint.
 const BOOT =
   "(function(){var d=document.documentElement;function s(){var p=location.hash.slice(1).split('/').filter(Boolean)[0];" +
   "if(p==='about'||p==='contact')d.setAttribute('data-boot',p);else d.removeAttribute('data-boot')}" +
@@ -65,6 +67,8 @@ const BOOT =
   "if(d.getAttribute('data-boot')==='contact')['Main-Regular','Math-Italic','Size2-Regular','Size4-Regular'].forEach(function(n){" +
   "var l=document.createElement('link');l.rel='preload';l.as='font';l.type='font/woff2';l.crossOrigin='anonymous';" +
   "l.href='/fonts/katex/KaTeX_'+n+'.woff2';document.head.appendChild(l)});" +
+  "var a={about:'/about/ribbon.webp',contact:'/contact/infinity.webp'}[d.getAttribute('data-boot')];" +
+  "if(a){var i=document.createElement('link');i.rel='preload';i.as='image';i.href=a;i.setAttribute('fetchpriority','high');document.head.appendChild(i)}" +
   "var t=document.createElement('div');t.style.cssText='position:absolute;top:-200px;width:100px;height:100px;overflow-y:auto;scrollbar-gutter:stable';" +
   "d.appendChild(t);var g=t.offsetWidth-t.clientWidth;d.removeChild(t);d.style.setProperty('--sbw',g+'px')})();";
 
