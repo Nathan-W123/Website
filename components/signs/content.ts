@@ -10,7 +10,6 @@ export const ABOUT = {
   tagline: 'Learning by building.',
   paragraphs: [
     "Hi, I'm Nathan. I study civil engineering and chemistry at UC Davis, where I do quantum research.",
-    "In Winter 2027 I'm joining Machina Labs as a simulation engineer.",
     'I also run an art business, painting custom shoes for people and organizations.',
     'Before transferring, I placed in the top 1% in the nation on the 2025 organic chemistry ACS exam.',
     'I like building fast, and working at the frontier.',
