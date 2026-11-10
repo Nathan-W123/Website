@@ -13,7 +13,8 @@
     "lint": "oxlint",
     "format": "oxfmt",
     "plates": "node scripts/build-plates.mjs",
-    "shots": "node scripts/shots.mjs"
+    "shots": "node scripts/shots.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

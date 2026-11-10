@@ -23,25 +23,28 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL('https://nateward.me'),
   title: 'Nathan W.',
-  description: 'Nathan Ward: art, machine learning and numerical modelling projects, and how to get in touch. Follow the signpost.',
+  description: 'Nathan Ward — engineer and artist. Simulators, solvers and neural networks; hand-painted shoes and drawings.',
   alternates: { canonical: '/' },
   icons: {
     icon: [{ url: '/favicon.svg?v=2', type: 'image/svg+xml' }, { url: '/favicon.ico?v=2', sizes: '16x16 32x32 48x48' }],
     apple: '/apple-touch-icon.png?v=2',
   },
+  // The picture a sent link shows is the home page itself, taken by
+  // scripts/og-image.mjs (npm run og). Run it after a redesign, and bump ?v=
+  // here (both places) so apps that keep old previews fetch the new one.
   openGraph: {
     title: 'Nathan W.',
-    description: 'Art, ML / AI and numerical modelling projects. Follow the signpost.',
+    description: 'Engineer and artist. Simulators, solvers and neural networks; hand-painted shoes and drawings.',
     url: '/',
     siteName: 'Nathan W.',
     type: 'website',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Nathan W. — a lined-paper page with taped photos of his art and projects' }],
+    images: [{ url: '/og.png?v=2', type: 'image/png', width: 1200, height: 630, alt: 'The nateward.me home page: the name Nathan Ward over a fan of project images, then the words Engineer and Artist' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Nathan W.',
-    description: 'Art, ML / AI and numerical modelling projects. Follow the signpost.',
-    images: ['/og.png'],
+    description: 'Engineer and artist. Simulators, solvers and neural networks; hand-painted shoes and drawings.',
+    images: ['/og.png?v=2'],
   },
 };
 
