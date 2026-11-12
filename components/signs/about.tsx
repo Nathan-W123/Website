@@ -19,7 +19,11 @@ const base = () => (typeof window !== 'undefined' && window.__SIGNS_BASE) || '';
  *
  * Those pages arrive as a sheet pulled up from below; starting a video decoder
  * in the same frame made the first step of that rise stall, so the ribbon rides
- * up as its own first frame and only turns into the video once the sheet lands.
+ * up as its own first frame and turns into the video 0.3 s in, when the fast
+ * part of the rise is over (the sheet has come 97 % of the way), so the loop
+ * is already running as the page arrives. Waiting for the sheet to land (it
+ * was 0.7 s) left the ribbon standing still for a third of a second after the
+ * page was visibly there.
  *
  * In the copies of About and Contact that ship in the HTML for a visit straight
  * to one of them (`copy`), the box is drawn empty: the copy on show paints the
@@ -31,7 +35,7 @@ export function RibbonArt({ name = 'about/ribbon', copy = false }: { name?: stri
   const reduce = useReducedMotion();
   const [live, setLive] = useState(false);
   useEffect(() => {
-    const t = window.setTimeout(() => setLive(true), 700);
+    const t = window.setTimeout(() => setLive(true), 300);
     return () => window.clearTimeout(t);
   }, []);
   if (copy) return <div className="ab2-art" aria-hidden="true" />;
