@@ -26,8 +26,8 @@ export const metadata: Metadata = {
   description: 'Nathan Ward — engineer and artist. Simulators, solvers and neural networks; hand-painted shoes and drawings.',
   alternates: { canonical: '/' },
   icons: {
-    icon: [{ url: '/favicon.svg?v=2', type: 'image/svg+xml' }, { url: '/favicon.ico?v=2', sizes: '16x16 32x32 48x48' }],
-    apple: '/apple-touch-icon.png?v=2',
+    icon: [{ url: '/favicon.svg?v=3', type: 'image/svg+xml' }, { url: '/favicon.ico?v=3', sizes: '16x16 32x32 48x48' }],
+    apple: '/apple-touch-icon.png?v=3',
   },
   // The picture a sent link shows is the home page itself, taken by
   // scripts/og-image.mjs (npm run og). Run it after a redesign, and bump ?v=
