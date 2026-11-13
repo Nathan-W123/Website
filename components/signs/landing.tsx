@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { flushSync } from 'react-dom';
 import { ART, CONTACTS, PROJECT_GROUPS, WORKED_WITH, type ArtItem, type Card } from './content';
 import { BrandIcon } from './icons';
 import { SendOff } from './sendoff';
@@ -137,6 +138,15 @@ export function Landing({
   // the side the switch is set to: it answers the click at once, and the cards
   // catch up with it at the end of the shuffle
   const [chosen, setChosen] = useState<Side>('engineering');
+  // the word the bar sits under. It changes in a React commit of its own, just
+  // before the rest of the page changes side (flushSync, below): taking the
+  // old bar away makes motion measure it on the spot, so the new one can slide
+  // from there, and in the same commit as the gallery swap that measurement
+  // landed in the instant the old gallery was gone and the new one not yet in.
+  // The page was briefly short, the browser pulled a scrolled page back up to
+  // fit, and the bar slid in from below: only on a page scrolled off the top,
+  // which is why a reload (back at the top) seemed to cure it.
+  const [barSide, setBarSide] = useState<Side>('engineering');
   // mid-shuffle the four cards are squared into one deck; the pictures change
   // underneath while they are stacked, then the deck is dealt back out
   const [stacked, setStacked] = useState(false);
@@ -166,6 +176,7 @@ export function Landing({
     const next = other(side);
     setChosen(next);
     if (reduce) {
+      flushSync(() => setBarSide(next));
       setSide(next);
       return;
     }
@@ -176,6 +187,7 @@ export function Landing({
       window.setTimeout(() => setTucked([TOP]), 170 + 205),
       // which is also why swapping the faces over here changes nothing you can see
       window.setTimeout(() => {
+        flushSync(() => setBarSide(next));
         setSide(next);
         setPeeling(false);
         setTucked([]);
@@ -285,11 +297,14 @@ export function Landing({
           {(['engineering', 'art'] as Side[]).map((s2, i) => (
             <Fragment key={s2}>
               {i === 1 && <span className="hm-role-and"> and </span>}
-              <span className={`hm-role-word${side === s2 ? ' is-on' : ''}`}>
+              <span className={`hm-role-word${barSide === s2 ? ' is-on' : ''}`}>
                 <span className="hm-role-glyph">{s2 === 'engineering' ? 'Engineer' : 'Artist'}</span>
-                {side === s2 && (
+                {barSide === s2 && (
                   <motion.span
                     layoutId="hm-role-bar"
+                    // measured again only when it moves, so the gallery swap a moment
+                    // later does not restart its slide
+                    layoutDependency={barSide}
                     className="hm-role-bar"
                     transition={reduce ? { duration: 0.01 } : { layout: { duration: 0.26, ease: 'linear' }, duration: 0.26, ease: 'linear' }}
                   />
