@@ -36,11 +36,11 @@ const FANS = {
 
 /** the fan opens larger than the sizes it is given (at those, a picture in it
  *  was still hard to make out), and a little closer under the chip */
-const GROW = 1.6;
+const GROW = 1.25;
 
 export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boolean }) {
   const n = Math.min(3, Math.max(1, set.cards.length)) as 1 | 2 | 3;
-  const FAN = useMemo(() => FANS[n].map((f) => ({ ...f, x: f.x * GROW, y: f.y * GROW - 30 })), [n]);
+  const FAN = useMemo(() => FANS[n].map((f) => ({ ...f, x: f.x * GROW, y: f.y * GROW - 12 })), [n]);
   const cards = useMemo(() => set.cards.map((c) => ({ ...c, w: c.w * GROW, h: c.h * GROW })), [set.cards]);
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);

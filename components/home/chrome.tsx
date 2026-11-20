@@ -37,11 +37,12 @@ const BANNERS = {
 type Banner = keyof typeof BANNERS;
 
 /**
- * The wave packet on Projects, observed: point at it and it collapses to a
- * narrow peak where you point (the whole packet squeezed in, its envelope
- * become a spike, still moving inside it) on the line it lies along, and
- * follows the pointer; look away and it spreads back out. A tap on a phone
- * observes it for a moment.
+ * The wave packet on Projects, observed: point at it and it collapses, all
+ * of it, into the straight line it lies along, closing on the point where
+ * you looked; look away and it grows back out of that point and spreads.
+ * The point is taken once, as the pointer arrives (following it made the
+ * collapse trail behind the pointer). A tap on a phone observes it for a
+ * moment.
  */
 function Observed({ children }: { children: ReactNode }) {
   const [seen, setSeen] = useState(false);
@@ -59,7 +60,6 @@ function Observed({ children }: { children: ReactNode }) {
         aim(e);
         setSeen(true);
       }}
-      onPointerMove={(e) => e.pointerType === 'mouse' && aim(e)}
       onPointerLeave={(e) => e.pointerType === 'mouse' && setSeen(false)}
       onPointerDown={(e) => {
         if (e.pointerType === 'mouse') return;
