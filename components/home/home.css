@@ -130,6 +130,78 @@ html:has(.nw) { scroll-behavior: smooth; }
 .nw-find a:hover { transform: translateY(-2px); background: rgb(31 28 24 / 0.06); }
 .nw-find a:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
 
+/* ---- picture chips in the About (peek.tsx): a small tilted photo after a
+   phrase, with a second one peeking out behind it to say there is more; it
+   opens into a fan of three over the words below ---- */
+.pk {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+  vertical-align: middle;
+  /* as tall as a capital and a half, without making its line any taller */
+  margin: -0.32em 0.1em -0.32em 0.3em;
+}
+.pk.is-open { z-index: 50; }
+.pk::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 0.32em;
+  background: #fffdf8;
+  box-shadow: 0 1px 2px rgb(40 30 20 / 0.2);
+  transform: translate(0.16em, -0.1em) rotate(9deg);
+  transition: transform 0.2s ease;
+}
+.pk-chip {
+  display: block;
+  width: 1.65em;
+  height: 1.65em;
+  padding: 0;
+  border: 0;
+  border-radius: 0.32em;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(40 30 20 / 0.28), 0 0 0 1px rgb(40 30 20 / 0.06);
+  transform: rotate(-4deg);
+  transition: transform 0.2s ease;
+}
+.pk-chip img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  pointer-events: none;
+}
+.pk:hover .pk-chip,
+.pk.is-open .pk-chip,
+.pk-chip:focus-visible { transform: rotate(0deg) scale(1.1); }
+.pk:hover::before,
+.pk.is-open::before { transform: translate(0.24em, -0.16em) rotate(13deg); }
+.pk-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.pk-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  pointer-events: none;
+  box-shadow: 0 24px 44px -20px rgb(40 25 10 / 0.55), 0 3px 10px rgb(40 25 10 / 0.16);
+}
+.pk-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-chip,
+  .pk::before { transition: none; }
+}
+
 /* ---- the paper plane from the deployed home, at the foot of the page:
    pushed to the bottom of the screen when the words are shorter than it,
    and never closer than 64px under them when they are not ---- */
