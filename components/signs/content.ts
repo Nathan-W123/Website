@@ -91,7 +91,7 @@ const TAGS: Record<string, string> = {
   aero: 'Computational fluid dynamics simulator',
   formulate: 'Materials design engine',
   'black-hole': 'Relativistic ray tracer',
-  'hf-scf': 'Hartree-Fock engine',
+  'hf-scf': 'Quantum mechanics calculator',
   olson: 'Redesign project',
   'high-risk-roads': 'Traffic safety analysis',
 };
