@@ -23,7 +23,7 @@ export const PLACES: Record<string, Place[]> = {
   gambit: [
     { after: 'a distribution over 4,672 moves', shots: [2, 3] },
     { after: "plays the human's move 48.2% of the time", shots: [1] },
-    { after: 'scores the leaves with the value head', shots: [0] },
+    { after: 'scores each with the value head', shots: [0] },
   ],
   aero: [
     { after: 'an STL of an aircraft', shots: [0] },

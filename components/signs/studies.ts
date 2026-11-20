@@ -24,9 +24,9 @@ export const STUDIES: Record<string, Study> = {
   "gambit": {
     "page": {
       "body": [
-        "Can a small network learn bullet chess from strong human games, and move fast enough for a 1+1 clock? Gambit is a 6x128 residual network trained on 5M positions from Lichess bullet games where both players were rated 2400+, and it plays over the Lichess Bot API.",
-        "The net predicts a distribution over 4,672 moves and the game's result. On 100,000 held-out positions it plays the human's move 48.2% of the time; Maia, the published reference for this approach, tops out near 50-55%. Illegal moves are masked before the softmax, so it cannot play one.",
-        "On instinct alone it hangs pieces to any two-move tactic, so an alpha-beta search looks at the policy's top few moves per ply and scores the leaves with the value head. Over 9 colour-reversed games at 600 ms a move, search beat the raw policy +8 =1 -0."
+        "I trained a neural network to play chess. It's so good that I can't beat it.",
+        "Gambit is a 6x128 residual network trained with supervised learning on 5M positions from games between players rated 2400+. The net predicts a distribution over 4,672 moves, and it plays the human's move 48.2% of the time (the published reference, Maia, gets about 50%).",
+        "I also implemented an alpha-beta search that looks at the policy's top moves per ply and scores each with the value head."
       ],
       "choices": [
         "The board is always shown from the mover's side, which halves what the net has to learn.",
