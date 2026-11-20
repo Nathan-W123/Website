@@ -14,24 +14,24 @@ type Role = { when?: string; role: string; at: string; what: string };
 const WORK: Role[] = [
   {
     when: 'Apr 2026 – Present',
-    role: 'Quantum Mechanics Research Assistant',
+    role: 'Quantum Mechanics Research',
     at: 'UC Davis',
     what:
-      "Developing a way to pin down molecular structures when lab data alone can't, combining rotational spectroscopy with quantum chemistry so each counts only where it's reliable.",
+      "Developing a method that pins down molecular structures when lab data alone can't by combining rotational spectroscopy with quantum chemistry. It outperforms quantum chemistry alone against published structures.",
   },
   {
     when: 'Jun 2026 – Sep 2026',
     role: 'Industrial Engineer Intern',
     at: 'Pacific Coast Producers',
     what:
-      "Tracked down why a production line kept stopping, then specified the fixes and custom parts that cut its downtime and raised its daily output.",
+      'Ran a root-cause investigation into recurring stoppages on a production line, combining time studies, downtime data and operator interviews to find failure modes the logs never captured. Specified the fixes and custom parts that cut downtime and lifted daily output, and presented capacity and staffing plans to plant managers.',
   },
   {
     when: 'Oct 2023 – Jun 2026',
     role: 'Engineer Intern (Part-time)',
     at: 'Sacramento Area Sewer District',
     what:
-      "Automated the district's staffing projections and monthly maintenance maps, turning weeks of manual work into minutes.",
+      "Replaced weeks of manual staffing projections with a SQL/VBA pipeline I proposed and built, now used by dozens of staff, and automated the district's monthly maintenance maps with Python, SQL and ArcGIS.",
   },
   {
     role: 'Tutor',
