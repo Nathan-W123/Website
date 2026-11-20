@@ -12,7 +12,7 @@ export type Place = { after: string; shots: number[] };
 export const PLACES: Record<string, Place[]> = {
   machina: [
     { after: 'different from the target shape', shots: [0] },
-    { after: 'plasticity at finite strain', shots: [3] },
+    { after: 'with Newton iterations', shots: [3] },
     { after: 'On eight held-out parts', shots: [2, 1] },
   ],
   siege: [
