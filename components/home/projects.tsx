@@ -69,10 +69,11 @@ const EXTRA: Card[] = [
 /** write-ups for the projects above, which have no study of their own */
 const BODIES: Record<string, string[]> = {
   'ab-initio-md': [
-    "How are chemical reactions discovered without the danger of mixing two volatile chemicals? Molecular dynamics simulates the interaction instead, and ab initio MD does it from quantum mechanics alone: at every time step it solves the electrons' Schrödinger equation for where the nuclei are, takes the forces from that energy, and moves the nuclei by Newton's laws:",
+    "How are chemical reactions discovered without the danger of mixing two volatile chemicals?",
+    "Molecular dynamics simulates the interaction instead, and ab initio MD does it from quantum mechanics alone: at every time step it solves the electrons' Schrödinger equation for where the nuclei are, takes the forces from that energy, and moves the nuclei by Newton's laws:",
     '$$bomd$$',
-    "It runs on its own restricted and unrestricted Hartree–Fock code, with McMurchie–Davidson integrals and analytic gradients compiled with Numba. Velocity Verlet and Langevin integrators carry the nuclei, with Berendsen, CSVR and Nosé–Hoover-chain thermostats, and extended-Lagrangian BOMD keeps the energy from drifting when each step's SCF is solved loosely.",
-    "Its energies, forces and dipoles agree with PySCF to 1e-13 Hartree, and water's optimized geometry lands on the literature's 0.989 Å and 100.0°. NVE runs conserve energy with no drift over a picosecond, and with a loose SCF, XL-BOMD cuts the drift 23-fold while needing fewer SCF iterations.",
+    "It runs on its own Hartree–Fock engine, which computes the forces exactly rather than estimating them, and it can hold the molecules at a set temperature or let them move freely.",
+    "Its energies and forces match PySCF, the standard quantum chemistry package, to 13 decimal places, water's computed shape matches published values, and left to move freely for a picosecond, its energy does not drift.",
   ],
   terra: [
     "Terra is a local-first assistant for orchard growers: their weather, their winter chill and the data behind them. It tracks each orchard's chill through the winter and messages the grower, through the OpenAI and Twilio APIs, when chill is close to met, when something looks wrong, or when the season won't reach it.",
