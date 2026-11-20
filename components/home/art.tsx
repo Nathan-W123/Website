@@ -25,7 +25,7 @@ export function Art() {
     <Shell page="art">
       <section className="nw-col nw-section" aria-labelledby="nw-art">
         <h1 id="nw-art">Art</h1>
-        <p className="nw-lede">Pieces I&apos;ve made by hand.</p>
+        <p className="nw-lede">Scroll and stay awhile.</p>
         <ol className="nw-timeline">
           {SECTIONS.map((s) => {
             const items = ART.find((a) => a.id === s.id)?.items ?? [];
