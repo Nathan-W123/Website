@@ -512,8 +512,8 @@ html:has(.nw) {
 }
 .nw-what { margin: 12px 0 0; }
 
-/* ---- projects: an index. Each group's name sits in a margin of its own,
-   a dot before it, beside its projects (on a phone, over them); one line
+/* ---- projects: an index. Each group's name, a dot before it, with its
+   projects under it, set in from the dot to line up with the name; one line
    per project, which opens into its write-up. No line down the side: on
    Work that is time, and here it read as a timeline ---- */
 .nw-groups {
@@ -521,19 +521,13 @@ html:has(.nw) {
   margin: 40px 0 0;
   padding: 0;
   display: grid;
-  gap: 40px;
+  gap: 36px;
 }
-.nw-group {
-  display: grid;
-  grid-template-columns: 196px minmax(0, 1fr);
-  column-gap: 20px;
-  align-items: baseline;
-}
-/* in the small capitals of the site's section labels (.nw-section h2),
-   level with its first project */
+/* in the small capitals of the site's section labels (.nw-section h2), a
+   size up from them */
 .nw-section .nw-group-name {
-  margin: 0;
-  padding: 10px 0 0;
+  margin: 0 0 2px;
+  font-size: 15.5px;
 }
 .nw-group-name::before {
   content: '';
@@ -546,10 +540,7 @@ html:has(.nw) {
   vertical-align: 0.2em;
 }
 .nw-projs { list-style: none; margin: 0; padding: 0; }
-@media (max-width: 600px) {
-  .nw-group { grid-template-columns: minmax(0, 1fr); }
-  .nw-section .nw-group-name { padding: 0; }
-}
+.nw-group .nw-projs { padding-left: 19px; }
 .nw-proj + .nw-proj { border-top: 1px solid var(--rule); }
 .nw-proj-row {
   display: grid;
