@@ -6,7 +6,8 @@ import { Shell } from './chrome';
  * Work, after the reference's Work page: a line down the left with a dot at
  * each role, the dates, the role and where, and a few lines on what was done.
  * Taken from Nathan's resume (Downloads/NW.Resume.pdf, November 2026),
- * nothing added; current role first, then by start date.
+ * nothing added, and kept to a line or two without figures, as the reference
+ * does; current role first, then by start date.
  */
 type Role = { when?: string; role: string; at: string; what: string };
 
@@ -16,26 +17,26 @@ const WORK: Role[] = [
     role: 'Quantum Mechanics Research Assistant',
     at: 'UC Davis',
     what:
-      "Developed a method to pin down molecular structures when lab data alone can't, combining rotational spectroscopy with quantum chemistry in one weighted objective so each source counts only where it is reliable. Against published structures for 9 molecules it cut the mean bond-length error of quantum chemistry alone by half, and it predicted held-out measurements better than theory alone on 5 of 5 molecules.",
+      "Developing a way to pin down molecular structures when lab data alone can't, combining rotational spectroscopy with quantum chemistry so each counts only where it's reliable.",
   },
   {
     when: 'Jun 2026 – Sep 2026',
     role: 'Industrial Engineer Intern',
     at: 'Pacific Coast Producers',
     what:
-      "Investigated recurring stoppages on a production line with time studies at 7 stations, 100+ hours of downtime data and interviews with operators. Ranked the fixes by cost and downtime impact, specified custom parts for the plant's mechanics to build, and tracked the results: line downtime fell 32% and average daily output rose 9.1%.",
+      "Tracked down why a production line kept stopping, then specified the fixes and custom parts that cut its downtime and raised its daily output.",
   },
   {
     when: 'Oct 2023 – Jun 2026',
     role: 'Engineer Intern (Part-time)',
     at: 'Sacramento Area Sewer District',
     what:
-      'Automated staffing projections that took weeks of manual work with a SQL/VBA pipeline, validated against the manual process and now under an hour for 50+ users, and automated the monthly maintenance maps with Python, SQL and ArcGIS, cutting days of GIS work to about 20 minutes.',
+      "Automated the district's staffing projections and monthly maintenance maps, turning weeks of manual work into minutes.",
   },
   {
     role: 'Tutor',
     at: 'MESA',
-    what: 'Tutored 40+ students for 300+ hours in quantum mechanics, differential equations, organic chemistry and electromagnetism.',
+    what: 'Tutored students in quantum mechanics, differential equations, organic chemistry and electromagnetism.',
   },
 ];
 
