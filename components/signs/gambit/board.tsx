@@ -263,16 +263,16 @@ export function GambitBoard() {
         )}
       </div>
 
-      {/* Gambit thinking, without words: three dots under the board */}
-      <AnimatePresence>
-        {phase === 'thinking' && (
-          <motion.span key="thinking" className="gbp-thinking" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <i />
-            <i />
-            <i />
-          </motion.span>
-        )}
-      </AnimatePresence>
+      {/* Gambit thinking, without words: a small wave under the board
+          (Downloads/Interference Ribbon.gif, public/chess) that lies flat as
+          a line while it waits for you, and rises and moves while it thinks */}
+      <span className={`gbp-wave${phase === 'thinking' ? ' is-thinking' : ''}`} aria-hidden="true">
+        <picture>
+          <source srcSet="/chess/thinking.webp" media="(prefers-reduced-motion: reduce)" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/chess/thinking-anim.webp" alt="" draggable={false} />
+        </picture>
+      </span>
 
       {!isBig && (
         <button ref={expandRef} type="button" className="gbp-expand" onClick={() => setBig(true)} aria-label="Expand the board" title="Expand">

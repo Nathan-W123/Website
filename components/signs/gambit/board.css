@@ -93,15 +93,42 @@
   transform-origin: left;
   transition: transform 0.2s linear;
 }
-/* thinking, without words: three dots under the middle of the board */
-.gbp-thinking { position: absolute; bottom: 1px; left: 50%; display: flex; gap: 4px; translate: -50% 0; }
-.gbp-thinking i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-soft); animation: gbp-think 1s ease-in-out infinite; }
-.gbp-thinking i:nth-child(2) { animation-delay: 0.15s; }
-.gbp-thinking i:nth-child(3) { animation-delay: 0.3s; }
-@keyframes gbp-think {
-  0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
-  40% { opacity: 1; transform: translateY(-2px); }
+/* thinking, without words: a small wave under the middle of the board, a
+   flat line while Gambit waits for you, rising out of it into the moving
+   wave while it thinks and settling back when it has moved. Grey lines on
+   white multiplied onto the cream it sits on, so it has no box. */
+.gbp-wave {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 150px;
+  height: 43px;
+  translate: -50% 0;
+  isolation: isolate;
+  background: var(--cream, #f9f6ef);
+  pointer-events: none;
 }
+.gbp-wave::before {
+  content: '';
+  position: absolute;
+  left: 3%;
+  right: 3%;
+  top: 50%;
+  height: 1px;
+  background: rgb(100 103 94 / 0.45);
+}
+.gbp-wave img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transform: scaleY(0);
+  transition: transform 0.5s cubic-bezier(0.3, 0.7, 0.2, 1), opacity 0.3s ease;
+}
+.gbp-wave.is-thinking img { opacity: 1; transform: scaleY(1); }
 /* for a screen reader: what the board shows, as words */
 .gbp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* a phone-width frame is too short for a playable board: the board takes the
@@ -110,7 +137,7 @@
   .gbp { position: relative; inset: auto; flex-direction: column; padding-bottom: 52px; }
   .gbp-board { width: 100%; height: auto; }
   .gbp:not(.is-big) .gbp-expand { top: auto; bottom: 9px; right: 14px; }
-  .gbp:not(.is-big) .gbp-thinking { bottom: 22px; }
+  .gbp:not(.is-big) .gbp-wave { bottom: 4px; }
 }
 /* the expand button: top of the panel beside the board, round like the corner mark */
 .gbp-expand,
@@ -149,16 +176,16 @@
   overflow: auto;
 }
 .gbp-shrink { position: fixed; top: clamp(14px, 2.4vh, 26px); right: clamp(14px, 2.4vw, 30px); z-index: 2; }
-.gbp.is-big { position: relative; inset: auto; padding: 0 0 22px; }
-.gbp.is-big .gbp-board { width: auto; height: min(84vh, calc(100vw - 64px)); border-radius: 12px; }
-.gbp.is-big .gbp-thinking { bottom: 4px; }
+.gbp.is-big { position: relative; inset: auto; padding: 0 0 56px; }
+.gbp.is-big .gbp-board { width: auto; height: min(80vh, calc(100vw - 64px)); border-radius: 12px; }
+.gbp.is-big .gbp-wave { bottom: 2px; }
 .gbp.is-big .gbp-invite-pill { font-size: 17px; padding: 13px 22px 13px 17px; }
 @media (max-width: 860px) {
   .gbp.is-big .gbp-board { width: min(calc(100vw - 32px), 80vh); height: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gbp-invite-dot { animation: none; }
-  .gbp-thinking i { animation: none; opacity: 0.6; }
+  .gbp-wave img { transition: none; }
   .gbp-expand,
   .gbp-shrink,
   .gbp-invite-pill.is-end { transition: none; }

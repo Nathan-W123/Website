@@ -44,7 +44,7 @@ const WORK: Role[] = [
 
 export function Work() {
   return (
-    <Shell page="work" banner="gable">
+    <Shell page="work" banner="infinity">
       <section className="nw-col nw-section" aria-labelledby="nw-work">
         <h1 id="nw-work">Work</h1>
         <p className="nw-lede">Read below to see what I&apos;ve been up to.</p>

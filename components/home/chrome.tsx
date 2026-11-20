@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { SendOff } from '@/components/signs/sendoff';
 import './home.css';
 
@@ -22,18 +22,67 @@ const NAV: { page: Page; label: string; href: string }[] = [
 ];
 
 /**
- * The banners, each a loop in public/banner: on Work,
- * Downloads/Red_Gable_900x292.gif, on Projects, Downloads/Golden_Meadow.gif,
- * and on Art, Downloads/Rain_Garden_Still_Leaf.gif, all three drawn at the
- * banner's own shape (on a phone's taller box, centred on the house, the oak
- * and the cat). Home has the morphing ribbon beside its words instead.
+ * The banners, each a loop in public/banner. Art's is a picture in a box,
+ * Downloads/Rain_Garden_Still_Leaf.gif, drawn at the banner's shape (on a
+ * phone's taller box, centred on the cat). Work's and Projects' are drawings
+ * of fine lines with their off-white ground divided out
+ * (work/ref/wave-encode.mjs), so they lie on the paper with no box, as
+ * Home's ribbon does: on Work, Downloads/Infinity Ribbon.gif, whole; on
+ * Projects, Downloads/Braided Wave Packet.gif, a wave function you collapse
+ * by looking at it (Observed).
  */
 const BANNERS = {
-  gable: { src: '/banner/gable', position: '55% 50%' },
-  meadow: { src: '/banner/meadow', position: '58% 50%' },
-  canopy: { src: '/banner/canopy', position: '50% 50%' },
+  infinity: { src: '/banner/infinity', look: 'is-drawing is-infinity' },
+  wave: { src: '/banner/wave', look: 'is-drawing is-wave' },
+  canopy: { src: '/banner/canopy', look: '' },
 };
 type Banner = keyof typeof BANNERS;
+
+/**
+ * The wave packet on Projects, observed: point at it and it collapses to a
+ * narrow peak where you point (the whole packet squeezed in, its envelope
+ * become a spike) and holds still for as long as you watch (the Zeno
+ * effect); look away and it spreads back out and moves again. A tap on a
+ * phone observes it for a moment.
+ */
+function Observed({ children }: { children: ReactNode }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [seen, setSeen] = useState(false);
+  const release = useRef<number | undefined>(undefined);
+  const aim = (e: PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--ox', `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}%`);
+  };
+  useEffect(() => {
+    const v = box.current?.querySelector('video');
+    if (!v) return;
+    if (seen) v.pause();
+    else v.play()?.catch(() => {});
+  }, [seen]);
+  useEffect(() => () => window.clearTimeout(release.current), []);
+  return (
+    <div
+      ref={box}
+      className={`nw-banner ${BANNERS.wave.look}${seen ? ' is-seen' : ''}`}
+      onPointerEnter={(e) => {
+        if (e.pointerType !== 'mouse') return;
+        aim(e);
+        setSeen(true);
+      }}
+      onPointerMove={(e) => e.pointerType === 'mouse' && aim(e)}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && setSeen(false)}
+      onPointerDown={(e) => {
+        if (e.pointerType === 'mouse') return;
+        aim(e);
+        setSeen(true);
+        window.clearTimeout(release.current);
+        release.current = window.setTimeout(() => setSeen(false), 1800);
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 /**
  * One of Nathan's GIFs as a loop that plays on any screen. `src` names four
@@ -117,9 +166,15 @@ export function Shell({ page, banner = false, children }: { page: Page; banner?:
         </nav>
         {banner && (
           <div className="nw-col">
-            <div className="nw-banner">
-              <Loop {...BANNERS[banner]} className="nw-banner-media" />
-            </div>
+            {banner === 'wave' ? (
+              <Observed>
+                <Loop src={BANNERS.wave.src} className="nw-banner-media" />
+              </Observed>
+            ) : (
+              <div className={`nw-banner ${BANNERS[banner].look}`}>
+                <Loop src={BANNERS[banner].src} className="nw-banner-media" />
+              </div>
+            )}
           </div>
         )}
       </header>

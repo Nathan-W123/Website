@@ -111,7 +111,7 @@ export default function Home() {
                 rel="noreferrer"
                 aria-label={c.label}
               >
-                <BrandIcon id={c.id} size={21} />
+                <BrandIcon id={c.id} size={26} />
               </a>
             ))}
           </p>

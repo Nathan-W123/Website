@@ -146,6 +146,52 @@ html:has(.nw) {
   display: none !important;
 }
 
+/* Work's and Projects' banners are drawings of fine lines on white,
+   multiplied onto the paper, so they lie on it with no box */
+.nw-banner.is-drawing {
+  background: var(--bg);
+  isolation: isolate;
+}
+.nw-banner.is-drawing .nw-banner-media { mix-blend-mode: multiply; }
+/* the figure eight, whole, a little taller than a banner */
+.nw-banner.is-infinity {
+  width: min(100%, 290px);
+  aspect-ratio: 424 / 346;
+}
+/* the wave packet, whole, across the banner's width; point at it to observe
+   it (Observed, chrome.tsx): it collapses to a narrow peak under the
+   pointer, quickly, and spreads back out slowly when let go */
+.nw-banner.is-wave {
+  aspect-ratio: 640 / 232;
+  cursor: crosshair;
+}
+.nw-banner.is-wave .nw-banner-media {
+  transform-origin: var(--ox, 50%) 50%;
+  transition: transform 1.2s cubic-bezier(0.3, 0.7, 0.2, 1), transform-origin 0.25s ease-out;
+}
+.nw-banner.is-wave.is-seen .nw-banner-media {
+  transform: scaleX(0.05) scaleY(1.06);
+  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.1, 1), transform-origin 0.25s ease-out;
+}
+/* the axis the wave lies along, left behind when it collapses */
+.nw-banner.is-wave::after {
+  content: '';
+  position: absolute;
+  left: 2.3%;
+  right: 2.3%;
+  top: 50%;
+  height: 1px;
+  background: rgb(102 105 96 / 0.5);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.nw-banner.is-wave.is-seen::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .nw-banner.is-wave .nw-banner-media,
+  .nw-banner.is-wave.is-seen .nw-banner-media { transition: none; }
+}
+
 /* ---- home: the words on the left and the morphing ribbon on the right, as
    the About was laid out before the redesign, the two centred together in
    the screen between the links and the paper plane ---- */
@@ -153,15 +199,15 @@ html:has(.nw) {
   flex: 1 0 auto;
   display: grid;
   /* the words at an easy measure, the ribbon about as tall as they are */
-  grid-template-columns: minmax(300px, 420px) minmax(0, 440px);
+  grid-template-columns: minmax(300px, 480px) minmax(0, 520px);
   justify-content: center;
   align-items: center;
   align-content: center;
-  gap: 56px;
+  gap: 64px;
   padding-top: 40px;
   /* wider than the other pages' column, to hold the two side by side,
      centred under the links like everything else */
-  max-width: calc(420px + 56px + 440px + 2 * var(--gut));
+  max-width: calc(480px + 64px + 520px + 2 * var(--gut));
 }
 /* square, as it was drawn (512px); grey lines on white, multiplied onto the
    paper: white times the paper is the paper itself, so the clip has no edge
@@ -170,7 +216,7 @@ html:has(.nw) {
 .nw-ribbon {
   position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: 520px;
   aspect-ratio: 1;
   justify-self: center;
   isolation: isolate;
@@ -205,7 +251,10 @@ html:has(.nw) {
   letter-spacing: -0.01em;
   color: var(--ink);
 }
-.nw-about p { margin: 0 0 12px; }
+/* the words under the name a size up from the rest of the site, the
+   heading as it was */
+.nw-about { font-size: 22px; }
+.nw-about p { margin: 0 0 14px; }
 .nw-find {
   display: flex;
   flex-wrap: wrap;
@@ -460,9 +509,44 @@ html:has(.nw) {
 }
 .nw-what { margin: 12px 0 0; }
 
-/* ---- projects: laid out like Work, a section at each dot, one line per
-   project; a line opens into the project's write-up ---- */
-.nw-projs { list-style: none; margin: 8px 0 0; padding: 0; }
+/* ---- projects: an index. Each group's name sits in a margin of its own,
+   a dot before it, beside its projects (on a phone, over them); one line
+   per project, which opens into its write-up. No line down the side: on
+   Work that is time, and here it read as a timeline ---- */
+.nw-groups {
+  list-style: none;
+  margin: 40px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 40px;
+}
+.nw-group {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  column-gap: 20px;
+  align-items: baseline;
+}
+/* in the small capitals of the site's section labels (.nw-section h2),
+   level with its first project */
+.nw-section .nw-group-name {
+  margin: 0;
+  padding: 10px 0 0;
+}
+.nw-group-name::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 12px;
+  border-radius: 50%;
+  background: var(--ink);
+  vertical-align: 0.2em;
+}
+.nw-projs { list-style: none; margin: 0; padding: 0; }
+@media (max-width: 600px) {
+  .nw-group { grid-template-columns: minmax(0, 1fr); }
+  .nw-section .nw-group-name { padding: 0; }
+}
 .nw-proj + .nw-proj { border-top: 1px solid var(--rule); }
 .nw-proj-row {
   display: grid;
@@ -499,11 +583,11 @@ html:has(.nw) {
   margin: 34px auto 0;
 }
 /* board.css lays it out for the project viewer's frame; here it is simply as
-   wide as its box, with room under it for the thinking dots */
+   wide as its box, with room under it for the thinking wave */
 .nw .nw-chess-board .gbp {
   position: relative;
   inset: auto;
-  padding: 0 0 28px;
+  padding: 0 0 64px;
 }
 .nw .nw-chess-board .gbp-board { width: 100%; height: auto; }
 /* it is already as big as the page lets it be */
@@ -520,6 +604,8 @@ html:has(.nw) {
 /* ---- phones: the picture takes the column, a little taller, its sides trimmed ---- */
 @media (max-width: 600px) {
   .nw { --gut: 18px; font-size: 18px; }
+  .nw-about { font-size: 20px; }
+  .nw-banner.is-infinity { width: 230px; }
   .nw-nav { padding: 22px var(--gut) 14px; gap: 6px 22px; }
   .nw-nav a { font-size: 18px; }
   .nw-banner { margin-top: 26px; aspect-ratio: 2 / 1; }
