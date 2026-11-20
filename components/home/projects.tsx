@@ -38,7 +38,7 @@ const EXTRA: Card[] = [
     title: 'Terra',
     line: 'Chill hours monitor',
     tag: 'Chill hours monitor',
-    stack: ['Python', 'PostgreSQL'],
+    stack: ['Python', 'PostgreSQL', 'OpenAI API', 'Twilio'],
     href: 'https://github.com/EthanVTruong/terra',
     notes: [],
     images: [
@@ -58,7 +58,7 @@ const EXTRA: Card[] = [
 /** write-ups for the projects above, which have no study of their own */
 const BODIES: Record<string, string[]> = {
   terra: [
-    "Terra is a local-first assistant for orchard growers: their weather, their winter chill and the data behind them. I co-built it and wrote all of its backend.",
+    "Terra is a local-first assistant for orchard growers: their weather, their winter chill and the data behind them. I co-built it and wrote all of its backend. It tracks each orchard's chill through the winter and messages the grower, through the OpenAI and Twilio APIs, when chill is close to met, when something looks wrong, or when the season won't reach it.",
     "The backend pulls CIMIS station observations and checks 17.3 million readings for nine kinds of fault, comparing each station's temperatures with its neighbours' and flagging suspect humidity, wind and solar readings, before estimating the temperature at the orchard itself.",
     'Tested by planting 50 faults in a held-out season, it caught 9 of 9 outages, 8 of 9 stuck sensors and 7 of 8 spikes at about half a false alarm per station-month. A more sensitive gate would have caught 14 more of 48 faults but quadrupled the false alarms, so the default stayed, with the trade-off written down.',
   ],
