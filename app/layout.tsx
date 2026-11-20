@@ -20,6 +20,18 @@ const geistMono = localFont({
   variable: '--font-geist-mono',
 });
 
+// the site's one face, EB Garamond: the variable upright, 400-800, Latin
+// (work/ref/fetch-garamond.mjs). On <html>, so the zoomed pictures, drawn
+// outside the page, have it too.
+const garamond = localFont({
+  src: './fonts/eb-garamond-var.woff2',
+  weight: '400 800',
+  style: 'normal',
+  display: 'swap',
+  variable: '--font-garamond',
+  adjustFontFallback: 'Times New Roman',
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://nateward.me'),
   title: 'Nathan W.',
@@ -38,13 +50,13 @@ export const metadata: Metadata = {
     url: '/',
     siteName: 'Nathan W.',
     type: 'website',
-    images: [{ url: '/og.png?v=3', type: 'image/png', width: 1200, height: 630, alt: "The nateward.me home page: a sunset study above 'Hi, I'm Nathan.' and the About, in Courier New" }],
+    images: [{ url: '/og.png?v=4', type: 'image/png', width: 1200, height: 630, alt: "The nateward.me home page: 'Hi, I'm Nathan.' and the About in EB Garamond, beside a morphing ribbon of fine grey lines" }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Nathan W.',
     description: 'Engineer and artist. Simulators, solvers and neural networks; hand-painted shoes and drawings.',
-    images: ['/og.png?v=3'],
+    images: ['/og.png?v=4'],
   },
 };
 
@@ -84,7 +96,7 @@ export default function RootLayout({
 }>) {
   return (
     // the head script adds data-boot before React sees the page
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={garamond.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT }} />
       </head>

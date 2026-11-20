@@ -9,15 +9,15 @@ import { createPortal } from 'react-dom';
  * pictures, after the reference Nathan showed (a thumbnail after a phrase;
  * hover it, or tap it on a phone, and three photos fly out of it and settle
  * at angles over the words below). The fan is shifted sideways if it would
- * run off the screen, and comes down a size on a phone. With , the
+ * run off the screen, and comes down a size on a phone. With `zoomable`, the
  * fan stays open while the pointer crosses to it, and a picture opens large
- * over the page when clicked.
+ * over the page when clicked. The chip itself is one picture, upright, about
+ * the height of the words around it, like the reference's.
  */
 
 export type PeekCard = { src: string; alt: string; w: number; h: number };
 /** one to three cards: a project with fewer pictures opens into fewer */
-/** `back`: the picture behind the chip, if not the set's last */
-export type PeekSet = { label: string; icon: string; cards: PeekCard[]; back?: string };
+export type PeekSet = { label: string; icon: string; cards: PeekCard[] };
 
 /** where the cards settle around the chip, by how many there are: for three,
  *  left, middle (in front), right */
@@ -40,8 +40,6 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
   const [open, setOpen] = useState(false);
   const [layout, setLayout] = useState({ shift: 0, k: 1 });
   const [zoom, setZoom] = useState<PeekCard | null>(null);
-  // the picture behind the chip: the set's last, skipping the chip's own
-  const backSrc = set.back ?? [...set.cards].reverse().find((c) => c.src !== set.icon)?.src ?? null;
   const root = useRef<HTMLSpanElement>(null);
   const closeTimer = useRef<number | undefined>(undefined);
 
@@ -105,16 +103,6 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
       // a fan you can click into gets long enough to cross the gap to it
       onPointerLeave={(e) => e.pointerType === 'mouse' && hide(zoomable ? 380 : 140)}
     >
-      {/* another picture of the set tucked behind the chip, so it reads as a
-          small stack of the real pictures and says there is more in there.
-          The last one, which is never the chip's own picture: the second was,
-          on the About's art chip, and on some project chips a near twin */}
-      {backSrc && (
-        <span className="pk-back" aria-hidden="true">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={backSrc} alt="" draggable={false} />
-        </span>
-      )}
       <button
         type="button"
         className="pk-chip"

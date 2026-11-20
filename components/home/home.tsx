@@ -3,13 +3,16 @@
 import { useEffect, type ReactNode } from 'react';
 import { ABOUT, CONTACTS, EMAIL } from '@/components/signs/content';
 import { BrandIcon } from '@/components/signs/icons';
-import { Shell } from './chrome';
+import { Loop, Shell } from './chrome';
 import { Peek, useWarmPeeks, type PeekSet } from './peek';
 
 /**
- * Home, after the reference Nathan picked: the study at the top, then who he
- * is in his own words, in Courier New (the paper plane at the foot comes with
- * the shell, chrome.tsx). Three phrases in the About carry a picture chip
+ * Home: who Nathan is in his own words, in EB Garamond, on the left, and on
+ * the right the morphing ribbon the About had before the redesign
+ * (Downloads/Nathan - Morphing Ribbon.gif, its dark ground taken to white and
+ * its lines to grey, work/ref/ribbon-recolour.mjs, multiplied onto the
+ * paper), the way that About was laid out. The paper plane at the foot comes
+ * with the shell, chrome.tsx. Three phrases in the About carry a picture chip
  * that opens into a fan of three (peek.tsx).
  */
 
@@ -27,8 +30,6 @@ const PEEKS: Record<'quantum' | 'art' | 'ochem', PeekSet> = {
   quantum: {
     label: 'Quantum',
     icon: '/about/peek/quantum-icon.webp',
-    // the rings behind it: the last card is a cross like the chip's own
-    back: '/about/peek/quantum-1.webp',
     cards: [
       { src: '/about/peek/quantum-1.webp', alt: 'The probability density of a hydrogen 4s orbital: rings around the nucleus', w: 156, h: 156 },
       { src: '/about/peek/quantum-2.webp', alt: 'A hydrogen orbital with n = 4, l = 3, m = 1: six lobes', w: 172, h: 172 },
@@ -55,13 +56,10 @@ const PEEKS: Record<'quantum' | 'art' | 'ochem', PeekSet> = {
   },
 };
 
-/** phrases marked in the About: set in bold, the way the reference marks its names, and/or followed by a chip */
-const MARKS: { text: string; bold?: boolean; peek?: keyof typeof PEEKS }[] = [
-  { text: 'civil engineering and chemistry', bold: true },
-  { text: 'UC Davis', bold: true },
+/** the phrases in the About followed by a picture chip */
+const MARKS: { text: string; peek: keyof typeof PEEKS }[] = [
   { text: 'quantum research', peek: 'quantum' },
-  { text: 'art business', bold: true, peek: 'art' },
-  { text: 'top 1%', bold: true },
+  { text: 'art business', peek: 'art' },
   { text: 'ACS exam', peek: 'ochem' },
 ];
 
@@ -72,9 +70,8 @@ const mark = (text: string): ReactNode[] => {
     const hits = MARKS.map((m) => [rest.indexOf(m.text), m] as const).filter(([i]) => i >= 0);
     if (!hits.length) break;
     const [i, m] = hits.reduce((a, b) => (b[0] < a[0] ? b : a));
-    if (i > 0) out.push(rest.slice(0, i));
-    out.push(m.bold ? <strong key={out.length}>{m.text}</strong> : m.text);
-    if (m.peek) out.push(<Peek key={out.length} set={PEEKS[m.peek]} />);
+    out.push(rest.slice(0, i + m.text.length));
+    out.push(<Peek key={out.length} set={PEEKS[m.peek]} />);
     rest = rest.slice(i + m.text.length);
   }
   if (rest) out.push(rest);
@@ -98,25 +95,30 @@ export default function Home() {
   }, []);
   return (
     <Shell page="home">
-      <section className="nw-col nw-about" aria-labelledby="nw-hi">
-        <h1 id="nw-hi">{OPENING}</h1>
-        {PARAGRAPHS.map((p) => (
-          <p key={p}>{mark(p)}</p>
-        ))}
-        <p className="nw-find" id="contact">
-          Find me on
-          {[...CONTACTS, EMAIL].map((c) => (
-            <a
-              key={c.id}
-              href={c.href}
-              target={c.href.startsWith('mailto:') ? undefined : '_blank'}
-              rel="noreferrer"
-              aria-label={c.label}
-            >
-              <BrandIcon id={c.id} size={21} />
-            </a>
+      <section className="nw-col nw-home" aria-labelledby="nw-hi">
+        <div className="nw-about">
+          <h1 id="nw-hi">{OPENING}</h1>
+          {PARAGRAPHS.map((p) => (
+            <p key={p}>{mark(p)}</p>
           ))}
-        </p>
+          <p className="nw-find" id="contact">
+            Find me on
+            {[...CONTACTS, EMAIL].map((c) => (
+              <a
+                key={c.id}
+                href={c.href}
+                target={c.href.startsWith('mailto:') ? undefined : '_blank'}
+                rel="noreferrer"
+                aria-label={c.label}
+              >
+                <BrandIcon id={c.id} size={21} />
+              </a>
+            ))}
+          </p>
+        </div>
+        <div className="nw-ribbon" aria-hidden="true">
+          <Loop src="/about/ribbon" className="nw-ribbon-media" />
+        </div>
       </section>
     </Shell>
   );

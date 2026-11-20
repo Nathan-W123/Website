@@ -6,12 +6,10 @@ import './home.css';
 
 /**
  * What every page of the redesign shares, laid out like the reference Nathan
- * picked: a plain row of links on the paper, his sunset study as a picture in
- * the column under them, the words under that, and the paper plane from the
- * deployed home at the foot of every page. The study is
- * Downloads/Sunset_Study_Three_Panes.gif with its black frame cropped off,
- * re-encoded as a loop (0.5 MB in place of 18.8 MB); the page shows its first
- * frame until the loop is ready, and only that frame with reduced motion.
+ * picked: a plain row of links on the paper, centred over a rule that runs
+ * the width of the page, one of his GIFs as a picture in the column under
+ * them (Home has its ribbon beside the words instead), the words under that,
+ * and the paper plane from the deployed home at the foot of every page.
  */
 
 type Page = 'home' | 'work' | 'projects' | 'art' | 'chess';
@@ -24,30 +22,30 @@ const NAV: { page: Page; label: string; href: string }[] = [
 ];
 
 /**
- * The banners, each a loop in public/banner (.webm, .mp4, a .webp still, and
- * an animated -anim.webp for phones that will not play the video):
- * the sunset study on Home; on Work, Downloads/Red_Gable_900x292.gif, on
- * Projects, Downloads/Golden_Meadow.gif, and on Art,
- * Downloads/Rain_Garden_Still_Leaf.gif, all three drawn at the banner's own
- * shape (on a phone's taller box, centred on the house, the oak and the cat).
+ * The banners, each a loop in public/banner: on Work,
+ * Downloads/Red_Gable_900x292.gif, on Projects, Downloads/Golden_Meadow.gif,
+ * and on Art, Downloads/Rain_Garden_Still_Leaf.gif, all three drawn at the
+ * banner's own shape (on a phone's taller box, centred on the house, the oak
+ * and the cat). Home has the morphing ribbon beside its words instead.
  */
 const BANNERS = {
-  study: { file: 'study', position: '46% 50%' },
-  gable: { file: 'gable', position: '55% 50%' },
-  meadow: { file: 'meadow', position: '58% 50%' },
-  canopy: { file: 'canopy', position: '50% 50%' },
+  gable: { src: '/banner/gable', position: '55% 50%' },
+  meadow: { src: '/banner/meadow', position: '58% 50%' },
+  canopy: { src: '/banner/canopy', position: '50% 50%' },
 };
 type Banner = keyof typeof BANNERS;
 
 /**
- * A banner: its first frame in the HTML, then the loop as a video; and when
- * the phone will not play the video (an iPhone in Low Power Mode refuses all
- * video autoplay, and showed its big play button, which the banner did not
- * even let you press), the same loop as an animated picture, which it plays.
- * With reduced motion, only the first frame.
+ * One of Nathan's GIFs as a loop that plays on any screen. `src` names four
+ * files by their shared start: .webp, the first frame, which is in the HTML;
+ * .webm and .mp4, the loop as a video, which takes over once the page runs;
+ * and -anim.webp, the loop as an animated picture, for when the phone will
+ * not play the video (an iPhone in Low Power Mode refuses all video
+ * autoplay, and showed its big play button, which a banner did not even let
+ * you press): pictures animate there. With reduced motion, only the first
+ * frame.
  */
-function Loop({ which }: { which: Banner }) {
-  const { file, position } = BANNERS[which];
+export function Loop({ src, className, position = '50% 50%' }: { src: string; className: string; position?: string }) {
   const [mode, setMode] = useState<'still' | 'video' | 'picture'>('still');
   useEffect(() => {
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setMode('video');
@@ -69,7 +67,7 @@ function Loop({ which }: { which: Banner }) {
   return mode === 'video' ? (
     <video
       ref={start}
-      className="nw-banner-media"
+      className={`nw-loop ${className}`}
       style={{ objectPosition: position }}
       autoPlay
       muted
@@ -80,36 +78,36 @@ function Loop({ which }: { which: Banner }) {
       disableRemotePlayback
       tabIndex={-1}
       aria-hidden="true"
-      poster={`/banner/${file}.webp`}
+      poster={`${src}.webp`}
     >
-      <source src={`/banner/${file}.webm`} type="video/webm" />
+      <source src={`${src}.webm`} type="video/webm" />
       {/* the last file failing means neither plays here (the browser
           only waits, play() is never refused) */}
-      <source src={`/banner/${file}.mp4`} type="video/mp4" onError={() => setMode('picture')} />
+      <source src={`${src}.mp4`} type="video/mp4" onError={() => setMode('picture')} />
     </video>
   ) : (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      className="nw-banner-media"
+      className={`nw-loop ${className}`}
       // the animated picture is the bigger file: the first frame, already
       // here, shows behind it (cropped the same way) until it arrives
       style={
         mode === 'picture'
-          ? { objectPosition: position, background: `url(/banner/${file}.webp) ${position} / cover no-repeat` }
+          ? { objectPosition: position, background: `url(${src}.webp) ${position} / cover no-repeat` }
           : { objectPosition: position }
       }
-      src={`/banner/${file}${mode === 'picture' ? '-anim' : ''}.webp`}
+      src={`${src}${mode === 'picture' ? '-anim' : ''}.webp`}
       alt=""
       aria-hidden="true"
     />
   );
 }
 
-/** which banner a page wears; `false` for a page that is all about what is on it, like the reference's game page */
-export function Shell({ page, banner = 'study', children }: { page: Page; banner?: Banner | false; children: ReactNode }) {
+/** which banner a page wears, if any: none on Home (its ribbon is beside the words) or on Chess, which is all about the board */
+export function Shell({ page, banner = false, children }: { page: Page; banner?: Banner | false; children: ReactNode }) {
   return (
     <div className="nw" id="top">
-      <header className="nw-col nw-head">
+      <header className="nw-head">
         <nav className="nw-nav" aria-label="Site">
           {NAV.map((n) => (
             <a key={n.label} href={n.href} aria-current={n.page === page ? 'page' : undefined}>
@@ -118,8 +116,10 @@ export function Shell({ page, banner = 'study', children }: { page: Page; banner
           ))}
         </nav>
         {banner && (
-          <div className="nw-banner">
-            <Loop which={banner} />
+          <div className="nw-col">
+            <div className="nw-banner">
+              <Loop {...BANNERS[banner]} className="nw-banner-media" />
+            </div>
           </div>
         )}
       </header>

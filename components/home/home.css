@@ -1,6 +1,7 @@
 /* The redesign, laid out like the reference Nathan picked: a plain row of
-   links on warm paper, his sunset study as a picture in the column, and one
-   column of words under it. One face for all of it: Courier New. */
+   links on warm paper, one of his GIFs as a picture in the column, and one
+   column of words under it (Home: the words beside his morphing ribbon).
+   One face for all of it: EB Garamond. */
 
 /* the old site scrolls inside its own boxes and locks the document
    (globals.css); these pages scroll the ordinary way, so the address bar can
@@ -14,6 +15,10 @@ html:has(.nw) body {
   background: #f9f6ef;
 }
 html:has(.nw) {
+  /* the face, set here so the zoomed pictures (drawn outside .nw) have it:
+     EB Garamond (app/layout.tsx), with next/font's metric-matched Times
+     while it loads and for any sign it lacks */
+  --serif: var(--font-garamond), Georgia, serif;
   scroll-behavior: smooth;
   /* room for the scrollbar on every page, even one short enough not to
      scroll: without it Home (which fits) centred its column 7.5px right of
@@ -29,16 +34,18 @@ html:has(.nw) {
   --bg: #f9f6ef;
   --ink: #1f1c18;
   --text: #34302a;
-  /* the bold words and the marks under the About: a dark grey, not black */
+  /* the marks under the About and the project names: a dark grey, not black */
   --soft: #4a4641;
   --muted: #6d665b;
   --rule: #e9e3d7;
+  /* the line under the links: a shade firmer than the rules inside the page */
+  --nav-rule: #ddd5c6;
   --col: 760px;
   --gut: 24px;
   /* the paper plane is sized in the old site's design pixels; here one is one */
   --uv: 1px;
   /* what Gambit's board reads from the page around it */
-  --body: 'Courier New', Courier, monospace;
+  --body: var(--serif);
   --ink-soft: #8d877d;
   --cream: #f9f6ef;
   /* at least a screen tall, so the paper plane can sit at the foot of it */
@@ -47,9 +54,10 @@ html:has(.nw) {
   flex-direction: column;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 16.5px;
-  line-height: 1.65;
+  font-family: var(--serif);
+  /* Garamond sets small for its size: 19px reads as Courier's 16.5 did */
+  font-size: 19px;
+  line-height: 1.7;
   -webkit-font-smoothing: auto;
 }
 .nw a { color: var(--ink); }
@@ -76,15 +84,18 @@ html:has(.nw) {
   padding-bottom: 120px;
 }
 
-/* ---- the row of links, on the paper, left on the column ---- */
+/* ---- the row of links, on the paper, centred over a rule that runs the
+   width of the page ---- */
 .nw-nav {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 6px 30px;
-  padding: 34px 0 0;
+  padding: 30px var(--gut) 18px;
+  border-bottom: 1px solid var(--nav-rule);
 }
 .nw-nav a {
-  font-size: 17px;
+  font-size: 19px;
   text-decoration: none;
 }
 .nw-nav a[aria-current='page'],
@@ -95,11 +106,11 @@ html:has(.nw) {
   text-decoration-thickness: 1px;
 }
 
-/* ---- the study: a picture in the column, whole, centred under the links ---- */
+/* ---- the banner: a picture in the column, whole, centred under the links ---- */
 .nw-banner {
   position: relative;
   width: min(100%, 600px);
-  margin: 46px auto 0;
+  margin: 40px auto 0;
   aspect-ratio: 1670 / 542;
   overflow: hidden;
   background: #2b1d22;
@@ -119,34 +130,82 @@ html:has(.nw) {
   object-position: 46% 50%;
   pointer-events: none;
 }
-/* no play button over a banner, ever: Safari draws one on a video it will
-   not start (an iPhone in Low Power Mode) for the moment before the loop is
-   swapped for its picture. One rule each: a selector a browser does not
-   know drops every rule it is grouped with. */
-.nw-banner-media::-webkit-media-controls-start-playback-button {
+/* no play button over a loop (a banner, the ribbon), ever: Safari draws one
+   on a video it will not start (an iPhone in Low Power Mode) for the moment
+   before the loop is swapped for its picture. One rule each: a selector a
+   browser does not know drops every rule it is grouped with. */
+.nw-loop::-webkit-media-controls-start-playback-button {
   display: none !important;
   -webkit-appearance: none;
 }
-.nw-banner-media::-webkit-media-controls-overlay-play-button {
+.nw-loop::-webkit-media-controls-overlay-play-button {
   display: none !important;
   -webkit-appearance: none;
 }
-.nw-banner-media::-webkit-media-controls {
+.nw-loop::-webkit-media-controls {
   display: none !important;
 }
 
+/* ---- home: the words on the left and the morphing ribbon on the right, as
+   the About was laid out before the redesign, the two centred together in
+   the screen between the links and the paper plane ---- */
+.nw-home {
+  flex: 1 0 auto;
+  display: grid;
+  /* the words at an easy measure, the ribbon about as tall as they are */
+  grid-template-columns: minmax(300px, 420px) minmax(0, 440px);
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 56px;
+  padding-top: 40px;
+  /* wider than the other pages' column, to hold the two side by side,
+     centred under the links like everything else */
+  max-width: calc(420px + 56px + 440px + 2 * var(--gut));
+}
+/* square, as it was drawn (512px); grey lines on white, multiplied onto the
+   paper: white times the paper is the paper itself, so the clip has no edge
+   and the lines take the page's warmth. The box paints the paper under it
+   and keeps the blend inside, so it works whatever is stacked around it. */
+.nw-ribbon {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 1;
+  justify-self: center;
+  isolation: isolate;
+  background: var(--bg);
+}
+.nw-ribbon-media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  /* a picture that moves: no player controls, no right-click menu */
+  pointer-events: none;
+  user-select: none;
+}
+/* one above the other where two columns would squeeze the lines: the words,
+   then the ribbon under them, as the old About did on a phone */
+@media (max-width: 720px) {
+  .nw-home { grid-template-columns: minmax(0, 1fr); justify-content: stretch; align-content: start; gap: 12px; }
+  .nw-ribbon { max-width: 320px; }
+}
+
 /* ---- about ---- */
-.nw-about { padding-top: 46px; }
 .nw-about h1 {
   margin: 0 0 18px;
-  font-size: clamp(28px, 3.6vw, 36px);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  font-size: clamp(32px, 4vw, 42px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
   color: var(--ink);
 }
 .nw-about p { margin: 0 0 12px; }
-.nw-about strong { color: var(--soft); font-weight: 700; }
 .nw-find {
   display: flex;
   flex-wrap: wrap;
@@ -167,48 +226,30 @@ html:has(.nw) {
 .nw-find a:hover { transform: translateY(-2px); background: rgb(31 28 24 / 0.06); }
 .nw-find a:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
 
-/* ---- picture chips in the About (peek.tsx): a small tilted photo after a
-   phrase, with a second one peeking out behind it to say there is more; it
-   opens into a fan of three over the words below ---- */
+/* ---- picture chips in the text (peek.tsx), after the reference Nathan
+   showed: one picture after a phrase, upright, about as tall as the words
+   from a capital's top to a tail's foot, sitting on the line so neither line
+   moves; it opens into a fan of three over the words below ---- */
 .pk {
   position: relative;
   isolation: isolate;
   display: inline-block;
-  vertical-align: middle;
-  /* as tall as a capital and a half, without making its line any taller */
-  margin: -0.32em 0.1em -0.32em 0.3em;
+  /* its foot a little under the baseline, its top a little over a capital */
+  vertical-align: -0.38em;
+  margin: 0 0.1em 0 0.25em;
 }
 .pk.is-open { z-index: 50; }
-/* the next picture of the set, behind the chip and turned the other way */
-.pk-back {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  border-radius: 0.32em;
-  background: #fff;
-  box-shadow: 0 1px 2px rgb(40 30 20 / 0.25), 0 0 0 1px rgb(40 30 20 / 0.06);
-  transform: translate(0.2em, -0.12em) rotate(10deg);
-  transition: transform 0.2s ease;
-}
-.pk-back img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-}
 .pk-chip {
   display: block;
-  width: 1.65em;
-  height: 1.65em;
+  width: 1.45em;
+  height: 1.45em;
   padding: 0;
   border: 0;
-  border-radius: 0.32em;
+  border-radius: 0.24em;
   background: #fff;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgb(40 30 20 / 0.28), 0 0 0 1px rgb(40 30 20 / 0.06);
-  transform: rotate(-4deg);
+  /* a hairline, so a picture on white still has an edge on the paper */
+  box-shadow: 0 0 0 1px rgb(40 30 20 / 0.1);
   transition: transform 0.2s ease;
 }
 .pk-chip img {
@@ -221,9 +262,7 @@ html:has(.nw) {
 }
 .pk:hover .pk-chip,
 .pk.is-open .pk-chip,
-.pk-chip:focus-visible { transform: rotate(0deg) scale(1.1); }
-.pk:hover .pk-back,
-.pk.is-open .pk-back { transform: translate(0.3em, -0.18em) rotate(14deg); }
+.pk-chip:focus-visible { transform: scale(1.08); }
 .pk-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .pk-card {
   position: absolute;
@@ -257,8 +296,7 @@ html:has(.nw) {
 .pk-card-open img { pointer-events: none; }
 .pk-card-open:focus-visible { outline: 2px solid #1f1c18; outline-offset: -2px; border-radius: 14px; }
 @media (prefers-reduced-motion: reduce) {
-  .pk-chip,
-  .pk-back { transition: none; }
+  .pk-chip { transition: none; }
 }
 
 /* ---- one picture, opened large over a dimmed page (peek.tsx). It sits in
@@ -288,11 +326,11 @@ html:has(.nw) {
   background: #fff;
   box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.7);
 }
-.pk-zoom-note { display: block; margin-top: 4px; font-size: 13px; opacity: 0.75; }
+.pk-zoom-note { display: block; margin-top: 4px; font-size: 15px; opacity: 0.75; }
 .pk-zoom figcaption {
   max-width: 70ch;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 15px;
+  font-family: var(--serif);
+  font-size: 18px;
   line-height: 1.5;
   text-align: center;
   color: #f9f6ef;
@@ -307,7 +345,7 @@ html:has(.nw) {
   border-radius: 50%;
   background: rgb(249 246 239 / 0.14);
   color: #f9f6ef;
-  font: 700 26px/1 'Courier New', Courier, monospace;
+  font: 500 30px/1 var(--serif);
   cursor: pointer;
 }
 .pk-zoom-close:hover { background: rgb(249 246 239 / 0.24); }
@@ -327,16 +365,16 @@ html:has(.nw) {
 .nw-section { padding-top: 46px; }
 .nw-section h1 {
   margin: 0 0 6px;
-  font-size: clamp(28px, 3.6vw, 36px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: clamp(32px, 4vw, 42px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--ink);
 }
 .nw-section h2 {
   margin: 30px 0 10px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -406,16 +444,16 @@ html:has(.nw) {
 }
 .nw-when {
   margin: 0;
-  font-size: 13.5px;
-  letter-spacing: 0.06em;
+  font-size: 15px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
 }
 .nw .nw-role {
   margin: 4px 0 0;
-  font-size: 16.5px;
-  font-weight: 700;
-  line-height: 1.45;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.35;
   letter-spacing: 0;
   text-transform: none;
   color: var(--ink);
@@ -440,9 +478,9 @@ html:has(.nw) {
   text-align: left;
   cursor: pointer;
 }
-.nw-proj-name { font-weight: 700; color: var(--soft); }
+.nw-proj-name { font-weight: 600; color: var(--soft); }
 .nw-proj-tag { color: var(--muted); }
-.nw-proj-sign { min-width: 1ch; font-weight: 700; color: var(--muted); text-align: center; }
+.nw-proj-sign { min-width: 1ch; font-weight: 600; color: var(--muted); text-align: center; }
 .nw-proj-row:hover .nw-proj-name,
 .nw-proj.is-open .nw-proj-name { color: var(--ink); }
 .nw-proj-row:hover .nw-proj-name { text-decoration: underline; text-underline-offset: 4px; }
@@ -481,11 +519,11 @@ html:has(.nw) {
 
 /* ---- phones: the picture takes the column, a little taller, its sides trimmed ---- */
 @media (max-width: 600px) {
-  .nw { --gut: 18px; font-size: 15.5px; }
-  .nw-nav { padding-top: 24px; gap: 6px 22px; }
-  .nw-nav a { font-size: 16px; }
-  .nw-banner { margin-top: 28px; aspect-ratio: 2 / 1; }
-  .nw-about,
+  .nw { --gut: 18px; font-size: 18px; }
+  .nw-nav { padding: 22px var(--gut) 14px; gap: 6px 22px; }
+  .nw-nav a { font-size: 18px; }
+  .nw-banner { margin-top: 26px; aspect-ratio: 2 / 1; }
+  .nw-home,
   .nw-section { padding-top: 34px; }
   .nw-art { grid-template-columns: repeat(2, 1fr); }
   /* the name, then what it is under it */
