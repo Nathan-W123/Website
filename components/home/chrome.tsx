@@ -12,13 +12,14 @@ import './home.css';
  * one and the new page drops in (View Transitions, home.css).
  */
 
-type Page = 'home' | 'work' | 'projects' | 'art' | 'chess';
+type Page = 'home' | 'work' | 'projects' | 'art' | 'chess' | 'contact';
 const NAV: { page: Page; label: string; href: string }[] = [
   { page: 'home', label: 'Home', href: '/' },
   { page: 'work', label: 'Work', href: '/work/' },
   { page: 'projects', label: 'Projects', href: '/projects/' },
   { page: 'art', label: 'Art', href: '/art/' },
   { page: 'chess', label: 'Chess', href: '/chess/' },
+  { page: 'contact', label: 'Contact', href: '/contact/' },
 ];
 
 /**

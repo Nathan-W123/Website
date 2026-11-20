@@ -291,6 +291,21 @@ html:has(.nw) {
   .nw-ribbon { max-width: 320px; }
 }
 
+/* ---- contact: Home's layout, with the infinity ribbon at its own shape
+   and the email puzzle among the words ---- */
+.nw-ribbon.is-infinity { aspect-ratio: 424 / 346; }
+/* the string to count through, a little spaced so its letters count easily */
+.nw-puzzle-s { letter-spacing: 0.06em; white-space: nowrap; }
+/* s and j in the formula's own math italic */
+/* (line-height 1: its taller face would otherwise open the line up) */
+.nw-var { font-family: KaTeX_Math, serif; font-style: italic; line-height: 1; }
+/* the formula on the words' left edge, never wider than their column: it is
+   about 22.5em wide, so its em is the words' size capped at 4.4% of it */
+.nw-formula { container-type: inline-size; margin: 2px 0 10px; }
+.nw-formula .katex-display { margin: 0; text-align: left; }
+.nw-formula .katex-display > .katex { text-align: left; }
+.nw-formula .katex { font-size: min(1em, 4.4cqi); color: var(--ink); }
+
 /* ---- about ---- */
 .nw-about h1 {
   margin: 0 0 18px;
@@ -635,8 +650,9 @@ html:has(.nw) {
 @media (max-width: 600px) {
   .nw { --gut: 18px; font-size: 18px; }
   .nw-about { font-size: 21px; }
-  .nw-nav { padding: 22px var(--gut) 14px; gap: 6px 22px; }
-  .nw-nav a { font-size: 18px; }
+  /* six tabs on one line on a phone */
+  .nw-nav { padding: 22px var(--gut) 14px; gap: 6px 16px; }
+  .nw-nav a { font-size: 17px; }
   .nw-banner { margin-top: 26px; aspect-ratio: 2 / 1; }
   .nw-home,
   .nw-section { padding-top: 34px; }
