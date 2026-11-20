@@ -13,11 +13,10 @@ import './home.css';
  */
 
 type Page = 'home' | 'work' | 'art';
-const NAV: { page: Page | 'contact'; label: string; href: string }[] = [
+const NAV: { page: Page; label: string; href: string }[] = [
   { page: 'home', label: 'Home', href: '/' },
   { page: 'work', label: 'Work', href: '/work/' },
   { page: 'art', label: 'Art', href: '/art/' },
-  { page: 'contact', label: 'Contact', href: '/#contact' },
 ];
 
 function Study() {

@@ -29,7 +29,12 @@ html:has(.nw) { scroll-behavior: smooth; }
   --rule: #e4dac6;
   --col: 760px;
   --gut: 24px;
+  /* the paper plane is sized in the old site's design pixels; here one is one */
+  --uv: 1px;
+  /* at least a screen tall, so the paper plane can sit at the foot of it */
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--bg);
   color: var(--text);
   font-family: 'Courier New', Courier, monospace;
@@ -42,11 +47,17 @@ html:has(.nw) { scroll-behavior: smooth; }
 /* ---- the column ---- */
 .nw-col {
   position: relative;
+  width: 100%;
   max-width: var(--col);
   margin: 0 auto;
   padding: 0 var(--gut);
 }
-.nw main { padding-bottom: 120px; }
+.nw main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 120px;
+}
 
 /* ---- the row of links, on the paper, left on the column ---- */
 .nw-nav {
@@ -118,6 +129,16 @@ html:has(.nw) { scroll-behavior: smooth; }
 }
 .nw-find a:hover { transform: translateY(-2px); background: rgb(31 28 24 / 0.06); }
 .nw-find a:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+
+/* ---- the paper plane from the deployed home, at the foot of the page:
+   pushed to the bottom of the screen when the words are shorter than it,
+   and never closer than 64px under them when they are not ---- */
+.nw .hm-sendoff {
+  position: static;
+  margin-top: auto;
+  padding-top: 64px;
+}
+.nw main:has(> .hm-sendoff) { padding-bottom: 28px; }
 
 /* ---- work and art, each a page of its own ---- */
 .nw-section { padding-top: 46px; }

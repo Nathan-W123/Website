@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import './sendoff.css';
 
 // one cloud, drawn in a 32 x 14 box and sized where it is used
 const CLOUD = 'M4 13.5 C1.4 13.5 1.2 9.6 3.9 9.1 C3.9 6.1 7.6 5 9.4 6.9 C10.6 3.1 16.2 2.4 18 6.1 C20.2 4.2 24.6 5.4 24.6 8.7 C27.6 8.4 29.4 13.5 26.1 13.5 Z';

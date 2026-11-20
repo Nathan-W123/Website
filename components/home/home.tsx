@@ -3,11 +3,13 @@
 import type { ReactNode } from 'react';
 import { ABOUT, CONTACTS, EMAIL } from '@/components/signs/content';
 import { BrandIcon } from '@/components/signs/icons';
+import { SendOff } from '@/components/signs/sendoff';
 import { Shell } from './chrome';
 
 /**
- * Home, after the reference Nathan picked: the study across the top, then who
- * he is in his own words, in Courier New, and nothing after it.
+ * Home, after the reference Nathan picked: the study at the top, then who he
+ * is in his own words, in Courier New, and the paper plane from the deployed
+ * home to close the page.
  */
 
 /** The About, word for word from content.ts: its opening line is the heading. */
@@ -54,6 +56,8 @@ export default function Home() {
           ))}
         </p>
       </section>
+      {/* the paper plane from the deployed home, last on the page */}
+      <SendOff />
     </Shell>
   );
 }
