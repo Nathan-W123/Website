@@ -25,13 +25,14 @@ const NAV: { page: Page; label: string; href: string }[] = [
 
 /**
  * The banners, each a loop in public/banner (.webm, .mp4, and a .webp still):
- * the sunset study on most pages; on Work, Downloads/Red_Gable_900x292.gif,
- * drawn at the banner's own shape (on a phone's taller box, centred a little
- * toward the house).
+ * the sunset study on Home and Projects; on Work, Downloads/Red_Gable_900x292.gif
+ * and on Art, Downloads/Rain_on_the_Canopy.gif, both drawn at the banner's own
+ * shape (on a phone's taller box, centred on the house and on the cat).
  */
 const BANNERS = {
   study: { file: 'study', position: '46% 50%' },
   gable: { file: 'gable', position: '55% 50%' },
+  canopy: { file: 'canopy', position: '50% 50%' },
 };
 type Banner = keyof typeof BANNERS;
 
