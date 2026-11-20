@@ -20,12 +20,7 @@ export function ChessPage() {
     <Shell page="chess" banner={false}>
       <section className="nw-col nw-section nw-chess" aria-labelledby="nw-chess">
         <h1 id="nw-chess">Chess</h1>
-        <p>
-          Take a break and play Gambit, the chess bot I built: a small neural network trained on five million positions
-          from Lichess bullet games between players rated 2400 and up, with a search on top. It runs right here in your
-          browser.
-        </p>
-        <p>You play white. Drag a piece, or tap it and then tap where it goes. Gambit thinks for about three seconds a move.</p>
+        <p>Take a break and play Gambit, the chess bot I built.</p>
         <div className="nw-chess-board">
           <GambitBoard />
         </div>
