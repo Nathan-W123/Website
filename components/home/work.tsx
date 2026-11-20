@@ -7,7 +7,8 @@ import { Shell } from './chrome';
  * each role, the dates, the role and where, and a few lines on what was done.
  * Taken from Nathan's resume (Downloads/NW.Resume.pdf, November 2026),
  * nothing added, and kept to a line or two without figures, as the reference
- * does; current role first, then by start date.
+ * does; the current role first, then the rest by when they ended (the
+ * reference's order). MESA's dates are from Nathan, not the resume.
  */
 type Role = { when?: string; role: string; at: string; what: string };
 
@@ -34,6 +35,7 @@ const WORK: Role[] = [
       "Developed internal tools for the district's infrastructure, automating its staffing projections and maintenance maps.",
   },
   {
+    when: 'Sep 2024 – May 2025',
     role: 'Tutor',
     at: 'MESA',
     what: 'Tutored students in quantum mechanics, differential equations, organic chemistry and electromagnetism.',
