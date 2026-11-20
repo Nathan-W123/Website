@@ -22,19 +22,17 @@ const NAV: { page: Page; label: string; href: string }[] = [
 ];
 
 /**
- * The banners, each a loop in public/banner. Art's is a picture in a box,
- * Downloads/Rain_Garden_Still_Leaf.gif, drawn at the banner's shape (on a
- * phone's taller box, centred on the cat). Work's and Projects' are drawings
- * of fine lines with their off-white ground divided out
- * (work/ref/wave-encode.mjs), so they lie on the paper with no box, as
- * Home's ribbon does: on Work, Downloads/Infinity Ribbon.gif, whole; on
- * Projects, Downloads/Braided Wave Packet.gif, a wave function you collapse
- * by looking at it (Observed).
+ * The banners, each a loop in public/banner: Nathan's drawings of fine lines
+ * with their off-white ground divided out (work/ref/wave-encode.mjs), so
+ * they lie on the paper with no box, as Home's ribbon does. On Work,
+ * Downloads/Infinity Ribbon.gif, whole; on Projects, Downloads/Braided Wave
+ * Packet.gif, a wave function you collapse by looking at it (Observed); on
+ * Art, Downloads/Art - Gestural Weave.gif.
  */
 const BANNERS = {
   infinity: { src: '/banner/infinity', look: 'is-drawing is-infinity' },
   wave: { src: '/banner/wave', look: 'is-drawing is-wave' },
-  canopy: { src: '/banner/canopy', look: '' },
+  weave: { src: '/banner/weave', look: 'is-drawing is-weave' },
 };
 type Banner = keyof typeof BANNERS;
 

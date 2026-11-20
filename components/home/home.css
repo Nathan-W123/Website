@@ -160,7 +160,13 @@ html:has(.nw) {
   aspect-ratio: 15 / 7;
 }
 .nw-banner.is-infinity .nw-banner-media { object-fit: fill; }
-.nw:has(.nw-banner.is-infinity) .nw-section { padding-top: 12px; }
+/* the words come up close under a drawing, which has its own air */
+.nw:has(.nw-banner.is-drawing) .nw-section { padding-top: 12px; }
+/* the gestural weave on Art, whole */
+.nw-banner.is-weave {
+  width: min(100%, 560px);
+  aspect-ratio: 614 / 278;
+}
 /* the wave packet, whole, across the banner's width; point at it to observe
    it (Observed, chrome.tsx): it collapses to a narrow peak under the
    pointer, still moving, quickly, and spreads back out slowly when let go */
@@ -202,7 +208,7 @@ html:has(.nw) {
   flex: 1 0 auto;
   display: grid;
   /* the words at an easy measure, the ribbon about as tall as they are */
-  grid-template-columns: minmax(300px, 480px) minmax(0, 520px);
+  grid-template-columns: minmax(300px, 520px) minmax(0, 520px);
   justify-content: center;
   align-items: center;
   align-content: center;
@@ -210,7 +216,7 @@ html:has(.nw) {
   padding-top: 40px;
   /* wider than the other pages' column, to hold the two side by side,
      centred under the links like everything else */
-  max-width: calc(480px + 64px + 520px + 2 * var(--gut));
+  max-width: calc(520px + 64px + 520px + 2 * var(--gut));
 }
 /* square, as it was drawn (512px); grey lines on white, multiplied onto the
    paper: white times the paper is the paper itself, so the clip has no edge
@@ -256,7 +262,7 @@ html:has(.nw) {
 }
 /* the words under the name a size up from the rest of the site, the
    heading as it was */
-.nw-about { font-size: 22px; }
+.nw-about { font-size: 24px; }
 .nw-about p { margin: 0 0 14px; }
 .nw-find {
   display: flex;
@@ -598,7 +604,7 @@ html:has(.nw) {
 /* ---- phones: the picture takes the column, a little taller, its sides trimmed ---- */
 @media (max-width: 600px) {
   .nw { --gut: 18px; font-size: 18px; }
-  .nw-about { font-size: 20px; }
+  .nw-about { font-size: 21px; }
   .nw-nav { padding: 22px var(--gut) 14px; gap: 6px 22px; }
   .nw-nav a { font-size: 18px; }
   .nw-banner { margin-top: 26px; aspect-ratio: 2 / 1; }

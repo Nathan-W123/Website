@@ -22,7 +22,7 @@ const SECTIONS: { id: string; label: string; line: string }[] = [
 export function Art() {
   const [zoom, setZoom] = useState<ArtItem | null>(null);
   return (
-    <Shell page="art" banner="canopy">
+    <Shell page="art" banner="weave">
       <section className="nw-col nw-section" aria-labelledby="nw-art">
         <h1 id="nw-art">Art</h1>
         <p className="nw-lede">Scroll and stay awhile.</p>
