@@ -16,7 +16,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'On eight held-out parts', shots: [2, 1] },
   ],
   siege: [
-    { after: 'what a human player can see', shots: [0] },
+    { after: 'timing its counters', shots: [0] },
     { after: 'both masked for legality', shots: [1, 2] },
     { after: 'the five most common deck archetypes', shots: [3] },
   ],
@@ -26,10 +26,10 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'scores each with the value head', shots: [0] },
   ],
   aero: [
-    { after: 'an STL of an aircraft', shots: [0] },
-    { after: 'and live convergence', shots: [2, 1] },
+    { after: 'build a wind tunnel simulator', shots: [0, 2] },
+    { after: 'for its 20% blockage', shots: [1] },
     { after: 'about 29 MLUPS', shots: [4] },
-    { after: 'expected band for that blockage', shots: [3] },
+    { after: 'from Schiller–Naumann', shots: [3] },
   ],
   aether6: [
     { after: 'never the true state', shots: [2] },

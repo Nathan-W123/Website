@@ -1,10 +1,12 @@
 'use client';
 
+import 'katex/dist/katex.min.css';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 import { PROJECT_GROUPS, type Card } from '@/components/signs/content';
 import { Shell } from './chrome';
 import { Peek, type PeekSet } from './peek';
+import { EQUATIONS } from './equations';
 import { PLACES } from './project-pictures';
 import { SHOT_SIZE } from './shot-sizes';
 
@@ -90,6 +92,9 @@ const writeUp = (c: Card, body: string[]): ReactNode[][] => {
   if (process.env.NODE_ENV !== 'production')
     places.forEach((p, i) => home[i] < 0 && console.warn(`${c.id}: no "${p.after}" in the write-up`));
   return body.map((text, pi) => {
+    // a paragraph that is only "$$name$$" is that equation, typeset ahead of time (equations.ts)
+    const eq = /^\$\$([a-z-]+)\$\$$/.exec(text)?.[1];
+    if (eq && EQUATIONS[eq]) return [<span key="eq" className="nw-equation" dangerouslySetInnerHTML={{ __html: EQUATIONS[eq] }} />];
     const hits = places
       .map((p, i) => ({ p, i, at: home[i] === pi ? text.indexOf(p.after) : -1 }))
       .filter((h) => h.at >= 0)
