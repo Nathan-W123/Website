@@ -18,7 +18,7 @@ const WORK: Role[] = [
     role: 'Quantum Mechanics Research',
     at: 'UC Davis',
     what:
-      "Developing a method that pins down molecular structures when lab data alone can't by combining rotational spectroscopy with quantum chemistry. It outperforms quantum chemistry alone against published structures.",
+      "Developing a method that pins down molecular structures when lab data alone can't by combining rotational spectroscopy with quantum chemistry.",
   },
   {
     when: 'Jun 2026 – Sep 2026',
