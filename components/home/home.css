@@ -197,12 +197,8 @@ html:has(.nw) {
 .nw-banner.is-infinity .nw-banner-media { object-fit: fill; }
 /* the words come up close under a drawing, which has its own air */
 .nw:has(.nw-banner.is-drawing) .nw-section { padding-top: 12px; }
-/* the ripple shell on Art, drawn out wider the same way, to the same box */
-.nw-banner.is-shell {
-  width: min(100%, 480px);
-  aspect-ratio: 15 / 7;
-}
-.nw-banner.is-shell .nw-banner-media { object-fit: fill; }
+/* the interference ribbon on Art, whole, across the banner's width */
+.nw-banner.is-interference { aspect-ratio: 664 / 298; }
 /* the wave packet, whole, across the banner's width; point at it to observe
    it (Observed, chrome.tsx): its waves flatten into its straight line, the
    full width of it, quickly; let go and they rise back out, slowly */
