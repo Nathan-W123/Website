@@ -1,8 +1,8 @@
 'use client';
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Fragment, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
-import { ART, PROJECT_GROUPS, type Card } from '@/components/signs/content';
+import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
+import { PROJECT_GROUPS, type Card } from '@/components/signs/content';
 import { Shell } from './chrome';
 import { Peek, type PeekSet } from './peek';
 import { PLACES } from './project-pictures';
@@ -141,31 +141,6 @@ export function Projects() {
             </li>
           ))}
         </ol>
-      </section>
-    </Shell>
-  );
-}
-
-/** Art: the drawings, shoes and doodles, each with its caption. */
-export function Art() {
-  return (
-    <Shell page="art">
-      <section className="nw-col nw-section" aria-labelledby="nw-art">
-        <h1 id="nw-art">Art</h1>
-        {ART.map((s) => (
-          <Fragment key={s.id}>
-            <h2>{s.label}</h2>
-            <ul className="nw-art">
-              {s.items.map((it) => (
-                <li key={it.image}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={it.image} alt={it.caption} loading="lazy" />
-                  {it.caption && <span>{it.caption}</span>}
-                </li>
-              ))}
-            </ul>
-          </Fragment>
-        ))}
       </section>
     </Shell>
   );

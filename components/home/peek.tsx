@@ -149,13 +149,13 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
           })}
       </AnimatePresence>
       {typeof document !== 'undefined' &&
-        createPortal(<AnimatePresence>{zoom && <Zoom key={zoom.src} card={zoom} onClose={() => setZoom(null)} />}</AnimatePresence>, document.body)}
+        createPortal(<AnimatePresence>{zoom && <Zoom key={zoom.src} src={zoom.src} caption={zoom.alt} onClose={() => setZoom(null)} />}</AnimatePresence>, document.body)}
     </span>
   );
 }
 
-/** one picture, as large as the screen allows, over a dimmed page; a click anywhere, the cross or Escape closes it */
-function Zoom({ card, onClose }: { card: PeekCard; onClose: () => void }) {
+/** one picture, as large as the screen allows, over a dimmed page, with its caption and an optional second line; a click anywhere, the cross or Escape closes it */
+export function Zoom({ src, caption, note, onClose }: { src: string; caption: string; note?: string; onClose: () => void }) {
   const reduce = useReducedMotion();
   const close = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -177,7 +177,7 @@ function Zoom({ card, onClose }: { card: PeekCard; onClose: () => void }) {
       className="pk-zoom"
       role="dialog"
       aria-modal="true"
-      aria-label={card.alt}
+      aria-label={caption}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: reduce ? 0.01 : 0.16 } }}
@@ -190,8 +190,13 @@ function Zoom({ card, onClose }: { card: PeekCard; onClose: () => void }) {
         transition={{ duration: reduce ? 0.01 : 0.26, ease: [0.22, 1, 0.3, 1] }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={card.src} alt={card.alt} draggable={false} />
-        {card.alt && <figcaption>{card.alt}</figcaption>}
+        <img src={src} alt={caption} draggable={false} />
+        {(caption || note) && (
+          <figcaption>
+            {caption}
+            {note && <span className="pk-zoom-note">{note}</span>}
+          </figcaption>
+        )}
       </motion.figure>
       <button ref={close} type="button" className="pk-zoom-close" aria-label="Close" onClick={onClose}>
         ×

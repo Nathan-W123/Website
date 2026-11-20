@@ -255,6 +255,7 @@ html:has(.nw) { scroll-behavior: smooth; }
   background: #fff;
   box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.7);
 }
+.pk-zoom-note { display: block; margin-top: 4px; font-size: 13px; opacity: 0.75; }
 .pk-zoom figcaption {
   max-width: 70ch;
   font-family: 'Courier New', Courier, monospace;
@@ -307,23 +308,37 @@ html:has(.nw) { scroll-behavior: smooth; }
   color: var(--muted);
 }
 
+/* ---- art: the pieces in rows of square pictures under each section's
+   sentence; a picture opens large with its name and materials ---- */
 .nw-art {
   list-style: none;
-  margin: 0;
+  margin: 16px 0 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px 14px;
+  gap: 12px;
 }
-.nw-art li { display: grid; gap: 6px; }
-.nw-art img {
+.nw-art-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--rule);
+  overflow: hidden;
+  cursor: zoom-in;
+  box-shadow: 0 10px 22px -16px rgb(40 25 10 / 0.5);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+.nw-art-open img {
+  display: block;
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 6px;
   object-fit: cover;
-  background: var(--rule);
+  pointer-events: none;
 }
-.nw-art span { font-size: 13px; line-height: 1.35; color: var(--muted); }
+.nw-art-open:hover { transform: translateY(-3px); box-shadow: 0 16px 28px -16px rgb(40 25 10 / 0.6); }
+.nw-art-open:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 /* ---- work: after the reference, a line down the left with a dot at each
    role, then the dates, the role and where, and what was done ---- */
@@ -446,5 +461,6 @@ html:has(.nw) { scroll-behavior: smooth; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nw-find a { transition: none; }
+  .nw-find a,
+  .nw-art-open { transition: none; }
 }
