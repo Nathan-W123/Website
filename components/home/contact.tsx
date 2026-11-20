@@ -9,7 +9,7 @@ import { Loop, Shell } from './chrome';
 
 /**
  * Contact, as it was before the redesign, in the redesign's face and Home's
- * layout: the words on the left, Nathan's infinity ribbon on the right. The
+ * layout: the words on the left, Nathan's ripple shell on the right. The
  * email address is not written here: it is the answer to the puzzle (the
  * integral works out to exactly 2, which picks the order of the scrambled
  * characters, components/signs/puzzle.ts). The puzzle's s and j are set in
@@ -36,8 +36,8 @@ export function Contact() {
             ))}
           </p>
         </div>
-        <div className="nw-ribbon is-infinity" aria-hidden="true">
-          <Loop src="/banner/infinity" className="nw-ribbon-media" />
+        <div className="nw-ribbon is-shell" aria-hidden="true">
+          <Loop src="/banner/shell" className="nw-ribbon-media" />
         </div>
       </section>
     </Shell>

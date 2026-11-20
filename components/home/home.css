@@ -291,9 +291,9 @@ html:has(.nw) {
   .nw-ribbon { max-width: 320px; }
 }
 
-/* ---- contact: Home's layout, with the infinity ribbon at its own shape
-   and the email puzzle among the words ---- */
-.nw-ribbon.is-infinity { aspect-ratio: 424 / 346; }
+/* ---- contact: Home's layout, with the ripple shell whole at its own
+   shape and the email puzzle among the words ---- */
+.nw-ribbon.is-shell { aspect-ratio: 474 / 400; }
 /* the string to count through, a little spaced so its letters count easily */
 .nw-puzzle-s { letter-spacing: 0.06em; white-space: nowrap; }
 /* s and j in the formula's own math italic */
