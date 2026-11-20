@@ -38,13 +38,13 @@ export const metadata: Metadata = {
     url: '/',
     siteName: 'Nathan W.',
     type: 'website',
-    images: [{ url: '/og.png?v=2', type: 'image/png', width: 1200, height: 630, alt: 'The nateward.me home page: the name Nathan Ward over a fan of project images, then the words Engineer and Artist' }],
+    images: [{ url: '/og.png?v=3', type: 'image/png', width: 1200, height: 630, alt: "The nateward.me home page: a sunset study above 'Hi, I'm Nathan.' and the About, in Courier New" }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Nathan W.',
     description: 'Engineer and artist. Simulators, solvers and neural networks; hand-painted shoes and drawings.',
-    images: ['/og.png?v=2'],
+    images: ['/og.png?v=3'],
   },
 };
 
@@ -63,8 +63,8 @@ export const metadata: Metadata = {
 // stylesheets and the formula is whole in the first frame. On a visit
 // straight to About or Contact it also asks for that page's art's first
 // frame, which the copy on show draws from the first paint.
-// Only the old site (now at /classic) needs it: the redesign's pages have no
-// copies to show and no KaTeX, so it stops at once anywhere else.
+// Only the old site needed it, and it is no longer routed (it lived at / and
+// briefly at /classic): on every page now it stops at once.
 const BOOT =
   "(function(){if(location.pathname.indexOf('/classic')!==0)return;var d=document.documentElement;function s(){var p=location.hash.slice(1).split('/').filter(Boolean)[0];" +
   "if(p==='about'||p==='contact')d.setAttribute('data-boot',p);else d.removeAttribute('data-boot')}" +

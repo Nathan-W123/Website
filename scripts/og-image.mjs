@@ -48,12 +48,12 @@ try {
   await page.goto(url.href, { waitUntil: 'networkidle0', timeout: 60000 });
   await page.evaluate(() => document.fonts.ready);
   // no gutter: the nav's rule runs edge to edge and the page sits centred
-  await page.addStyleTag({ content: '.sg-page { scrollbar-width: none !important; scrollbar-gutter: auto !important; }' });
+  await page.addStyleTag({ content: 'html, .sg-page { scrollbar-width: none !important; scrollbar-gutter: auto !important; }' });
   await page.evaluate(() => window.dispatchEvent(new Event('resize')));
   // the opening motion has settled once the name, the cards, the two words
   // and the switch have held still for three looks in a row
   const pose = () => page.evaluate(() =>
-    ['.hm-name', '.hm-role', '.hm-switch', '.hm-fan *', '.hm-nav-bar']
+    ['.nw-banner', '.nw-about h1', '.nw-about p', '.hm-name', '.hm-role', '.hm-switch', '.hm-fan *', '.hm-nav-bar']
       .flatMap((s) => [...document.querySelectorAll(s)])
       .map((e) => { const r = e.getBoundingClientRect(); return `${r.x.toFixed(1)},${r.y.toFixed(1)},${r.width.toFixed(1)},${r.height.toFixed(1)}`; })
       .join('|'));
