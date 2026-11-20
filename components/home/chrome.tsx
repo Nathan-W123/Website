@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { SendOff } from '@/components/signs/sendoff';
 import './home.css';
 
 /**
@@ -8,7 +9,8 @@ import './home.css';
  * picked: a plain row of links on the paper, centred over a rule that runs
  * the width of the page, one of his GIFs as a picture in the column under
  * them (Home has its ribbon beside the words instead), and the words under
- * that. Going from page to page, the line under the tab glides to the next
+ * that, and at the foot of Art and Projects, the paper plane from the old
+ * home over a line of its own. Going from page to page, the line under the tab glides to the next
  * one and the new page drops in (View Transitions, home.css).
  */
 
@@ -106,7 +108,7 @@ export function Loop({ src, className, position = '50% 50%' }: { src: string; cl
 }
 
 /** which banner a page wears, if any: none on Home (its ribbon is beside the words) or on Chess, which is all about the board */
-export function Shell({ page, banner = false, children }: { page: Page; banner?: Banner | false; children: ReactNode }) {
+export function Shell({ page, banner = false, sendoff = false, children }: { page: Page; banner?: Banner | false; sendoff?: boolean; children: ReactNode }) {
   return (
     <div className="nw" id="top">
       <header className="nw-head">
@@ -130,6 +132,12 @@ export function Shell({ page, banner = false, children }: { page: Page; banner?:
       </header>
       <main>
         {children}
+        {sendoff && (
+          <footer className="nw-sendoff">
+            <SendOff />
+            <p>In search of greatness</p>
+          </footer>
+        )}
       </main>
     </div>
   );

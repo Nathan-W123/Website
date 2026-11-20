@@ -42,6 +42,8 @@ html:has(.nw) {
   --nav-rule: #ddd5c6;
   --col: 760px;
   --gut: 24px;
+  /* the paper plane is sized in the old site's design pixels; here one is one */
+  --uv: 1px;
   /* what Gambit's board reads from the page around it */
   --body: var(--serif);
   --ink-soft: #8d877d;
@@ -438,6 +440,25 @@ html:has(.nw) {
 }
 .pk-zoom-close:hover { background: rgb(249 246 239 / 0.24); }
 .pk-zoom-close:focus-visible { outline: 2px solid #f9f6ef; outline-offset: 3px; }
+
+/* ---- the paper plane from the old home, at the foot of Art and Projects,
+   with a line under it: pushed to the bottom of the screen when the words
+   are shorter than it, and never closer than 64px under them ---- */
+.nw-sendoff {
+  margin-top: auto;
+  padding-top: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.nw .nw-sendoff .hm-sendoff { position: static; padding-top: 0; }
+.nw-sendoff p {
+  margin: 2px 0 0;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+.nw main:has(> .nw-sendoff) { padding-bottom: 28px; }
 
 /* ---- work and art, each a page of its own ---- */
 .nw-section { padding-top: 46px; }

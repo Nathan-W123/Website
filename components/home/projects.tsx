@@ -292,7 +292,7 @@ function Project({ c }: { c: Card }) {
 
 export function Projects() {
   return (
-    <Shell page="projects" banner="wave">
+    <Shell page="projects" banner="wave" sendoff>
       <section className="nw-col nw-section" aria-labelledby="nw-projects">
         <h1 id="nw-projects">Projects</h1>
         <p className="nw-lede">Things I&apos;ve built and am passionate about.</p>

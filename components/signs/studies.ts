@@ -299,7 +299,7 @@ export const STUDIES: Record<string, Study> = {
     "brief": "A redesign of the north entry at UC Davis: a 55-ft steel-and-glass curtain wall carrying three automatic sliding doors, modelled in Fusion and then checked element by element against the 2025 CBC.",
     "page": {
       "body": [
-        "Anyone from Davis knows that Olson Hall is outdated, so I decided to propose a remodel. The north entry causes a lot of foot-traffic congestion, so the redesign replaces it with a 55-ft steel-and-glass curtain wall on three automatic sliding doors, and runs a paved bike path with parking down the west side to meet it.",
+        "Anyone from Davis knows that Olson Hall is outdated, so I decided to propose a remodel.","The north entry causes a lot of foot-traffic congestion, so the redesign replaces it with a 55-ft steel-and-glass curtain wall on three automatic sliding doors, and runs a paved bike path with parking down the west side to meet it.",
         "Only the elements the redesign changes are checked, which is what the existing-building code asks for. Wind at 100 mph in Exposure C governs: −21.7 psf against +19.8, where the seismic demand on the same wall is 3.7 psf. The mullions, the head beam, the bracket anchors and the glass are all sized to it.",
         "Quarter-inch glass failed its deflection check, 0.89 in against a 0.75-in limit, so the panes went to 5/16 in, at 0.37. The steel peaks at a 0.29 demand ratio, and the existing lateral system takes only 0.5% more load, far under the 10% that would force a seismic upgrade."
       ],
