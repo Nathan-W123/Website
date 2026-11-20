@@ -48,7 +48,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'against closed-form values', shots: [2] },
   ],
   sparlab: [
-    { after: 'load cases and a mass budget', shots: [0, 1] },
+    { after: 'a fixed mass budget', shots: [0, 1] },
     { after: 'a part rather than a grey field', shots: [2, 3] },
   ],
   'hf-scf': [

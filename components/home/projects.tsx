@@ -126,11 +126,16 @@ const writeUp = (c: Card, body: string[]): ReactNode[][] => {
 /** a video a write-up can play, from a button beside its code link: the path
  *  without its ending (a .webm and an .mp4), its poster, and what it shows */
 const VIDEOS: Record<string, { src: string; poster: string; caption: string }> = {
-  // results/figures/flight.gif from the project, as a video
+  // the videos Nathan made for LinkedIn (work/ref/project-videos.mjs)
   aether6: {
     src: '/projects/aether6/flight',
     poster: '/projects/aether6/flight.webp',
-    caption: 'The nominal mission: the LQR autopilot flying the six waypoints on its own estimate, with its time, altitude, airspeed and roll',
+    caption: 'The autonomous circuit: the autopilot flying the waypoints lap after lap on its own estimate',
+  },
+  sparlab: {
+    src: '/projects/sparlab/tower',
+    poster: '/projects/sparlab/tower.webp',
+    caption: 'An algorithm designs a tower: under a 1 kN load and 100 N·m of torsion, 176 iterations move the material to where the strain energy is highest, and a truss is left',
   },
 };
 
