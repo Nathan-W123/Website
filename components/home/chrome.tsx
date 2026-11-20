@@ -25,13 +25,13 @@ const NAV: { page: Page; label: string; href: string }[] = [
 
 /**
  * The banners, each a loop in public/banner (.webm, .mp4, and a .webp still):
- * the sunset study on most pages; on Work, Downloads/Red_Gable_by_the_Sea.gif
- * (16:9, so the banner's box shows a band of it, set to keep the red gable
- * and the sun on the sea).
+ * the sunset study on most pages; on Work, Downloads/Red_Gable_900x292.gif,
+ * drawn at the banner's own shape (on a phone's taller box, centred a little
+ * toward the house).
  */
 const BANNERS = {
   study: { file: 'study', position: '46% 50%' },
-  gable: { file: 'gable', position: '50% 12%' },
+  gable: { file: 'gable', position: '55% 50%' },
 };
 type Banner = keyof typeof BANNERS;
 
