@@ -162,19 +162,19 @@ html:has(.nw) {
 .nw-banner.is-infinity .nw-banner-media { object-fit: fill; }
 .nw:has(.nw-banner.is-infinity) .nw-section { padding-top: 12px; }
 /* the wave packet, whole, across the banner's width; point at it to observe
-   it (Observed, chrome.tsx): it flattens into the straight line it lies
-   along, quickly, and rises back out of it slowly when let go */
+   it (Observed, chrome.tsx): it collapses to a narrow peak under the
+   pointer, still moving, quickly, and spreads back out slowly when let go */
 .nw-banner.is-wave {
   aspect-ratio: 640 / 232;
   cursor: crosshair;
 }
 .nw-banner.is-wave .nw-banner-media {
-  transform-origin: 50% 50%;
-  transition: transform 1.2s cubic-bezier(0.3, 0.7, 0.2, 1);
+  transform-origin: var(--ox, 50%) 50%;
+  transition: transform 1.2s cubic-bezier(0.3, 0.7, 0.2, 1), transform-origin 0.25s ease-out;
 }
 .nw-banner.is-wave.is-seen .nw-banner-media {
-  transform: scaleY(0);
-  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.1, 1);
+  transform: scaleX(0.05) scaleY(1.06);
+  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.1, 1), transform-origin 0.25s ease-out;
 }
 /* the axis the wave lies along, left behind when it collapses */
 .nw-banner.is-wave::after {

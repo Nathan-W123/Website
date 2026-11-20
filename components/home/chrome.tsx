@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { SendOff } from '@/components/signs/sendoff';
 import './home.css';
 
@@ -39,30 +39,33 @@ const BANNERS = {
 type Banner = keyof typeof BANNERS;
 
 /**
- * The wave packet on Projects, observed: point at it and it collapses, flat,
- * into the straight line it lies along, and stays a line for as long as you
- * watch (the Zeno effect); look away and it rises back out of the line and
- * moves again. A tap on a phone observes it for a moment.
+ * The wave packet on Projects, observed: point at it and it collapses to a
+ * narrow peak where you point (the whole packet squeezed in, its envelope
+ * become a spike, still moving inside it) on the line it lies along, and
+ * follows the pointer; look away and it spreads back out. A tap on a phone
+ * observes it for a moment.
  */
 function Observed({ children }: { children: ReactNode }) {
-  const box = useRef<HTMLDivElement>(null);
   const [seen, setSeen] = useState(false);
   const release = useRef<number | undefined>(undefined);
-  useEffect(() => {
-    const v = box.current?.querySelector('video');
-    if (!v) return;
-    if (seen) v.pause();
-    else v.play()?.catch(() => {});
-  }, [seen]);
+  const aim = (e: PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--ox', `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}%`);
+  };
   useEffect(() => () => window.clearTimeout(release.current), []);
   return (
     <div
-      ref={box}
       className={`nw-banner ${BANNERS.wave.look}${seen ? ' is-seen' : ''}`}
-      onPointerEnter={(e) => e.pointerType === 'mouse' && setSeen(true)}
+      onPointerEnter={(e) => {
+        if (e.pointerType !== 'mouse') return;
+        aim(e);
+        setSeen(true);
+      }}
+      onPointerMove={(e) => e.pointerType === 'mouse' && aim(e)}
       onPointerLeave={(e) => e.pointerType === 'mouse' && setSeen(false)}
       onPointerDown={(e) => {
         if (e.pointerType === 'mouse') return;
+        aim(e);
         setSeen(true);
         window.clearTimeout(release.current);
         release.current = window.setTimeout(() => setSeen(false), 1800);
