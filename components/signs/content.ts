@@ -81,7 +81,7 @@ export type Card = { id: string; title: string; line: string; tag: string; stack
 /** Gallery images come from ./gallery (1-4 per project); the first one is the card cover. */
 /** Two or three words under a tile on the home page: what the thing is, nothing more. */
 const TAGS: Record<string, string> = {
-  machina: 'Sheet-forming solver',
+  machina: 'Springback Predictor',
   siege: 'Clash Royale engine',
   gambit: 'Neural chess bot',
   ignis: 'Rocket propulsion engine',
