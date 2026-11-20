@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { SendOff } from '@/components/signs/sendoff';
 import './home.css';
 
@@ -37,33 +37,22 @@ const BANNERS = {
 type Banner = keyof typeof BANNERS;
 
 /**
- * The wave packet on Projects, observed: point at it and it collapses, all
- * of it, into the straight line it lies along, closing on the point where
- * you looked; look away and it grows back out of that point and spreads.
- * The point is taken once, as the pointer arrives (following it made the
- * collapse trail behind the pointer). A tap on a phone observes it for a
- * moment.
+ * The wave packet on Projects, observed: point at it and its waves flatten,
+ * top and bottom together, into the straight line they lie along, the full
+ * width of it; look away and they rise back out of the line. A tap on a
+ * phone observes it for a moment.
  */
 function Observed({ children }: { children: ReactNode }) {
   const [seen, setSeen] = useState(false);
   const release = useRef<number | undefined>(undefined);
-  const aim = (e: PointerEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty('--ox', `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}%`);
-  };
   useEffect(() => () => window.clearTimeout(release.current), []);
   return (
     <div
       className={`nw-banner ${BANNERS.wave.look}${seen ? ' is-seen' : ''}`}
-      onPointerEnter={(e) => {
-        if (e.pointerType !== 'mouse') return;
-        aim(e);
-        setSeen(true);
-      }}
+      onPointerEnter={(e) => e.pointerType === 'mouse' && setSeen(true)}
       onPointerLeave={(e) => e.pointerType === 'mouse' && setSeen(false)}
       onPointerDown={(e) => {
         if (e.pointerType === 'mouse') return;
-        aim(e);
         setSeen(true);
         window.clearTimeout(release.current);
         release.current = window.setTimeout(() => setSeen(false), 1800);

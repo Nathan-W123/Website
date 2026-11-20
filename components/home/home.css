@@ -168,9 +168,8 @@ html:has(.nw) {
   aspect-ratio: 614 / 278;
 }
 /* the wave packet, whole, across the banner's width; point at it to observe
-   it (Observed, chrome.tsx): all of it collapses into its straight line,
-   closing on the point where the pointer came in, quickly; let go and it
-   grows back out of that point, slowly */
+   it (Observed, chrome.tsx): its waves flatten into its straight line, the
+   full width of it, quickly; let go and they rise back out, slowly */
 .nw-banner.is-wave {
   /* flatter than it was drawn: its peaks at two thirds of their height */
   aspect-ratio: 640 / 155;
@@ -178,13 +177,13 @@ html:has(.nw) {
 }
 .nw-banner.is-wave .nw-banner-media {
   object-fit: fill;
-  transform-origin: var(--ox, 50%) 50%;
+  transform-origin: 50% 50%;
   /* a layer of its own, so the collapse runs on the GPU, not the page */
   will-change: transform;
   transition: transform 1.1s cubic-bezier(0.3, 0.7, 0.2, 1);
 }
 .nw-banner.is-wave.is-seen .nw-banner-media {
-  transform: scale(0.04, 0);
+  transform: scaleY(0);
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* the axis the wave lies along, left behind when it collapses */
