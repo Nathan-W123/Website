@@ -73,6 +73,12 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'the seismic demand on the same wall is 3.7 psf', shots: [4] },
     { after: 'are all sized to it', shots: [5] },
   ],
+  terra: [
+    { after: 'a local-first assistant for orchard growers', shots: [2, 0, 1] },
+    { after: 'nine kinds of fault', shots: [3, 4, 5] },
+    { after: "with its neighbours'", shots: [6, 7] },
+    { after: 'per station-month', shots: [8, 9] },
+  ],
   'high-risk-roads': [
     { after: 'are actually dangerous', shots: [0] },
     { after: '2023 collision records', shots: [1, 2] },

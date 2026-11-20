@@ -20,24 +20,36 @@ const SECTIONS: { label: string; ids: string[] }[] = [
   { label: 'ML / AI', ids: ['machina', 'siege', 'gambit'] },
   { label: 'Simulations', ids: ['aero', 'aether6', 'ignis', 'black-hole'] },
   { label: 'Numerical modeling', ids: ['sparlab', 'hf-scf', 'quantize', 'formulate'] },
-  { label: 'Data', ids: ['terra'] },
-  { label: 'Civil', ids: ['olson', 'high-risk-roads'] },
+  { label: 'Data', ids: ['terra', 'high-risk-roads'] },
+  { label: 'Civil', ids: ['olson'] },
 ];
 /**
  * Projects that live only here, not in the old site's notebook: Terra, which
  * Nathan co-built and wrote the whole backend of. Its write-up is from his
- * resume and the repo's README; it has no pictures yet, so no chips.
+ * resume and the repo's README; its pictures are the repo's own screenshots
+ * (docs/terra in github.com/EthanVTruong/terra) and its mascot.
  */
 const EXTRA: Card[] = [
   {
     id: 'terra',
     title: 'Terra',
-    line: 'Orchard weather assistant',
-    tag: 'Orchard weather assistant',
+    line: 'Chill hours monitor',
+    tag: 'Chill hours monitor',
     stack: ['Python', 'PostgreSQL'],
     href: 'https://github.com/EthanVTruong/terra',
     notes: [],
-    images: [],
+    images: [
+      { src: '/projects/terra/1.webp', caption: 'Terra beside its evidence: how many stations it could use for the orchard' },
+      { src: '/projects/terra/2.webp', caption: "A grower's chat with Terra, with the orchard's temperature panel beside it" },
+      { src: '/projects/terra/3.webp', caption: "Terra's mascot" },
+      { src: '/projects/terra/4.webp', caption: 'Station lab on raw readings: the CIMIS stations around a demo orchard' },
+      { src: '/projects/terra/5.webp', caption: "The same hour after Terra's checks" },
+      { src: '/projects/terra/6.webp', caption: 'Pushing the Davis station to 125° by hand: Terra flags it' },
+      { src: '/projects/terra/7.webp', caption: "Station lab: each station's reading, what was expected, and which ones report" },
+      { src: '/projects/terra/8.webp', caption: 'Asking which station is acting up: the answer comes with its evidence' },
+      { src: '/projects/terra/9.webp', caption: 'Turning on heads-ups, with the evidence behind the estimate' },
+      { src: '/projects/terra/10.webp', caption: 'Orchard weather support: which stations were used and which were left out' },
+    ],
   },
 ];
 /** write-ups for the projects above, which have no study of their own */
