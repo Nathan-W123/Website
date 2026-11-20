@@ -33,7 +33,7 @@ export const PLACES: Record<string, Place[]> = {
   aether6: [
     { after: 'never the true state', shots: [2] },
     { after: 'flown twice in 300 seconds', shots: [0, 1] },
-    { after: 'closed-loop regression and determinism', shots: [3] },
+    { after: 'complete the mission', shots: [3] },
   ],
   ignis: [
     { after: 'from the propellants up', shots: [0] },
