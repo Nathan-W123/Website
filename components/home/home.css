@@ -427,6 +427,7 @@ html:has(.nw) {
   max-width: min(92vw, 1180px);
   margin: 0;
 }
+.pk-zoom video,
 .pk-zoom img {
   display: block;
   max-width: 100%;
@@ -621,7 +622,21 @@ html:has(.nw) {
 .nw-equation { display: block; container-type: inline-size; }
 .nw-equation .katex-display { margin: 4px 0; }
 .nw-equation .katex { font-size: min(1.12em, calc(97cqi / var(--eq-em, 22))); color: var(--ink); }
+/* under a write-up: its code, and a video to play where there is one */
+.nw-proj-link { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 26px; }
 .nw-proj-link a { text-decoration: underline; text-underline-offset: 4px; }
+.nw-proj-video {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+}
+.nw-proj-video:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
 
 /* ---- chess: Gambit's board on a page of its own, after the reference's game page ---- */
 .nw-chess p { margin: 0 0 12px; }

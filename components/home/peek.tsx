@@ -153,8 +153,14 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
   );
 }
 
-/** one picture, as large as the screen allows, over a dimmed page, with its caption and an optional second line; a click anywhere, the cross or Escape closes it */
-export function Zoom({ src, caption, note, onClose }: { src: string; caption: string; note?: string; onClose: () => void }) {
+/**
+ * one picture, as large as the screen allows, over a dimmed page, with its
+ * caption and an optional second line; a click anywhere, the cross or Escape
+ * closes it. With `video` (a path without its ending: a .webm and an .mp4
+ * beside it) it plays that instead, looping, with `src` as its poster and
+ * its own controls, which a click does not close it through.
+ */
+export function Zoom({ src, video, caption, note, onClose }: { src: string; video?: string; caption: string; note?: string; onClose: () => void }) {
   const reduce = useReducedMotion();
   const close = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -188,8 +194,15 @@ export function Zoom({ src, caption, note, onClose }: { src: string; caption: st
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: reduce ? 0.01 : 0.26, ease: [0.22, 1, 0.3, 1] }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={caption} draggable={false} />
+        {video ? (
+          <video poster={src} autoPlay loop muted playsInline controls aria-label={caption} onClick={(e) => e.stopPropagation()}>
+            <source src={`${video}.webm`} type="video/webm" />
+            <source src={`${video}.mp4`} type="video/mp4" />
+          </video>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={src} alt={caption} draggable={false} />
+        )}
         {(caption || note) && (
           <figcaption>
             {caption}

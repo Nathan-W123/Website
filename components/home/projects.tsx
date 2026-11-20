@@ -3,9 +3,10 @@
 import 'katex/dist/katex.min.css';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useEffect, useId, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { PROJECT_GROUPS, type Card } from '@/components/signs/content';
 import { Shell } from './chrome';
-import { Peek, type PeekSet } from './peek';
+import { Peek, Zoom, type PeekSet } from './peek';
 import { EQUATIONS } from './equations';
 import { PLACES } from './project-pictures';
 import { SHOT_SIZE } from './shot-sizes';
@@ -122,10 +123,23 @@ const writeUp = (c: Card, body: string[]): ReactNode[][] => {
   });
 };
 
+/** a video a write-up can play, from a button beside its code link: the path
+ *  without its ending (a .webm and an .mp4), its poster, and what it shows */
+const VIDEOS: Record<string, { src: string; poster: string; caption: string }> = {
+  // results/figures/flight.gif from the project, as a video
+  aether6: {
+    src: '/projects/aether6/flight',
+    poster: '/projects/aether6/flight.webp',
+    caption: 'The nominal mission: the LQR autopilot flying the six waypoints on its own estimate, with its time, altitude, airspeed and roll',
+  },
+};
+
 function Project({ c }: { c: Card }) {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [settled, setSettled] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const video = VIDEOS[c.id];
   const id = useId();
   const body = useMemo(() => writeUp(c, BODIES[c.id] ?? c.study?.page.body ?? [c.line]), [c]);
   // its pictures start loading as it opens, so every chip's fan has them
@@ -158,17 +172,32 @@ function Project({ c }: { c: Card }) {
               {body.map((nodes, i) => (
                 <p key={i}>{nodes}</p>
               ))}
-              {c.href && (
+              {(c.href || video) && (
                 <p className="nw-proj-link">
-                  <a href={c.href} target="_blank" rel="noreferrer">
-                    Code ↗
-                  </a>
+                  {c.href && (
+                    <a href={c.href} target="_blank" rel="noreferrer">
+                      Code ↗
+                    </a>
+                  )}
+                  {video && (
+                    <button type="button" className="nw-proj-video" onClick={() => setPlaying(true)}>
+                      Video ▶
+                    </button>
+                  )}
                 </p>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+      {video &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {playing && <Zoom key="video" src={video.poster} video={video.src} caption={video.caption} onClose={() => setPlaying(false)} />}
+          </AnimatePresence>,
+          document.body,
+        )}
     </li>
   );
 }
