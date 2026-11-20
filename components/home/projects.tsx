@@ -21,7 +21,7 @@ import { SHOT_SIZE } from './shot-sizes';
  */
 const SECTIONS: { label: string; ids: string[] }[] = [
   { label: 'Numerical modeling', ids: ['sparlab', 'hf-scf', 'quantize', 'formulate'] },
-  { label: 'Simulations', ids: ['aero', 'aether6', 'ignis', 'black-hole'] },
+  { label: 'Simulations', ids: ['aero', 'aether6', 'ignis', 'black-hole', 'ab-initio-md'] },
   { label: 'Civil', ids: ['olson'] },
   { label: 'Data', ids: ['terra', 'high-risk-roads'] },
   { label: 'ML / AI', ids: ['machina', 'siege', 'gambit'] },
@@ -33,6 +33,17 @@ const SECTIONS: { label: string; ids: string[] }[] = [
  * (docs/terra in github.com/EthanVTruong/terra) and its mascot.
  */
 const EXTRA: Card[] = [
+  // github.com/Nathan-W123/Ab-Initio-MD (its README has the numbers below)
+  {
+    id: 'ab-initio-md',
+    title: 'Ab Initio MD',
+    line: 'Quantum molecular dynamics engine',
+    tag: 'Quantum molecular dynamics engine',
+    stack: ['Python', 'NumPy', 'SciPy', 'Numba', 'PySCF'],
+    href: 'https://github.com/Nathan-W123/Ab-Initio-MD',
+    notes: [],
+    images: [],
+  },
   {
     id: 'terra',
     title: 'Terra',
@@ -57,6 +68,12 @@ const EXTRA: Card[] = [
 ];
 /** write-ups for the projects above, which have no study of their own */
 const BODIES: Record<string, string[]> = {
+  'ab-initio-md': [
+    "Ab initio molecular dynamics moves molecules by quantum mechanics alone: at every time step it solves the electrons' Schrödinger equation for where the nuclei are, takes the forces from that energy, and moves the nuclei by Newton's laws:",
+    '$$bomd$$',
+    "It runs on its own restricted and unrestricted Hartree–Fock code, with McMurchie–Davidson integrals and analytic gradients compiled with Numba. Velocity Verlet and Langevin integrators carry the nuclei, with Berendsen, CSVR and Nosé–Hoover-chain thermostats, and extended-Lagrangian BOMD keeps the energy from drifting when each step's SCF is solved loosely.",
+    "Its energies, forces and dipoles agree with PySCF to 1e-13 Hartree, and water's optimized geometry lands on the literature's 0.989 Å and 100.0°. NVE runs conserve energy with no drift over a picosecond, and with a loose SCF, XL-BOMD cuts the drift 23-fold while needing fewer SCF iterations.",
+  ],
   terra: [
     "Terra is a local-first assistant for orchard growers: their weather, their winter chill and the data behind them. It tracks each orchard's chill through the winter and messages the grower, through the OpenAI and Twilio APIs, when chill is close to met, when something looks wrong, or when the season won't reach it.",
     "The backend pulls CIMIS station observations and checks 17.3 million readings for nine kinds of fault, comparing each station's temperatures with its neighbours' and flagging suspect humidity, wind and solar readings, before estimating the temperature at the orchard itself.",
@@ -166,6 +183,7 @@ const STACKS: Record<string, string[]> = {
   'black-hole': ['Python', 'NumPy', 'SciPy', 'Matplotlib', 'pytest'],
   sparlab: ['C++17', 'Eigen', 'OpenMP', 'CMake', 'Catch2'],
   'hf-scf': ['Python', 'NumPy', 'Numba', 'FastAPI', 'React', '3Dmol.js'],
+  'ab-initio-md': ['Python', 'NumPy', 'SciPy', 'Numba', 'PySCF'],
   quantize: ['Python', 'NumPy', 'SciPy', 'PySCF'],
   formulate: ['Python', 'RDKit', 'scikit-learn', 'thermo'],
   'high-risk-roads': ['R', 'tidyverse', 'sf', 'Leaflet', 'ggplot2'],
