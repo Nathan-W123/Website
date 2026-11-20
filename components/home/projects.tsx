@@ -2,7 +2,7 @@
 
 import 'katex/dist/katex.min.css';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useId, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { PROJECT_GROUPS, type Card } from '@/components/signs/content';
 import { Shell } from './chrome';
 import { Peek, type PeekSet } from './peek';
@@ -94,7 +94,16 @@ const writeUp = (c: Card, body: string[]): ReactNode[][] => {
   return body.map((text, pi) => {
     // a paragraph that is only "$$name$$" is that equation, typeset ahead of time (equations.ts)
     const eq = /^\$\$([a-z-]+)\$\$$/.exec(text)?.[1];
-    if (eq && EQUATIONS[eq]) return [<span key="eq" className="nw-equation" dangerouslySetInnerHTML={{ __html: EQUATIONS[eq] }} />];
+    if (eq && EQUATIONS[eq])
+      return [
+        <span
+          key="eq"
+          className="nw-equation"
+          // its width in ems, so the CSS can size it to fit the column
+          style={{ '--eq-em': EQUATIONS[eq].em } as CSSProperties}
+          dangerouslySetInnerHTML={{ __html: EQUATIONS[eq].html }}
+        />,
+      ];
     const hits = places
       .map((p, i) => ({ p, i, at: home[i] === pi ? text.indexOf(p.after) : -1 }))
       .filter((h) => h.at >= 0)

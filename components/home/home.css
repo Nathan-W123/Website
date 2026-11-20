@@ -615,11 +615,12 @@ html:has(.nw) {
 .nw-proj-body.is-settled { overflow: visible; }
 .nw-proj-inner { padding: 2px 0 14px; }
 .nw-proj-inner p { margin: 0 0 12px; }
-/* an equation in a write-up (equations.ts), centred, and never wider than
-   the column: its em is the words' size, capped at a share of the column */
+/* an equation in a write-up (equations.ts), centred: a little larger than
+   the words, but never wider than the column, whatever its width in ems
+   (--eq-em, measured when it was typeset) */
 .nw-equation { display: block; container-type: inline-size; }
 .nw-equation .katex-display { margin: 4px 0; }
-.nw-equation .katex { font-size: min(1.12em, 4.2cqi); color: var(--ink); }
+.nw-equation .katex { font-size: min(1.12em, calc(97cqi / var(--eq-em, 22))); color: var(--ink); }
 .nw-proj-link a { text-decoration: underline; text-underline-offset: 4px; }
 
 /* ---- chess: Gambit's board on a page of its own, after the reference's game page ---- */

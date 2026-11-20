@@ -42,8 +42,8 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'to within 4.5%', shots: [5] },
   ],
   'black-hole': [
-    { after: 'from a camera near it', shots: [0] },
-    { after: 'integrated forward from the camera', shots: [3] },
+    { after: 'black hole simulator', shots: [0] },
+    { after: 'traced back from the camera', shots: [3] },
     { after: 'the disk is struck more than once', shots: [1] },
     { after: 'against closed-form values', shots: [2] },
   ],
