@@ -81,7 +81,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'per station-month', shots: [8] },
   ],
   'high-risk-roads': [
-    { after: 'are actually dangerous', shots: [0] },
+    { after: 'carry the most risk', shots: [0] },
     { after: '2023 collision records', shots: [1, 2] },
     { after: 'flagged for engineering attention', shots: [3] },
   ],
