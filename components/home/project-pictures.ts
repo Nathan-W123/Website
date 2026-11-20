@@ -16,7 +16,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'On eight held-out parts', shots: [2, 1] },
   ],
   siege: [
-    { after: 'on an elixir budget', shots: [0] },
+    { after: 'what a human player can see', shots: [0] },
     { after: 'both masked for legality', shots: [1, 2] },
     { after: 'over 100 matches each', shots: [3] },
   ],
