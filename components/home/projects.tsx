@@ -139,12 +139,32 @@ const VIDEOS: Record<string, { src: string; poster: string; caption: string }> =
   },
 };
 
+/** what each project is built with, shown under its write-up: the languages,
+ *  libraries and tools from its study's notes (the card's own list where
+ *  there is none here) */
+const STACKS: Record<string, string[]> = {
+  machina: ['C++17', 'Eigen', 'Python', 'PyTorch', 'scikit-learn'],
+  siege: ['Python', 'PyTorch', 'NumPy', 'Gymnasium', 'WebGL2'],
+  gambit: ['Python', 'PyTorch', 'python-chess', 'ONNX Runtime', 'Lichess Bot API'],
+  aero: ['Python', 'NumPy', 'Numba', 'WebGL2'],
+  aether6: ['C++17', 'Eigen', 'yaml-cpp', 'Catch2', 'CMake'],
+  ignis: ['C++17', 'Eigen', 'yaml-cpp', 'Catch2', 'CMake', 'PySide6', 'OpenGL'],
+  'black-hole': ['Python', 'NumPy', 'SciPy', 'Matplotlib', 'pytest'],
+  sparlab: ['C++17', 'Eigen', 'OpenMP', 'CMake', 'Catch2'],
+  'hf-scf': ['Python', 'NumPy', 'Numba', 'FastAPI', 'React', '3Dmol.js'],
+  quantize: ['Python', 'NumPy', 'SciPy', 'PySCF'],
+  formulate: ['Python', 'RDKit', 'scikit-learn', 'thermo'],
+  'high-risk-roads': ['R', 'tidyverse', 'sf', 'Leaflet', 'ggplot2'],
+  olson: ['Autodesk Fusion', 'ASCE 7-22', 'AISC 360-22', 'ACI 318-19', '2025 CBC'],
+};
+
 function Project({ c }: { c: Card }) {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [settled, setSettled] = useState(false);
   const [playing, setPlaying] = useState(false);
   const video = VIDEOS[c.id];
+  const stack = STACKS[c.id] ?? c.stack;
   const id = useId();
   const body = useMemo(() => writeUp(c, BODIES[c.id] ?? c.study?.page.body ?? [c.line]), [c]);
   // its pictures start loading as it opens, so every chip's fan has them
@@ -177,6 +197,7 @@ function Project({ c }: { c: Card }) {
               {body.map((nodes, i) => (
                 <p key={i}>{nodes}</p>
               ))}
+              {stack.length > 0 && <p className="nw-proj-stack">{stack.join(' · ')}</p>}
               {(c.href || video) && (
                 <p className="nw-proj-link">
                   {c.href && (

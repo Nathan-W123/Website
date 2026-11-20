@@ -52,7 +52,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'a part rather than a grey field', shots: [2, 3] },
   ],
   'hf-scf': [
-    { after: 'minimize the electronic energy self-consistently', shots: [1] },
+    { after: 'the oxygen lone pair', shots: [1] },
     { after: 'behind a FastAPI backend', shots: [0] },
     { after: 'any orbital from HOMO-3 to LUMO+3', shots: [2, 3] },
   ],
