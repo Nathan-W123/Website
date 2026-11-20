@@ -2,13 +2,16 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 /**
  * A picture chip in a line of text that opens into a small fan of three
  * pictures, after the reference Nathan showed (a thumbnail after a phrase;
  * hover it, or tap it on a phone, and three photos fly out of it and settle
  * at angles over the words below). The fan is shifted sideways if it would
- * run off the screen, and comes down a size on a phone.
+ * run off the screen, and comes down a size on a phone. With , the
+ * fan stays open while the pointer crosses to it, and a picture opens large
+ * over the page when clicked.
  */
 
 export type PeekCard = { src: string; alt: string; w: number; h: number };
@@ -30,11 +33,12 @@ const FANS = {
   ],
 };
 
-export function Peek({ set }: { set: PeekSet }) {
+export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boolean }) {
   const FAN = FANS[Math.min(3, Math.max(1, set.cards.length)) as 1 | 2 | 3];
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [layout, setLayout] = useState({ shift: 0, k: 1 });
+  const [zoom, setZoom] = useState<PeekCard | null>(null);
   const root = useRef<HTMLSpanElement>(null);
   const closeTimer = useRef<number | undefined>(undefined);
 
@@ -95,7 +99,8 @@ export function Peek({ set }: { set: PeekSet }) {
       ref={root}
       className={`pk${open ? ' is-open' : ''}`}
       onPointerEnter={(e) => e.pointerType === 'mouse' && show()}
-      onPointerLeave={(e) => e.pointerType === 'mouse' && hide(140)}
+      // a fan you can click into gets long enough to cross the gap to it
+      onPointerLeave={(e) => e.pointerType === 'mouse' && hide(zoomable ? 380 : 140)}
     >
       {/* the next picture in the set, tucked behind the chip: it reads as a
           small stack of the real pictures, and says there is more in there */}
@@ -122,20 +127,76 @@ export function Peek({ set }: { set: PeekSet }) {
             return (
               <motion.span
                 key={c.src}
-                className="pk-card"
+                className={zoomable ? 'pk-card is-zoomable' : 'pk-card'}
                 style={{ width: c.w * layout.k, height: c.h * layout.k, marginLeft: (-c.w * layout.k) / 2, marginTop: (-c.h * layout.k) / 2, zIndex: 40 + f.z }}
                 initial={{ opacity: 0, x: 0, y: 0, scale: 0.18, rotate: 0 }}
                 animate={{ opacity: 1, x: f.x * layout.k + layout.shift, y: f.y * layout.k, scale: 1, rotate: f.r }}
                 exit={{ opacity: 0, x: 0, y: 0, scale: 0.18, rotate: 0, transition: { duration: reduce ? 0.01 : 0.18, ease: 'easeIn' } }}
                 transition={{ ...spring, delay: reduce ? 0 : i * 0.035 }}
+                whileHover={zoomable && !reduce ? { scale: 1.06, zIndex: 60 } : undefined}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={c.src} alt={c.alt} draggable={false} />
+                {zoomable ? (
+                  <button type="button" className="pk-card-open" aria-label={'Open: ' + c.alt} onClick={() => setZoom(c)}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={c.src} alt="" draggable={false} />
+                  </button>
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={c.src} alt={c.alt} draggable={false} />
+                )}
               </motion.span>
             );
           })}
       </AnimatePresence>
+      {typeof document !== 'undefined' &&
+        createPortal(<AnimatePresence>{zoom && <Zoom key={zoom.src} card={zoom} onClose={() => setZoom(null)} />}</AnimatePresence>, document.body)}
     </span>
+  );
+}
+
+/** one picture, as large as the screen allows, over a dimmed page; a click anywhere, the cross or Escape closes it */
+function Zoom({ card, onClose }: { card: PeekCard; onClose: () => void }) {
+  const reduce = useReducedMotion();
+  const close = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const back = document.activeElement as HTMLElement | null;
+    close.current?.focus({ preventScroll: true });
+    const key = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.stopImmediatePropagation();
+      onClose();
+    };
+    window.addEventListener('keydown', key, true);
+    return () => {
+      window.removeEventListener('keydown', key, true);
+      back?.focus?.({ preventScroll: true });
+    };
+  }, [onClose]);
+  return (
+    <motion.div
+      className="pk-zoom"
+      role="dialog"
+      aria-modal="true"
+      aria-label={card.alt}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: reduce ? 0.01 : 0.16 } }}
+      transition={{ duration: reduce ? 0.01 : 0.2 }}
+      onClick={onClose}
+    >
+      <motion.figure
+        initial={{ opacity: 0, scale: reduce ? 1 : 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: reduce ? 0.01 : 0.26, ease: [0.22, 1, 0.3, 1] }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={card.src} alt={card.alt} draggable={false} />
+        {card.alt && <figcaption>{card.alt}</figcaption>}
+      </motion.figure>
+      <button ref={close} type="button" className="pk-zoom-close" aria-label="Close" onClick={onClose}>
+        ×
+      </button>
+    </motion.div>
   );
 }
 

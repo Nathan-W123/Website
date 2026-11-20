@@ -5,14 +5,16 @@ import { Fragment, useEffect, useId, useMemo, useState, type ReactNode } from 'r
 import { ART, PROJECT_GROUPS, type Card } from '@/components/signs/content';
 import { Shell } from './chrome';
 import { Peek, type PeekSet } from './peek';
+import { PLACES } from './project-pictures';
 import { SHOT_SIZE } from './shot-sizes';
 
 /**
  * Projects, laid out like Work: a line down the left with a dot at each
  * section (ML / AI, simulations, numerical modeling, civil), and under each,
  * one line per project. A project opens into its write-up (the one its old
- * project page had), with a picture chip in its first sentence that opens
- * into the project's own screenshots, the way the About's chips do.
+ * project page had), with picture chips where its pictures fit the words
+ * (project-pictures.ts), the way the About's chips do; a picture in a fan
+ * opens large when clicked.
  */
 const SECTIONS: { label: string; ids: string[] }[] = [
   { label: 'ML / AI', ids: ['machina', 'siege', 'gambit'] },
@@ -32,17 +34,39 @@ const cardSize = (src: string) => {
   return { w: Math.round(w * k), h: Math.round(h * k) };
 };
 
-const peekFor = (c: Card): PeekSet | null => {
-  const shots = c.images.slice(0, 3);
-  if (!shots.length) return null;
-  return { label: c.title, icon: shots[0].src, cards: shots.map((s) => ({ src: s.src, alt: s.caption, ...cardSize(s.src) })) };
+/** the pictures one chip opens into */
+const setFor = (c: Card, shots: number[]): PeekSet | null => {
+  const picked = shots.map((i) => c.images[i]).filter((s): s is Card['images'][number] => !!s);
+  if (!picked.length) return null;
+  return { label: c.title, icon: picked[0].src, cards: picked.map((s) => ({ src: s.src, alt: s.caption, ...cardSize(s.src) })) };
 };
 
-/** the chip goes at the end of the write-up's first sentence, before its full stop */
-const withChip = (text: string, chip: ReactNode): ReactNode[] => {
-  const m = /[.?!](?=\s|$)/.exec(text);
-  if (!m) return [text, chip];
-  return [text.slice(0, m.index), chip, text.slice(m.index)];
+/**
+ * The write-up as paragraphs of text and chips: each place's chip goes right
+ * after its phrase, in the first paragraph that has it (project-pictures.ts).
+ */
+const writeUp = (c: Card, body: string[]): ReactNode[][] => {
+  const places = PLACES[c.id] ?? [];
+  const home = places.map((p) => body.findIndex((t) => t.includes(p.after)));
+  if (process.env.NODE_ENV !== 'production')
+    places.forEach((p, i) => home[i] < 0 && console.warn(`${c.id}: no "${p.after}" in the write-up`));
+  return body.map((text, pi) => {
+    const hits = places
+      .map((p, i) => ({ p, i, at: home[i] === pi ? text.indexOf(p.after) : -1 }))
+      .filter((h) => h.at >= 0)
+      .sort((a, b) => a.at - b.at);
+    const out: ReactNode[] = [];
+    let pos = 0;
+    for (const { p, i, at } of hits) {
+      const end = at + p.after.length;
+      out.push(text.slice(pos, end));
+      const set = setFor(c, p.shots);
+      if (set) out.push(<Peek key={`pk${i}`} set={set} zoomable />);
+      pos = end;
+    }
+    out.push(text.slice(pos));
+    return out;
+  });
 };
 
 function Project({ c }: { c: Card }) {
@@ -50,12 +74,11 @@ function Project({ c }: { c: Card }) {
   const [open, setOpen] = useState(false);
   const [settled, setSettled] = useState(false);
   const id = useId();
-  const body = c.study?.page.body ?? [c.line];
-  const peek = useMemo(() => peekFor(c), [c]);
-  // its pictures start loading as it opens, so the chip's fan has them
+  const body = useMemo(() => writeUp(c, c.study?.page.body ?? [c.line]), [c]);
+  // its pictures start loading as it opens, so every chip's fan has them
   useEffect(() => {
-    if (open && peek) peek.cards.forEach((card) => { const i = new Image(); i.src = card.src; });
-  }, [open, peek]);
+    if (open) c.images.forEach((s) => { const i = new Image(); i.src = s.src; });
+  }, [open, c]);
   return (
     <li className={`nw-proj${open ? ' is-open' : ''}`}>
       <button type="button" className="nw-proj-row" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
@@ -79,8 +102,8 @@ function Project({ c }: { c: Card }) {
             transition={{ duration: reduce ? 0.01 : 0.32, ease: [0.22, 1, 0.3, 1] }}
           >
             <div className="nw-proj-inner">
-              {body.map((p, i) => (
-                <p key={i}>{i === 0 && peek ? withChip(p, <Peek key="peek" set={peek} />) : p}</p>
+              {body.map((nodes, i) => (
+                <p key={i}>{nodes}</p>
               ))}
               {c.href && (
                 <p className="nw-proj-link">
@@ -102,7 +125,7 @@ export function Projects() {
     <Shell page="projects">
       <section className="nw-col nw-section" aria-labelledby="nw-projects">
         <h1 id="nw-projects">Projects</h1>
-        <p className="nw-lede">Things I&apos;ve built. Open one to read more.</p>
+        <p className="nw-lede">Things I&apos;ve built and am passionate about.</p>
         <ol className="nw-timeline">
           {SECTIONS.map((s) => (
             <li key={s.label}>

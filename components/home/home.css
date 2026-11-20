@@ -11,7 +11,7 @@ html:has(.nw) body {
   overflow: visible;
   overscroll-behavior: auto;
   /* the same cream past the ends of the page, when a scroll overshoots */
-  background: #f4eddd;
+  background: #f9f6ef;
 }
 html:has(.nw) { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
@@ -19,14 +19,14 @@ html:has(.nw) { scroll-behavior: smooth; }
 }
 
 .nw {
-  /* a light cream, warm enough to read as paper rather than white */
-  --bg: #f4eddd;
+  /* barely cream: a breath warmer than white */
+  --bg: #f9f6ef;
   --ink: #1f1c18;
   --text: #34302a;
   /* the bold words and the marks under the About: a dark grey, not black */
   --soft: #4a4641;
   --muted: #6d665b;
-  --rule: #e4dac6;
+  --rule: #e9e3d7;
   --col: 760px;
   --gut: 24px;
   /* the paper plane is sized in the old site's design pixels; here one is one */
@@ -34,7 +34,7 @@ html:has(.nw) { scroll-behavior: smooth; }
   /* what Gambit's board reads from the page around it */
   --body: 'Courier New', Courier, monospace;
   --ink-soft: #8d877d;
-  --cream: #f4eddd;
+  --cream: #f9f6ef;
   /* at least a screen tall, so the paper plane can sit at the foot of it */
   min-height: 100vh;
   display: flex;
@@ -209,10 +209,75 @@ html:has(.nw) { scroll-behavior: smooth; }
   height: 100%;
   object-fit: cover;
 }
+/* on Projects a picture in the fan opens large: it takes the pointer, lifts
+   a little under it (whileHover, in peek.tsx), and is the button */
+.pk-card.is-zoomable { pointer-events: auto; cursor: zoom-in; }
+.pk-card-open {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.pk-card-open img { pointer-events: none; }
+.pk-card-open:focus-visible { outline: 2px solid #1f1c18; outline-offset: -2px; border-radius: 14px; }
 @media (prefers-reduced-motion: reduce) {
   .pk-chip,
   .pk-back { transition: none; }
 }
+
+/* ---- one picture, opened large over a dimmed page (peek.tsx). It sits in
+   the document's body, outside the page, so it brings its own face. ---- */
+.pk-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 5vh 4vw;
+  background: rgb(26 20 16 / 0.82);
+  cursor: zoom-out;
+}
+.pk-zoom figure {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  max-width: min(92vw, 1180px);
+  margin: 0;
+}
+.pk-zoom img {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.7);
+}
+.pk-zoom figcaption {
+  max-width: 70ch;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+  color: #f9f6ef;
+}
+.pk-zoom-close {
+  position: fixed;
+  top: 18px;
+  right: 20px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(249 246 239 / 0.14);
+  color: #f9f6ef;
+  font: 700 26px/1 'Courier New', Courier, monospace;
+  cursor: pointer;
+}
+.pk-zoom-close:hover { background: rgb(249 246 239 / 0.24); }
+.pk-zoom-close:focus-visible { outline: 2px solid #f9f6ef; outline-offset: 3px; }
 
 /* ---- the paper plane from the deployed home, at the foot of the page:
    pushed to the bottom of the screen when the words are shorter than it,
