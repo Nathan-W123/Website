@@ -13,7 +13,13 @@ html:has(.nw) body {
   /* the same cream past the ends of the page, when a scroll overshoots */
   background: #f9f6ef;
 }
-html:has(.nw) { scroll-behavior: smooth; }
+html:has(.nw) {
+  scroll-behavior: smooth;
+  /* room for the scrollbar on every page, even one short enough not to
+     scroll: without it Home (which fits) centred its column 7.5px right of
+     the pages that scroll, and the nav jumped going to and from it */
+  scrollbar-gutter: stable;
+}
 @media (prefers-reduced-motion: reduce) {
   html:has(.nw) { scroll-behavior: auto; }
 }
