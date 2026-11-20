@@ -125,13 +125,18 @@ const writeUp = (c: Card, body: string[]): ReactNode[][] => {
 
 /** a video a write-up can play, from a button beside its code link: the path
  *  without its ending (a .webm and an .mp4), its poster, and what it shows */
-const VIDEOS: Record<string, { src: string; poster: string; caption: string; sound?: boolean }> = {
+const VIDEOS: Record<string, { src?: string; poster?: string; embed?: string; caption: string; sound?: boolean }> = {
   // the videos Nathan made for LinkedIn (work/ref/project-videos.mjs)
   aether6: {
     // a new name, not flight: browsers kept the old clip cached under that one
     src: '/projects/aether6/circuit',
     poster: '/projects/aether6/circuit.webp',
     caption: 'The autonomous circuit: the autopilot flying the waypoints lap after lap on its own estimate',
+  },
+  // Terra's video, as its landing page (terra-orchard-landing.vercel.app) embeds it
+  terra: {
+    embed: 'https://www.youtube-nocookie.com/embed/awrDA6VIbRQ?autoplay=1&rel=0',
+    caption: 'Terra, from its landing page',
   },
   // the narrated explainer from his application (work/ref/quantize-video.mjs):
   // it has sound, so it plays once, unmuted, rather than as a silent loop
@@ -258,7 +263,7 @@ function Project({ c }: { c: Card }) {
         typeof document !== 'undefined' &&
         createPortal(
           <AnimatePresence>
-            {playing && <Zoom key="video" src={video.poster} video={video.src} sound={video.sound} caption={video.caption} onClose={() => setPlaying(false)} />}
+            {playing && <Zoom key="video" src={video.poster ?? ''} video={video.src} embed={video.embed} sound={video.sound} caption={video.caption} onClose={() => setPlaying(false)} />}
           </AnimatePresence>,
           document.body,
         )}

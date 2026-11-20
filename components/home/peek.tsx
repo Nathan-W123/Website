@@ -159,9 +159,10 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
  * closes it. With `video` (a path without its ending: a .webm and an .mp4
  * beside it) it plays that instead, with `src` as its poster and its own
  * controls, which a click does not close it through: a silent clip looping,
- * muted; one with `sound` once, with its sound.
+ * muted; one with `sound` once, with its sound. With `embed` (a player's
+ * address, such as a YouTube embed) it shows that player instead.
  */
-export function Zoom({ src, video, sound = false, caption, note, onClose }: { src: string; video?: string; sound?: boolean; caption: string; note?: string; onClose: () => void }) {
+export function Zoom({ src, video, embed, sound = false, caption, note, onClose }: { src: string; video?: string; embed?: string; sound?: boolean; caption: string; note?: string; onClose: () => void }) {
   const reduce = useReducedMotion();
   const close = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -195,7 +196,16 @@ export function Zoom({ src, video, sound = false, caption, note, onClose }: { sr
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: reduce ? 0.01 : 0.26, ease: [0.22, 1, 0.3, 1] }}
       >
-        {video ? (
+        {embed ? (
+          // a hosted player (YouTube, from its privacy-enhanced domain), loaded only now
+          <iframe
+            className="pk-zoom-embed"
+            src={embed}
+            title={caption}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+          />
+        ) : video ? (
           // a silent clip loops muted; one with sound (narration) plays once, with it
           <video poster={src} autoPlay loop={!sound} muted={!sound} playsInline controls aria-label={caption} onClick={(e) => e.stopPropagation()}>
             <source src={`${video}.webm`} type="video/webm" />

@@ -394,6 +394,17 @@ html:has(.nw) {
   max-width: min(92vw, 1180px);
   margin: 0;
 }
+/* a hosted player: 16:9, as large as the screen allows */
+.pk-zoom-embed {
+  display: block;
+  width: min(92vw, 1100px, calc(80vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  border-radius: 10px;
+  background: #000;
+  box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.7);
+}
 .pk-zoom video,
 .pk-zoom img {
   display: block;
