@@ -15,8 +15,8 @@ import { Zoom } from './peek';
  */
 const SECTIONS: { id: string; label: string; line: string }[] = [
   { id: 'shoes', label: 'Shoes', line: "Custom AF 1's, for people and organizations." },
-  { id: 'drawing', label: 'Drawings', line: 'Drawings in Copic markers.' },
   { id: 'doodles', label: 'Doodles', line: 'When I let my creativity flow wildly.' },
+  { id: 'drawing', label: 'Drawings', line: "Other cool things I've drawn." },
 ];
 
 export function Art() {
