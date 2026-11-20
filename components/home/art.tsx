@@ -14,7 +14,7 @@ import { Zoom } from './peek';
  * was made with. The last dot is who the work was for.
  */
 const SECTIONS: { id: string; label: string; line: string }[] = [
-  { id: 'shoes', label: 'Shoes', line: "Custom AF 1's, for people and organizations." },
+  { id: 'shoes', label: 'Shoes', line: "Some of my favorite shoes I've painted." },
   { id: 'doodles', label: 'Doodles', line: 'When I let my creativity flow wildly.' },
   { id: 'drawing', label: 'Drawings', line: "Other cool things I've drawn." },
 ];
