@@ -28,7 +28,6 @@ export const PLACES: Record<string, Place[]> = {
   aero: [
     { after: 'build a wind tunnel simulator', shots: [0, 2] },
     { after: 'for its 20% blockage', shots: [1] },
-    { after: 'about 29 MLUPS', shots: [4] },
     { after: 'from Schiller–Naumann', shots: [3] },
   ],
   aether6: [
