@@ -39,7 +39,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'from the propellants up', shots: [0] },
     { after: 'regenerative cooling', shots: [3, 4, 6] },
     { after: 'RS-25 bell', shots: [1, 2] },
-    { after: 'to within 4.5 per cent', shots: [5] },
+    { after: 'to within 4.5%', shots: [5] },
   ],
   'black-hole': [
     { after: 'from a camera near it', shots: [0] },
