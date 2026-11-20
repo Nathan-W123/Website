@@ -167,6 +167,11 @@ const STACKS: Record<string, string[]> = {
   olson: ['Autodesk Fusion', 'ASCE 7-22', 'AISC 360-22', 'ACI 318-19', '2025 CBC'],
 };
 
+/** who a project was built with, on a line of its own at the end of its write-up */
+const BUILT_WITH: Record<string, { name: string; href: string }> = {
+  terra: { name: 'Ethan Truong', href: 'https://www.ethantruong.me/' },
+};
+
 /** what a write-up's own link is called, where it is not code */
 const LINK_LABELS: Record<string, string> = { olson: 'CAD' };
 /** more links under a write-up, beside its own (a report, say) */
@@ -184,6 +189,7 @@ function Project({ c }: { c: Card }) {
   const video = VIDEOS[c.id];
   const stack = STACKS[c.id] ?? c.stack;
   const more = MORE_LINKS[c.id] ?? [];
+  const partner = BUILT_WITH[c.id];
   const id = useId();
   const body = useMemo(() => writeUp(c, BODIES[c.id] ?? c.study?.page.body ?? [c.line]), [c]);
   // its pictures start loading as it opens, so every chip's fan has them
@@ -216,6 +222,14 @@ function Project({ c }: { c: Card }) {
               {body.map((nodes, i) => (
                 <p key={i}>{nodes}</p>
               ))}
+              {partner && (
+                <p className="nw-proj-credit">
+                  Built with{' '}
+                  <a href={partner.href} target="_blank" rel="noreferrer">
+                    {partner.name}
+                  </a>
+                </p>
+              )}
               {stack.length > 0 && <p className="nw-proj-stack">{stack.join(' · ')}</p>}
               {(c.href || video || more.length > 0) && (
                 <p className="nw-proj-link">
