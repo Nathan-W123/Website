@@ -167,6 +167,15 @@ const STACKS: Record<string, string[]> = {
   olson: ['Autodesk Fusion', 'ASCE 7-22', 'AISC 360-22', 'ACI 318-19', '2025 CBC'],
 };
 
+/** what a write-up's own link is called, where it is not code */
+const LINK_LABELS: Record<string, string> = { olson: 'CAD' };
+/** more links under a write-up, beside its own (a report, say) */
+const MORE_LINKS: Record<string, { label: string; href: string }[]> = {
+  // the preliminary calculations from the UWP 102E team report (5 Nov 2026),
+  // which the write-up's numbers come from
+  olson: [{ label: 'Structural analysis report', href: '/docs/olson-structural-analysis.pdf' }],
+};
+
 function Project({ c }: { c: Card }) {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
@@ -174,6 +183,7 @@ function Project({ c }: { c: Card }) {
   const [playing, setPlaying] = useState(false);
   const video = VIDEOS[c.id];
   const stack = STACKS[c.id] ?? c.stack;
+  const more = MORE_LINKS[c.id] ?? [];
   const id = useId();
   const body = useMemo(() => writeUp(c, BODIES[c.id] ?? c.study?.page.body ?? [c.line]), [c]);
   // its pictures start loading as it opens, so every chip's fan has them
@@ -207,13 +217,18 @@ function Project({ c }: { c: Card }) {
                 <p key={i}>{nodes}</p>
               ))}
               {stack.length > 0 && <p className="nw-proj-stack">{stack.join(' · ')}</p>}
-              {(c.href || video) && (
+              {(c.href || video || more.length > 0) && (
                 <p className="nw-proj-link">
                   {c.href && (
                     <a href={c.href} target="_blank" rel="noreferrer">
-                      Code ↗
+                      {LINK_LABELS[c.id] ?? 'Code'} ↗
                     </a>
                   )}
+                  {more.map((l) => (
+                    <a key={l.href} href={l.href} target="_blank" rel="noreferrer">
+                      {l.label} ↗
+                    </a>
+                  ))}
                   {video && (
                     <button type="button" className="nw-proj-video" onClick={() => setPlaying(true)}>
                       Video ▶

@@ -73,7 +73,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'are all sized to it', shots: [5] },
   ],
   terra: [
-    { after: 'a local-first assistant for orchard growers', shots: [2, 0, 1] },
+    { after: 'a local-first assistant for orchard growers', shots: [3, 0, 1] },
     // the raw and filtered maps were near twins of the flagged one: the
     // flagged station and the chat about it, then the neighbours' map
     { after: 'nine kinds of fault', shots: [5, 7] },
