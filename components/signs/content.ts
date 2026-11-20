@@ -87,7 +87,7 @@ const TAGS: Record<string, string> = {
   ignis: 'Rocket propulsion engine',
   sparlab: 'Finite-element solver',
   aether6: 'Fixed-wing flight simulator',
-  quantize: 'Molecular geometry fitting',
+  quantize: 'Molecular geometry optimization',
   aero: 'Computational fluid dynamics simulator',
   formulate: 'Materials design engine',
   'black-hole': 'Relativistic ray tracer',
