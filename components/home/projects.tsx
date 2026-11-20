@@ -169,6 +169,13 @@ const VIDEOS: Record<string, { src?: string; poster?: string; embed?: string; ca
     poster: '/projects/sparlab/tower.webp',
     caption: 'An algorithm designs a tower: under a 1 kN load and 100 N·m of torsion, 176 iterations move the material to where the strain energy is highest, and a truss is left',
   },
+  // H + H2 -> H2 + H, run for this page by the engine itself (UHF/6-31G forces,
+  // velocity Verlet at 0.25 fs) and drawn by work/ref/h3-render.mjs
+  'ab-initio-md': {
+    src: '/projects/ab-initio-md/reaction',
+    poster: '/projects/ab-initio-md/reaction.webp',
+    caption: 'H + H₂ → H₂ + H, run by the engine with Hartree–Fock forces at every step: a hydrogen atom (blue) flies into H₂, takes one of its atoms and sends the other away, and the total energy stays flat',
+  },
 };
 
 /** what each project is built with, shown under its write-up: the languages,

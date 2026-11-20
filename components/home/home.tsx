@@ -21,19 +21,20 @@ const [OPENING, ...REST_OF_FIRST] = ABOUT.paragraphs[0].split(/(?<=\.)\s+/);
 const PARAGRAPHS = [REST_OF_FIRST.join(' '), ...ABOUT.paragraphs.slice(1)];
 
 /**
- * The pictures behind the chips, at their size on screen (the files are twice
- * that). Quantum: "Hydrogen Density Plots" by
- * PoorLeno (three of its panels); organic chemistry: Ben Mills' ball-and-stick renders; both public
- * domain, from Wikimedia Commons (work/ref/peek-images.mjs). Art: Nathan's own.
+ * The pictures behind the chips, at their size on screen (the files are at
+ * least twice that). Quantum: orbitals Nathan's own Hartree–Fock engine
+ * computed, the HF-SCF project's pictures (work/ref/orbital-render.mjs);
+ * organic chemistry: Ben Mills' ball-and-stick renders, public domain, from
+ * Wikimedia Commons (work/ref/peek-images.mjs). Art: Nathan's own.
  */
 const PEEKS: Record<'quantum' | 'art' | 'ochem', PeekSet> = {
   quantum: {
     label: 'Quantum',
-    icon: '/about/peek/quantum-icon.webp',
+    icon: '/projects/hf-scf/chip-6.webp',
     cards: [
-      { src: '/about/peek/quantum-1.webp', alt: 'The probability density of a hydrogen 4s orbital: rings around the nucleus', w: 156, h: 156 },
-      { src: '/about/peek/quantum-2.webp', alt: 'A hydrogen orbital with n = 4, l = 3, m = 1: six lobes', w: 172, h: 172 },
-      { src: '/about/peek/quantum-3.webp', alt: 'A hydrogen orbital with n = 4, l = 2, m = 0', w: 160, h: 160 },
+      { src: '/projects/hf-scf/1.webp', alt: "Water's HOMO, computed by my Hartree–Fock engine: the oxygen lone pair", w: 156, h: 156 },
+      { src: '/projects/hf-scf/6.webp', alt: "Ethylene's LUMO, computed by my Hartree–Fock engine: π*, with a node between the carbons", w: 172, h: 172 },
+      { src: '/projects/hf-scf/8.webp', alt: "Benzene's LUMO, computed by my Hartree–Fock engine: π*, with more nodes", w: 160, h: 160 },
     ],
   },
   art: {

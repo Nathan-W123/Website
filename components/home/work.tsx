@@ -32,7 +32,7 @@ const WORK: Role[] = [
     role: 'Software Engineering Intern',
     at: 'Sacramento Area Sewer District',
     what:
-      "Developed internal tools for the district's infrastructure, automating its staffing projections and maintenance maps.",
+      "Developed internal tools for the district's infrastructure, streamlining project efficiency and performance.",
   },
   {
     when: 'Sep 2024 – May 2025',
