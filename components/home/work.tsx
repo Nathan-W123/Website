@@ -1,70 +1,61 @@
 'use client';
 
-import { Fragment } from 'react';
-import { ART, PROJECT_GROUPS } from '@/components/signs/content';
 import { Shell } from './chrome';
 
-/** Work: every project by group, its tile, name and what it is; linked to its code where there is some. */
+/**
+ * Work, after the reference's Work page: a line down the left with a dot at
+ * each role, the dates, the role and where, and a few lines on what was done.
+ * Taken from Nathan's resume (Downloads/NW.Resume.pdf, November 2026),
+ * nothing added; current role first, then by start date.
+ */
+type Role = { when?: string; role: string; at: string; what: string };
+
+const WORK: Role[] = [
+  {
+    when: 'Apr 2026 – Present',
+    role: 'Quantum Mechanics Research Assistant',
+    at: 'UC Davis',
+    what:
+      "Developed a method to pin down molecular structures when lab data alone can't, combining rotational spectroscopy with quantum chemistry in one weighted objective so each source counts only where it is reliable. Against published structures for 9 molecules it cut the mean bond-length error of quantum chemistry alone by half, and it predicted held-out measurements better than theory alone on 5 of 5 molecules.",
+  },
+  {
+    when: 'Jun 2026 – Sep 2026',
+    role: 'Industrial Engineer Intern',
+    at: 'Pacific Coast Producers',
+    what:
+      "Investigated recurring stoppages on a production line with time studies at 7 stations, 100+ hours of downtime data and interviews with operators. Ranked the fixes by cost and downtime impact, specified custom parts for the plant's mechanics to build, and tracked the results: line downtime fell 32% and average daily output rose 9.1%.",
+  },
+  {
+    when: 'Oct 2023 – Jun 2026',
+    role: 'Engineer Intern (Part-time)',
+    at: 'Sacramento Area Sewer District',
+    what:
+      'Automated staffing projections that took weeks of manual work with a SQL/VBA pipeline, validated against the manual process and now under an hour for 50+ users, and automated the monthly maintenance maps with Python, SQL and ArcGIS, cutting days of GIS work to about 20 minutes.',
+  },
+  {
+    role: 'Tutor',
+    at: 'MESA',
+    what: 'Tutored 40+ students for 300+ hours in quantum mechanics, differential equations, organic chemistry and electromagnetism.',
+  },
+];
+
 export function Work() {
   return (
     <Shell page="work">
       <section className="nw-col nw-section" aria-labelledby="nw-work">
         <h1 id="nw-work">Work</h1>
-        {PROJECT_GROUPS.map((g) => (
-          <Fragment key={g.id}>
-            <h2>{g.label}</h2>
-            <ul className="nw-work">
-              {g.cards.map((c) => {
-                const body = (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`/tiles/${c.id}.webp`} alt="" loading="lazy" />
-                    <span>
-                      <strong>{c.title}</strong>
-                      <span className="nw-work-tag">{c.tag}</span>
-                    </span>
-                  </>
-                );
-                return (
-                  <li key={c.id}>
-                    {c.href ? (
-                      <a href={c.href} target="_blank" rel="noreferrer">
-                        {body}
-                      </a>
-                    ) : (
-                      <div>{body}</div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </Fragment>
-        ))}
-      </section>
-    </Shell>
-  );
-}
-
-/** Art: the drawings, shoes and doodles, each with its caption. */
-export function Art() {
-  return (
-    <Shell page="art">
-      <section className="nw-col nw-section" aria-labelledby="nw-art">
-        <h1 id="nw-art">Art</h1>
-        {ART.map((s) => (
-          <Fragment key={s.id}>
-            <h2>{s.label}</h2>
-            <ul className="nw-art">
-              {s.items.map((it) => (
-                <li key={it.image}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={it.image} alt={it.caption} loading="lazy" />
-                  {it.caption && <span>{it.caption}</span>}
-                </li>
-              ))}
-            </ul>
-          </Fragment>
-        ))}
+        <p className="nw-lede">Read below to see what I&apos;ve been up to.</p>
+        <ol className="nw-timeline">
+          {WORK.map((w) => (
+            <li key={w.at}>
+              {w.when && <p className="nw-when">{w.when}</p>}
+              <h2 className="nw-role">
+                {w.role} · {w.at}
+              </h2>
+              <p className="nw-what">{w.what}</p>
+            </li>
+          ))}
+        </ol>
       </section>
     </Shell>
   );

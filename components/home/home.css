@@ -274,6 +274,54 @@ html:has(.nw) { scroll-behavior: smooth; }
 }
 .nw-art span { font-size: 13px; line-height: 1.35; color: var(--muted); }
 
+/* ---- work: after the reference, a line down the left with a dot at each
+   role, then the dates, the role and where, and what was done ---- */
+.nw-lede { margin: 6px 0 0; }
+.nw-timeline {
+  position: relative;
+  list-style: none;
+  margin: 40px 0 0;
+  padding: 0 0 0 34px;
+}
+.nw-timeline::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 8px;
+  bottom: 0;
+  width: 1px;
+  background: #d9cfbc;
+}
+.nw-timeline li { position: relative; padding-bottom: 46px; }
+.nw-timeline li:last-child { padding-bottom: 0; }
+.nw-timeline li::before {
+  content: '';
+  position: absolute;
+  left: -34px;
+  top: 0.5em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.nw-when {
+  margin: 0;
+  font-size: 13.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.nw .nw-role {
+  margin: 4px 0 0;
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+.nw-what { margin: 12px 0 0; }
+
 /* ---- chess: Gambit's board on a page of its own, after the reference's game page ---- */
 .nw-chess p { margin: 0 0 12px; }
 .nw-chess-board {

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Art } from '@/components/home/work';
+import { Art } from '@/components/home/projects';
 
 export const metadata: Metadata = { title: 'Art · Nathan W.' };
 

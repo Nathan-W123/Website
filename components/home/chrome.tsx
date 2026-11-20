@@ -12,10 +12,11 @@ import './home.css';
  * frame until the loop is ready, and only that frame with reduced motion.
  */
 
-type Page = 'home' | 'work' | 'art' | 'chess';
+type Page = 'home' | 'work' | 'projects' | 'art' | 'chess';
 const NAV: { page: Page; label: string; href: string }[] = [
   { page: 'home', label: 'Home', href: '/' },
   { page: 'work', label: 'Work', href: '/work/' },
+  { page: 'projects', label: 'Projects', href: '/projects/' },
   { page: 'art', label: 'Art', href: '/art/' },
   { page: 'chess', label: 'Chess', href: '/chess/' },
 ];
