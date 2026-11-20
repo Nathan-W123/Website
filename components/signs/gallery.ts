@@ -34,11 +34,17 @@ export const GALLERY: Record<string, Shot[]> = {
     { src: '/projects/aero/4.webp', caption: 'Sphere drag against Schiller–Naumann: tunnel confinement, grid bias and local refinement' },
     { src: '/projects/aero/5.webp', caption: 'CPU throughput before and after the tiled, fused Numba kernels' },
   ],
+  // HOMOs and LUMOs computed by the engine itself and drawn with 3Dmol.js
+  // (work/ref/orbital-render.mjs), in place of screenshots of its interface
   "hf-scf": [
-    { src: "/projects/hf-scf/1.webp", caption: "The redesigned engine after a converged run: case setup, 3-D viewport and results in one window" },
-    { src: "/projects/hf-scf/2.webp", caption: "Water's frontier orbitals, HOMO-3 up to LUMO+2, drawn from the cube the solver returns" },
-    { src: "/projects/hf-scf/3.webp", caption: "The orbital table: occupancy and energy in Hartree and eV for every molecular orbital" },
-    { src: "/projects/hf-scf/4.webp", caption: "The same app in its light theme, with the HOMO-3 isosurface in the viewport" },
+    { src: "/projects/hf-scf/1.webp", caption: "Water's HOMO, computed by the engine (RHF/6-31G): the oxygen lone pair, out of the molecule's plane" },
+    { src: "/projects/hf-scf/2.webp", caption: "Water's LUMO: antibonding, across the O–H bonds" },
+    { src: "/projects/hf-scf/3.webp", caption: "Formaldehyde's HOMO: the oxygen lone pair, in the molecule's plane" },
+    { src: "/projects/hf-scf/4.webp", caption: "Formaldehyde's LUMO: the π* of the C=O bond" },
+    { src: "/projects/hf-scf/5.webp", caption: "Ethylene's HOMO: the π bond, above and below the C=C" },
+    { src: "/projects/hf-scf/6.webp", caption: "Ethylene's LUMO: π*, with a node between the carbons" },
+    { src: "/projects/hf-scf/7.webp", caption: "Benzene's HOMO: one of its two highest π orbitals, a node across the ring" },
+    { src: "/projects/hf-scf/8.webp", caption: "Benzene's LUMO: π*, with more nodes" },
   ],
   "quantize": [
     { src: "/projects/quantize/1.webp", caption: "Nine molecules, three methods: the hybrid against theory alone and against mixed estimation" },

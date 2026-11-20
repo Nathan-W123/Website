@@ -52,9 +52,10 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'a part rather than a grey field', shots: [2, 3] },
   ],
   'hf-scf': [
-    { after: 'the oxygen lone pair', shots: [1] },
-    { after: 'behind a FastAPI backend', shots: [0] },
-    { after: 'any orbital from HOMO-3 to LUMO+3', shots: [2, 3] },
+    { after: 'the oxygen lone pair', shots: [0, 1] },
+    { after: 'of its C=O bond', shots: [3, 2] },
+    { after: 'solve for new orbitals in a Gaussian basis', shots: [4, 5] },
+    { after: 'any orbital from HOMO-3 to LUMO+3', shots: [6, 7] },
   ],
   quantize: [
     { after: 'which directions the measurements can see', shots: [3] },
