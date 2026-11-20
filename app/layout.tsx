@@ -63,8 +63,10 @@ export const metadata: Metadata = {
 // stylesheets and the formula is whole in the first frame. On a visit
 // straight to About or Contact it also asks for that page's art's first
 // frame, which the copy on show draws from the first paint.
+// Only the old site (now at /classic) needs it: the redesign's pages have no
+// copies to show and no KaTeX, so it stops at once anywhere else.
 const BOOT =
-  "(function(){var d=document.documentElement;function s(){var p=location.hash.slice(1).split('/').filter(Boolean)[0];" +
+  "(function(){if(location.pathname.indexOf('/classic')!==0)return;var d=document.documentElement;function s(){var p=location.hash.slice(1).split('/').filter(Boolean)[0];" +
   "if(p==='about'||p==='contact')d.setAttribute('data-boot',p);else d.removeAttribute('data-boot')}" +
   "s();window.__sgBoot=s;addEventListener('hashchange',s);" +
   "if(d.getAttribute('data-boot')==='contact')['Main-Regular','Math-Italic','Size2-Regular','Size4-Regular'].forEach(function(n){" +

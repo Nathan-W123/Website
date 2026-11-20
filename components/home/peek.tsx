@@ -16,7 +16,8 @@ import { createPortal } from 'react-dom';
 
 export type PeekCard = { src: string; alt: string; w: number; h: number };
 /** one to three cards: a project with fewer pictures opens into fewer */
-export type PeekSet = { label: string; icon: string; cards: PeekCard[] };
+/** `back`: the picture behind the chip, if not the set's last */
+export type PeekSet = { label: string; icon: string; cards: PeekCard[]; back?: string };
 
 /** where the cards settle around the chip, by how many there are: for three,
  *  left, middle (in front), right */
@@ -39,6 +40,8 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
   const [open, setOpen] = useState(false);
   const [layout, setLayout] = useState({ shift: 0, k: 1 });
   const [zoom, setZoom] = useState<PeekCard | null>(null);
+  // the picture behind the chip: the set's last, skipping the chip's own
+  const backSrc = set.back ?? [...set.cards].reverse().find((c) => c.src !== set.icon)?.src ?? null;
   const root = useRef<HTMLSpanElement>(null);
   const closeTimer = useRef<number | undefined>(undefined);
 
@@ -102,12 +105,14 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
       // a fan you can click into gets long enough to cross the gap to it
       onPointerLeave={(e) => e.pointerType === 'mouse' && hide(zoomable ? 380 : 140)}
     >
-      {/* the next picture in the set, tucked behind the chip: it reads as a
-          small stack of the real pictures, and says there is more in there */}
-      {set.cards.length > 1 && (
+      {/* another picture of the set tucked behind the chip, so it reads as a
+          small stack of the real pictures and says there is more in there.
+          The last one, which is never the chip's own picture: the second was,
+          on the About's art chip, and on some project chips a near twin */}
+      {backSrc && (
         <span className="pk-back" aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={set.cards[1].src} alt="" draggable={false} />
+          <img src={backSrc} alt="" draggable={false} />
         </span>
       )}
       <button

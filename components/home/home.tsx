@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { ABOUT, CONTACTS, EMAIL } from '@/components/signs/content';
 import { BrandIcon } from '@/components/signs/icons';
 import { Shell } from './chrome';
@@ -27,6 +27,8 @@ const PEEKS: Record<'quantum' | 'art' | 'ochem', PeekSet> = {
   quantum: {
     label: 'Quantum',
     icon: '/about/peek/quantum-icon.webp',
+    // the rings behind it: the last card is a cross like the chip's own
+    back: '/about/peek/quantum-1.webp',
     cards: [
       { src: '/about/peek/quantum-1.webp', alt: 'The probability density of a hydrogen 4s orbital: rings around the nucleus', w: 156, h: 156 },
       { src: '/about/peek/quantum-2.webp', alt: 'A hydrogen orbital with n = 4, l = 3, m = 1: six lobes', w: 172, h: 172 },
@@ -83,6 +85,17 @@ const ALL_PEEKS = Object.values(PEEKS);
 
 export default function Home() {
   useWarmPeeks(ALL_PEEKS);
+  // Links into the site this one replaces all come here, since it lived at /
+  // with its pages after a #: the NFC tag opens nateward.me/#/contact, and
+  // that (and #/about) is this page now, so the old part comes off the
+  // address; old art and project links go on to the pages that have them.
+  useEffect(() => {
+    const route = /^#\/([a-z-]+)/.exec(window.location.hash)?.[1];
+    if (!route) return;
+    if (route === 'art') window.location.replace('/art/');
+    else if (route === 'projects') window.location.replace('/projects/');
+    else window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  }, []);
   return (
     <Shell page="home">
       <section className="nw-col nw-about" aria-labelledby="nw-hi">
