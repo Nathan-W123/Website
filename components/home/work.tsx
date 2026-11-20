@@ -28,10 +28,10 @@ const WORK: Role[] = [
   },
   {
     when: 'Oct 2023 – Jun 2026',
-    role: 'Engineer Intern (Part-time)',
+    role: 'Software Engineering Intern',
     at: 'Sacramento Area Sewer District',
     what:
-      "Replaced weeks of manual staffing projections with a SQL/VBA pipeline I proposed and built, now used by dozens of staff, and automated the district's monthly maintenance maps with Python, SQL and ArcGIS.",
+      "Developed internal tools for the district's infrastructure, automating its staffing projections and maintenance maps.",
   },
   {
     role: 'Tutor',
