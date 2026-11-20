@@ -38,7 +38,7 @@ export const PLACES: Record<string, Place[]> = {
   ignis: [
     { after: 'from the propellants up', shots: [0] },
     { after: 'regenerative cooling', shots: [3, 4, 6] },
-    { after: 'RS-25 bell', shots: [1, 2] },
+    { after: 'through a bell nozzle', shots: [1, 2] },
     { after: 'to within 4.5%', shots: [5] },
   ],
   'black-hole': [
