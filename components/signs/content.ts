@@ -82,17 +82,17 @@ export type Card = { id: string; title: string; line: string; tag: string; stack
 /** Two or three words under a tile on the home page: what the thing is, nothing more. */
 const TAGS: Record<string, string> = {
   machina: 'Sheet-forming solver',
-  siege: 'Reinforcement-learning agent',
+  siege: 'Clash Royale engine',
   gambit: 'Neural chess bot',
   ignis: 'Rocket propulsion engine',
   sparlab: 'Finite-element solver',
   aether6: 'Fixed-wing flight simulator',
   quantize: 'Molecular geometry fitting',
-  aero: 'Lattice-Boltzmann CFD',
-  formulate: 'Formulation search',
+  aero: 'Computational fluid dynamics simulator',
+  formulate: 'Materials design engine',
   'black-hole': 'Relativistic ray tracer',
   'hf-scf': 'Hartree-Fock engine',
-  olson: 'Curtain wall redesign',
+  olson: 'Redesign project',
   'high-risk-roads': 'Traffic safety analysis',
 };
 

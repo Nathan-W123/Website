@@ -20,9 +20,35 @@ const SECTIONS: { label: string; ids: string[] }[] = [
   { label: 'ML / AI', ids: ['machina', 'siege', 'gambit'] },
   { label: 'Simulations', ids: ['aero', 'aether6', 'ignis', 'black-hole'] },
   { label: 'Numerical modeling', ids: ['sparlab', 'hf-scf', 'quantize', 'formulate'] },
+  { label: 'Data', ids: ['terra'] },
   { label: 'Civil', ids: ['olson', 'high-risk-roads'] },
 ];
-const BY_ID = new Map(PROJECT_GROUPS.flatMap((g) => g.cards).map((c) => [c.id, c]));
+/**
+ * Projects that live only here, not in the old site's notebook: Terra, which
+ * Nathan co-built and wrote the whole backend of. Its write-up is from his
+ * resume and the repo's README; it has no pictures yet, so no chips.
+ */
+const EXTRA: Card[] = [
+  {
+    id: 'terra',
+    title: 'Terra',
+    line: 'Orchard weather assistant',
+    tag: 'Orchard weather assistant',
+    stack: ['Python', 'PostgreSQL'],
+    href: 'https://github.com/EthanVTruong/terra',
+    notes: [],
+    images: [],
+  },
+];
+/** write-ups for the projects above, which have no study of their own */
+const BODIES: Record<string, string[]> = {
+  terra: [
+    "Terra is a local-first assistant for orchard growers: their weather, their winter chill and the data behind them. I co-built it and wrote all of its backend.",
+    "The backend pulls CIMIS station observations and checks 17.3 million readings for nine kinds of fault, comparing each station's temperatures with its neighbours' and flagging suspect humidity, wind and solar readings, before estimating the temperature at the orchard itself.",
+    'Tested by planting 50 faults in a held-out season, it caught 9 of 9 outages, 8 of 9 stuck sensors and 7 of 8 spikes at about half a false alarm per station-month. A more sensitive gate would have caught 14 more of 48 faults but quadrupled the false alarms, so the default stayed, with the trade-off written down.',
+  ],
+};
+const BY_ID = new Map([...PROJECT_GROUPS.flatMap((g) => g.cards), ...EXTRA].map((c) => [c.id, c]));
 
 /** a card the size of about a postcard, in the picture's own shape */
 const cardSize = (src: string) => {
@@ -74,7 +100,7 @@ function Project({ c }: { c: Card }) {
   const [open, setOpen] = useState(false);
   const [settled, setSettled] = useState(false);
   const id = useId();
-  const body = useMemo(() => writeUp(c, c.study?.page.body ?? [c.line]), [c]);
+  const body = useMemo(() => writeUp(c, BODIES[c.id] ?? c.study?.page.body ?? [c.line]), [c]);
   // its pictures start loading as it opens, so every chip's fan has them
   useEffect(() => {
     if (open) c.images.forEach((s) => { const i = new Image(); i.src = s.src; });
