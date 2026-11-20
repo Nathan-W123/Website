@@ -31,6 +31,10 @@ html:has(.nw) { scroll-behavior: smooth; }
   --gut: 24px;
   /* the paper plane is sized in the old site's design pixels; here one is one */
   --uv: 1px;
+  /* what Gambit's board reads from the page around it */
+  --body: 'Courier New', Courier, monospace;
+  --ink-soft: #8d877d;
+  --cream: #f4eddd;
   /* at least a screen tall, so the paper plane can sit at the foot of it */
   min-height: 100vh;
   display: flex;
@@ -269,6 +273,31 @@ html:has(.nw) { scroll-behavior: smooth; }
   background: var(--rule);
 }
 .nw-art span { font-size: 13px; line-height: 1.35; color: var(--muted); }
+
+/* ---- chess: Gambit's board on a page of its own, after the reference's game page ---- */
+.nw-chess p { margin: 0 0 12px; }
+.nw-chess-board {
+  width: min(100%, 500px);
+  margin: 34px auto 0;
+}
+/* board.css lays it out for the project viewer's frame; here it is simply as
+   wide as its box, with room under it for the thinking dots */
+.nw .nw-chess-board .gbp {
+  position: relative;
+  inset: auto;
+  padding: 0 0 28px;
+}
+.nw .nw-chess-board .gbp-board { width: 100%; height: auto; }
+/* it is already as big as the page lets it be */
+.nw .nw-chess-board .gbp-expand { display: none; }
+/* a faint board in its place while the real one loads */
+.nw-chess-wait {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: repeating-conic-gradient(#efebe2 0% 25%, #bfb8aa 0% 50%) 0 0 / 25% 25%;
+  opacity: 0.5;
+}
 
 /* ---- phones: the picture takes the column, a little taller, its sides trimmed ---- */
 @media (max-width: 600px) {

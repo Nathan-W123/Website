@@ -20,8 +20,8 @@ const PARAGRAPHS = [REST_OF_FIRST.join(' '), ...ABOUT.paragraphs.slice(1)];
 
 /**
  * The pictures behind the chips, at their size on screen (the files are twice
- * that). Quantum: panels and the title of "Hydrogen Density Plots" by
- * PoorLeno; organic chemistry: Ben Mills' ball-and-stick renders; both public
+ * that). Quantum: "Hydrogen Density Plots" by
+ * PoorLeno (three of its panels); organic chemistry: Ben Mills' ball-and-stick renders; both public
  * domain, from Wikimedia Commons (work/ref/peek-images.mjs). Art: Nathan's own.
  */
 const PEEKS: Record<'quantum' | 'art' | 'ochem', PeekSet> = {
@@ -31,7 +31,7 @@ const PEEKS: Record<'quantum' | 'art' | 'ochem', PeekSet> = {
     cards: [
       { src: '/about/peek/quantum-1.webp', alt: 'The probability density of a hydrogen 4s orbital: rings around the nucleus', w: 156, h: 156 },
       { src: '/about/peek/quantum-2.webp', alt: 'A hydrogen orbital with n = 4, l = 3, m = 1: six lobes', w: 172, h: 172 },
-      { src: '/about/peek/quantum-3.webp', alt: 'The hydrogen wave function, written out', w: 230, h: 107 },
+      { src: '/about/peek/quantum-3.webp', alt: 'A hydrogen orbital with n = 4, l = 2, m = 0', w: 160, h: 160 },
     ],
   },
   art: {

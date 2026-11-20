@@ -7,6 +7,7 @@ import { Chessboard } from 'react-chessboard';
 import type { Square } from 'chess.js';
 import { Chess, SearchEngine, epAfter, keyOf, type Evaluate } from './engine';
 import { loadGambit } from './net';
+import './board.css';
 
 /**
  * The easter egg: Gambit's project page opens on a live board instead of a

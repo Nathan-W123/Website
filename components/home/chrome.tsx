@@ -12,11 +12,12 @@ import './home.css';
  * frame until the loop is ready, and only that frame with reduced motion.
  */
 
-type Page = 'home' | 'work' | 'art';
+type Page = 'home' | 'work' | 'art' | 'chess';
 const NAV: { page: Page; label: string; href: string }[] = [
   { page: 'home', label: 'Home', href: '/' },
   { page: 'work', label: 'Work', href: '/work/' },
   { page: 'art', label: 'Art', href: '/art/' },
+  { page: 'chess', label: 'Chess', href: '/chess/' },
 ];
 
 function Study() {
@@ -47,7 +48,8 @@ function Study() {
   );
 }
 
-export function Shell({ page, children }: { page: Page; children: ReactNode }) {
+/** `banner={false}` for a page that is all about what is on it, like the reference's game page */
+export function Shell({ page, banner = true, children }: { page: Page; banner?: boolean; children: ReactNode }) {
   return (
     <div className="nw" id="top">
       <header className="nw-col nw-head">
@@ -58,9 +60,11 @@ export function Shell({ page, children }: { page: Page; children: ReactNode }) {
             </a>
           ))}
         </nav>
-        <div className="nw-banner">
-          <Study />
-        </div>
+        {banner && (
+          <div className="nw-banner">
+            <Study />
+          </div>
+        )}
       </header>
       <main>{children}</main>
     </div>
