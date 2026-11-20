@@ -24,7 +24,7 @@ const WORK: Role[] = [
     role: 'Industrial Engineer Intern',
     at: 'Pacific Coast Producers',
     what:
-      'Ran a root-cause investigation into recurring stoppages on a production line, combining time studies, downtime data and operator interviews to find failure modes the logs never captured. Specified the fixes and custom parts that cut downtime and lifted daily output, and presented capacity and staffing plans to plant managers.',
+      'Ran time studies and root-cause analysis to find the top loss drivers on a production line, and implemented long-term fixes.',
   },
   {
     when: 'Oct 2023 – Jun 2026',
