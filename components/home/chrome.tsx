@@ -27,12 +27,12 @@ const NAV: { page: Page; label: string; href: string }[] = [
  * they lie on the paper with no box, as Home's ribbon does. On Work,
  * Downloads/Infinity Ribbon.gif, whole; on Projects, Downloads/Braided Wave
  * Packet.gif, a wave function you collapse by looking at it (Observed); on
- * Art, Downloads/Art - Gestural Weave.gif.
+ * Art, Downloads/Ripple Shell - Surface Waves.gif, whole.
  */
 const BANNERS = {
   infinity: { src: '/banner/infinity', look: 'is-drawing is-infinity' },
   wave: { src: '/banner/wave', look: 'is-drawing is-wave' },
-  weave: { src: '/banner/weave', look: 'is-drawing is-weave' },
+  shell: { src: '/banner/shell', look: 'is-drawing is-shell' },
 };
 type Banner = keyof typeof BANNERS;
 
