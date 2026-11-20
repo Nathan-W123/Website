@@ -157,10 +157,11 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
  * one picture, as large as the screen allows, over a dimmed page, with its
  * caption and an optional second line; a click anywhere, the cross or Escape
  * closes it. With `video` (a path without its ending: a .webm and an .mp4
- * beside it) it plays that instead, looping, with `src` as its poster and
- * its own controls, which a click does not close it through.
+ * beside it) it plays that instead, with `src` as its poster and its own
+ * controls, which a click does not close it through: a silent clip looping,
+ * muted; one with `sound` once, with its sound.
  */
-export function Zoom({ src, video, caption, note, onClose }: { src: string; video?: string; caption: string; note?: string; onClose: () => void }) {
+export function Zoom({ src, video, sound = false, caption, note, onClose }: { src: string; video?: string; sound?: boolean; caption: string; note?: string; onClose: () => void }) {
   const reduce = useReducedMotion();
   const close = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -195,7 +196,8 @@ export function Zoom({ src, video, caption, note, onClose }: { src: string; vide
         transition={{ duration: reduce ? 0.01 : 0.26, ease: [0.22, 1, 0.3, 1] }}
       >
         {video ? (
-          <video poster={src} autoPlay loop muted playsInline controls aria-label={caption} onClick={(e) => e.stopPropagation()}>
+          // a silent clip loops muted; one with sound (narration) plays once, with it
+          <video poster={src} autoPlay loop={!sound} muted={!sound} playsInline controls aria-label={caption} onClick={(e) => e.stopPropagation()}>
             <source src={`${video}.webm`} type="video/webm" />
             <source src={`${video}.mp4`} type="video/mp4" />
           </video>

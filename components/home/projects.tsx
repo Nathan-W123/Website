@@ -20,11 +20,11 @@ import { SHOT_SIZE } from './shot-sizes';
  * opens large when clicked.
  */
 const SECTIONS: { label: string; ids: string[] }[] = [
-  { label: 'ML / AI', ids: ['machina', 'siege', 'gambit'] },
-  { label: 'Simulations', ids: ['aero', 'aether6', 'ignis', 'black-hole'] },
   { label: 'Numerical modeling', ids: ['sparlab', 'hf-scf', 'quantize', 'formulate'] },
-  { label: 'Data', ids: ['terra', 'high-risk-roads'] },
+  { label: 'Simulations', ids: ['aero', 'aether6', 'ignis', 'black-hole'] },
   { label: 'Civil', ids: ['olson'] },
+  { label: 'Data', ids: ['terra', 'high-risk-roads'] },
+  { label: 'ML / AI', ids: ['machina', 'siege', 'gambit'] },
 ];
 /**
  * Projects that live only here, not in the old site's notebook: Terra, which
@@ -125,12 +125,21 @@ const writeUp = (c: Card, body: string[]): ReactNode[][] => {
 
 /** a video a write-up can play, from a button beside its code link: the path
  *  without its ending (a .webm and an .mp4), its poster, and what it shows */
-const VIDEOS: Record<string, { src: string; poster: string; caption: string }> = {
+const VIDEOS: Record<string, { src: string; poster: string; caption: string; sound?: boolean }> = {
   // the videos Nathan made for LinkedIn (work/ref/project-videos.mjs)
   aether6: {
-    src: '/projects/aether6/flight',
-    poster: '/projects/aether6/flight.webp',
+    // a new name, not flight: browsers kept the old clip cached under that one
+    src: '/projects/aether6/circuit',
+    poster: '/projects/aether6/circuit.webp',
     caption: 'The autonomous circuit: the autopilot flying the waypoints lap after lap on its own estimate',
+  },
+  // the narrated explainer from his application (work/ref/quantize-video.mjs):
+  // it has sound, so it plays once, unmuted, rather than as a silent loop
+  quantize: {
+    src: '/projects/quantize/video',
+    poster: '/projects/quantize/video.webp',
+    caption: 'Quantize, explained: recovering a molecule’s shape from how it spins, with theory deciding where the data are blind',
+    sound: true,
   },
   sparlab: {
     src: '/projects/sparlab/tower',
@@ -220,7 +229,7 @@ function Project({ c }: { c: Card }) {
         typeof document !== 'undefined' &&
         createPortal(
           <AnimatePresence>
-            {playing && <Zoom key="video" src={video.poster} video={video.src} caption={video.caption} onClose={() => setPlaying(false)} />}
+            {playing && <Zoom key="video" src={video.poster} video={video.src} sound={video.sound} caption={video.caption} onClose={() => setPlaying(false)} />}
           </AnimatePresence>,
           document.body,
         )}

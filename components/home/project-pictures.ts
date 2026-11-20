@@ -57,7 +57,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'any orbital from HOMO-3 to LUMO+3', shots: [2, 3] },
   ],
   quantize: [
-    { after: 'One joint objective', shots: [3] },
+    { after: 'which directions the measurements can see', shots: [3] },
     { after: '6.9 for spectroscopy alone', shots: [0, 1, 2] },
   ],
   formulate: [
