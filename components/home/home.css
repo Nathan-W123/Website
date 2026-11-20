@@ -153,11 +153,14 @@ html:has(.nw) {
   isolation: isolate;
 }
 .nw-banner.is-drawing .nw-banner-media { mix-blend-mode: multiply; }
-/* the figure eight, whole, a little taller than a banner */
+/* the figure eight, whole, drawn out wider than it was made, as an
+   infinity sign is; the words under it come up close */
 .nw-banner.is-infinity {
-  width: min(100%, 290px);
-  aspect-ratio: 424 / 346;
+  width: min(100%, 480px);
+  aspect-ratio: 15 / 7;
 }
+.nw-banner.is-infinity .nw-banner-media { object-fit: fill; }
+.nw:has(.nw-banner.is-infinity) .nw-section { padding-top: 12px; }
 /* the wave packet, whole, across the banner's width; point at it to observe
    it (Observed, chrome.tsx): it collapses to a narrow peak under the
    pointer, quickly, and spreads back out slowly when let go */
@@ -605,7 +608,6 @@ html:has(.nw) {
 @media (max-width: 600px) {
   .nw { --gut: 18px; font-size: 18px; }
   .nw-about { font-size: 20px; }
-  .nw-banner.is-infinity { width: 230px; }
   .nw-nav { padding: 22px var(--gut) 14px; gap: 6px 22px; }
   .nw-nav a { font-size: 18px; }
   .nw-banner { margin-top: 26px; aspect-ratio: 2 / 1; }
