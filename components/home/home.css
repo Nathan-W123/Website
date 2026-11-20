@@ -119,6 +119,21 @@ html:has(.nw) {
   object-position: 46% 50%;
   pointer-events: none;
 }
+/* no play button over a banner, ever: Safari draws one on a video it will
+   not start (an iPhone in Low Power Mode) for the moment before the loop is
+   swapped for its picture. One rule each: a selector a browser does not
+   know drops every rule it is grouped with. */
+.nw-banner-media::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+.nw-banner-media::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+.nw-banner-media::-webkit-media-controls {
+  display: none !important;
+}
 
 /* ---- about ---- */
 .nw-about { padding-top: 46px; }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { SendOff } from '@/components/signs/sendoff';
 import './home.css';
 
@@ -24,26 +24,51 @@ const NAV: { page: Page; label: string; href: string }[] = [
 ];
 
 /**
- * The banners, each a loop in public/banner (.webm, .mp4, and a .webp still):
- * the sunset study on Home and Projects; on Work, Downloads/Red_Gable_900x292.gif
- * and on Art, Downloads/Rain_Garden_Still_Leaf.gif, both drawn at the banner's own
- * shape (on a phone's taller box, centred on the house and on the cat).
+ * The banners, each a loop in public/banner (.webm, .mp4, a .webp still, and
+ * an animated -anim.webp for phones that will not play the video):
+ * the sunset study on Home; on Work, Downloads/Red_Gable_900x292.gif, on
+ * Projects, Downloads/Golden_Meadow.gif, and on Art,
+ * Downloads/Rain_Garden_Still_Leaf.gif, all three drawn at the banner's own
+ * shape (on a phone's taller box, centred on the house, the oak and the cat).
  */
 const BANNERS = {
   study: { file: 'study', position: '46% 50%' },
   gable: { file: 'gable', position: '55% 50%' },
+  meadow: { file: 'meadow', position: '58% 50%' },
   canopy: { file: 'canopy', position: '50% 50%' },
 };
 type Banner = keyof typeof BANNERS;
 
+/**
+ * A banner: its first frame in the HTML, then the loop as a video; and when
+ * the phone will not play the video (an iPhone in Low Power Mode refuses all
+ * video autoplay, and showed its big play button, which the banner did not
+ * even let you press), the same loop as an animated picture, which it plays.
+ * With reduced motion, only the first frame.
+ */
 function Loop({ which }: { which: Banner }) {
   const { file, position } = BANNERS[which];
-  const [live, setLive] = useState(false);
+  const [mode, setMode] = useState<'still' | 'video' | 'picture'>('still');
   useEffect(() => {
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setLive(true);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setMode('video');
   }, []);
-  return live ? (
+  // muted as an attribute as well as a property (React only sets the
+  // property, and iOS Safari judges autoplay by the attribute), then started
+  // by hand, so a refusal can be caught
+  const start = useCallback((v: HTMLVideoElement | null) => {
+    if (!v) return;
+    v.muted = true;
+    v.defaultMuted = true;
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
+    v.play()?.catch((e: unknown) => {
+      // refused; not an AbortError, which only means the video left the page
+      if (e instanceof DOMException && e.name === 'NotAllowedError') setMode('picture');
+    });
+  }, []);
+  return mode === 'video' ? (
     <video
+      ref={start}
       className="nw-banner-media"
       style={{ objectPosition: position }}
       autoPlay
@@ -58,11 +83,25 @@ function Loop({ which }: { which: Banner }) {
       poster={`/banner/${file}.webp`}
     >
       <source src={`/banner/${file}.webm`} type="video/webm" />
-      <source src={`/banner/${file}.mp4`} type="video/mp4" />
+      {/* the last file failing means neither plays here (the browser
+          only waits, play() is never refused) */}
+      <source src={`/banner/${file}.mp4`} type="video/mp4" onError={() => setMode('picture')} />
     </video>
   ) : (
     // eslint-disable-next-line @next/next/no-img-element
-    <img className="nw-banner-media" style={{ objectPosition: position }} src={`/banner/${file}.webp`} alt="" aria-hidden="true" />
+    <img
+      className="nw-banner-media"
+      // the animated picture is the bigger file: the first frame, already
+      // here, shows behind it (cropped the same way) until it arrives
+      style={
+        mode === 'picture'
+          ? { objectPosition: position, background: `url(/banner/${file}.webp) ${position} / cover no-repeat` }
+          : { objectPosition: position }
+      }
+      src={`/banner/${file}${mode === 'picture' ? '-anim' : ''}.webp`}
+      alt=""
+      aria-hidden="true"
+    />
   );
 }
 
