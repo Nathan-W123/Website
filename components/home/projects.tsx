@@ -76,7 +76,8 @@ const cardSize = (src: string) => {
 const setFor = (c: Card, shots: number[]): PeekSet | null => {
   const picked = shots.map((i) => c.images[i]).filter((s): s is Card['images'][number] => !!s);
   if (!picked.length) return null;
-  return { label: c.title, icon: picked[0].src, cards: picked.map((s) => ({ src: s.src, alt: s.caption, ...cardSize(s.src) })) };
+  // the chip is a detail of the first picture, not all of it shrunk to a word's size (work/ref/chip-crops.mjs)
+  return { label: c.title, icon: picked[0].src.replace(/\/(\d+)\.webp$/, '/chip-$1.webp'), cards: picked.map((s) => ({ src: s.src, alt: s.caption, ...cardSize(s.src) })) };
 };
 
 /**

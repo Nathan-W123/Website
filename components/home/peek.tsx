@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 /**
@@ -34,8 +34,14 @@ const FANS = {
   ],
 };
 
+/** the fan opens larger than the sizes it is given (at those, a picture in it
+ *  was still hard to make out), and a little closer under the chip */
+const GROW = 1.6;
+
 export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boolean }) {
-  const FAN = FANS[Math.min(3, Math.max(1, set.cards.length)) as 1 | 2 | 3];
+  const n = Math.min(3, Math.max(1, set.cards.length)) as 1 | 2 | 3;
+  const FAN = useMemo(() => FANS[n].map((f) => ({ ...f, x: f.x * GROW, y: f.y * GROW - 30 })), [n]);
+  const cards = useMemo(() => set.cards.map((c) => ({ ...c, w: c.w * GROW, h: c.h * GROW })), [set.cards]);
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [layout, setLayout] = useState({ shift: 0, k: 1 });
@@ -50,10 +56,10 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
     const r = el.getBoundingClientRect();
     const cx = r.left + r.width / 2;
     // smaller on a phone, and smaller still if even then the fan is wider than the screen
-    const span = Math.max(...FAN.map((f, i) => f.x + (set.cards[i] ?? set.cards[0]).w / 2 + 10)) - Math.min(...FAN.map((f, i) => f.x - (set.cards[i] ?? set.cards[0]).w / 2 - 10));
+    const span = Math.max(...FAN.map((f, i) => f.x + (cards[i] ?? cards[0]).w / 2 + 10)) - Math.min(...FAN.map((f, i) => f.x - (cards[i] ?? cards[0]).w / 2 - 10));
     const k = Math.min(window.innerWidth < 600 ? 0.66 : 1, (window.innerWidth - 24) / span);
     const extents = FAN.map((f, i) => {
-      const c = set.cards[i] ?? set.cards[0];
+      const c = cards[i] ?? cards[0];
       return [cx + (f.x - c.w / 2 - 10) * k, cx + (f.x + c.w / 2 + 10) * k];
     });
     const lo = Math.min(...extents.map((e) => e[0]));
@@ -62,7 +68,7 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
     if (hi > window.innerWidth - 12) shift = window.innerWidth - 12 - hi;
     if (lo + shift < 12) shift = 12 - lo;
     setLayout({ shift, k });
-  }, [set.cards, FAN]);
+  }, [cards, FAN]);
 
   const show = useCallback(() => {
     window.clearTimeout(closeTimer.current);
@@ -115,7 +121,7 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
       </button>
       <AnimatePresence>
         {open &&
-          set.cards.slice(0, 3).map((c, i) => {
+          cards.slice(0, 3).map((c, i) => {
             const f = FAN[i];
             return (
               <motion.span
