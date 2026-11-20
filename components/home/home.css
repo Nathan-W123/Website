@@ -23,6 +23,8 @@ html:has(.nw) { scroll-behavior: smooth; }
   --bg: #f4eddd;
   --ink: #1f1c18;
   --text: #34302a;
+  /* the bold words and the marks under the About: a dark grey, not black */
+  --soft: #4a4641;
   --muted: #6d665b;
   --rule: #e4dac6;
   --col: 760px;
@@ -96,7 +98,7 @@ html:has(.nw) { scroll-behavior: smooth; }
   color: var(--ink);
 }
 .nw-about p { margin: 0 0 12px; }
-.nw-about strong { color: var(--ink); font-weight: 700; }
+.nw-about strong { color: var(--soft); font-weight: 700; }
 .nw-find {
   display: flex;
   flex-wrap: wrap;
@@ -104,6 +106,9 @@ html:has(.nw) { scroll-behavior: smooth; }
   gap: 12px;
   margin-top: 22px !important;
   scroll-margin-top: 24px;
+}
+.nw .nw-find a {
+  color: var(--soft);
 }
 .nw-find a {
   display: inline-flex;
