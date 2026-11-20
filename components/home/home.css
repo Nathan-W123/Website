@@ -146,16 +146,24 @@ html:has(.nw) { scroll-behavior: smooth; }
   margin: -0.32em 0.1em -0.32em 0.3em;
 }
 .pk.is-open { z-index: 50; }
-.pk::before {
-  content: '';
+/* the next picture of the set, behind the chip and turned the other way */
+.pk-back {
   position: absolute;
   inset: 0;
   z-index: -1;
+  overflow: hidden;
   border-radius: 0.32em;
-  background: #fffdf8;
-  box-shadow: 0 1px 2px rgb(40 30 20 / 0.2);
-  transform: translate(0.16em, -0.1em) rotate(9deg);
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(40 30 20 / 0.25), 0 0 0 1px rgb(40 30 20 / 0.06);
+  transform: translate(0.2em, -0.12em) rotate(10deg);
   transition: transform 0.2s ease;
+}
+.pk-back img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
 }
 .pk-chip {
   display: block;
@@ -181,8 +189,8 @@ html:has(.nw) { scroll-behavior: smooth; }
 .pk:hover .pk-chip,
 .pk.is-open .pk-chip,
 .pk-chip:focus-visible { transform: rotate(0deg) scale(1.1); }
-.pk:hover::before,
-.pk.is-open::before { transform: translate(0.24em, -0.16em) rotate(13deg); }
+.pk:hover .pk-back,
+.pk.is-open .pk-back { transform: translate(0.3em, -0.18em) rotate(14deg); }
 .pk-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .pk-card {
   position: absolute;
@@ -203,7 +211,7 @@ html:has(.nw) { scroll-behavior: smooth; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pk-chip,
-  .pk::before { transition: none; }
+  .pk-back { transition: none; }
 }
 
 /* ---- the paper plane from the deployed home, at the foot of the page:
@@ -233,28 +241,6 @@ html:has(.nw) { scroll-behavior: smooth; }
   text-transform: uppercase;
   color: var(--muted);
 }
-
-.nw-work { list-style: none; margin: 0; padding: 0; }
-.nw-work li + li { border-top: 1px solid var(--rule); }
-.nw-work a,
-.nw-work li > div {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  align-items: center;
-  gap: 16px;
-  padding: 10px 0;
-  text-decoration: none;
-}
-.nw-work img {
-  width: 56px;
-  height: 56px;
-  border-radius: 6px;
-  object-fit: cover;
-  background: var(--rule);
-}
-.nw-work strong { display: block; color: var(--ink); }
-.nw-work-tag { color: var(--muted); font-size: 15px; }
-.nw-work a:hover strong { text-decoration: underline; text-underline-offset: 4px; }
 
 .nw-art {
   list-style: none;
@@ -292,9 +278,10 @@ html:has(.nw) { scroll-behavior: smooth; }
   width: 1px;
   background: #d9cfbc;
 }
-.nw-timeline li { position: relative; padding-bottom: 46px; }
-.nw-timeline li:last-child { padding-bottom: 0; }
-.nw-timeline li::before {
+/* only the entries on the line itself: the projects listed inside one are not */
+.nw-timeline > li { position: relative; padding-bottom: 46px; }
+.nw-timeline > li:last-child { padding-bottom: 0; }
+.nw-timeline > li::before {
   content: '';
   position: absolute;
   left: -34px;
@@ -321,6 +308,38 @@ html:has(.nw) { scroll-behavior: smooth; }
   color: var(--ink);
 }
 .nw-what { margin: 12px 0 0; }
+
+/* ---- projects: laid out like Work, a section at each dot, one line per
+   project; a line opens into the project's write-up ---- */
+.nw-projs { list-style: none; margin: 8px 0 0; padding: 0; }
+.nw-proj + .nw-proj { border-top: 1px solid var(--rule); }
+.nw-proj-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 2px 14px;
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.nw-proj-name { font-weight: 700; color: var(--soft); }
+.nw-proj-tag { color: var(--muted); }
+.nw-proj-sign { min-width: 1ch; font-weight: 700; color: var(--muted); text-align: center; }
+.nw-proj-row:hover .nw-proj-name,
+.nw-proj.is-open .nw-proj-name { color: var(--ink); }
+.nw-proj-row:hover .nw-proj-name { text-decoration: underline; text-underline-offset: 4px; }
+.nw-proj-row:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+/* clipped while it opens and closes; once open, the chip's fan may reach out past it */
+.nw-proj-body { overflow: hidden; }
+.nw-proj-body.is-settled { overflow: visible; }
+.nw-proj-inner { padding: 2px 0 14px; }
+.nw-proj-inner p { margin: 0 0 12px; }
+.nw-proj-link a { text-decoration: underline; text-underline-offset: 4px; }
 
 /* ---- chess: Gambit's board on a page of its own, after the reference's game page ---- */
 .nw-chess p { margin: 0 0 12px; }
@@ -356,6 +375,9 @@ html:has(.nw) { scroll-behavior: smooth; }
   .nw-about,
   .nw-section { padding-top: 34px; }
   .nw-art { grid-template-columns: repeat(2, 1fr); }
+  /* the name, then what it is under it */
+  .nw-proj-row { grid-template-columns: 1fr auto; }
+  .nw-proj-tag { grid-row: 2; grid-column: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

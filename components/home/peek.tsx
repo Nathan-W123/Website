@@ -12,16 +12,26 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  */
 
 export type PeekCard = { src: string; alt: string; w: number; h: number };
-export type PeekSet = { label: string; icon: string; cards: [PeekCard, PeekCard, PeekCard] };
+/** one to three cards: a project with fewer pictures opens into fewer */
+export type PeekSet = { label: string; icon: string; cards: PeekCard[] };
 
-/** where the three settle around the chip: left, middle (in front), right */
-const FAN = [
-  { x: -172, y: 118, r: -7, z: 1 },
-  { x: 4, y: 132, r: 3, z: 3 },
-  { x: 182, y: 100, r: 8, z: 2 },
-];
+/** where the cards settle around the chip, by how many there are: for three,
+ *  left, middle (in front), right */
+const FANS = {
+  1: [{ x: 0, y: 124, r: 3, z: 1 }],
+  2: [
+    { x: -98, y: 116, r: -6, z: 1 },
+    { x: 104, y: 108, r: 7, z: 2 },
+  ],
+  3: [
+    { x: -172, y: 118, r: -7, z: 1 },
+    { x: 4, y: 132, r: 3, z: 3 },
+    { x: 182, y: 100, r: 8, z: 2 },
+  ],
+};
 
 export function Peek({ set }: { set: PeekSet }) {
+  const FAN = FANS[Math.min(3, Math.max(1, set.cards.length)) as 1 | 2 | 3];
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [layout, setLayout] = useState({ shift: 0, k: 1 });
@@ -32,11 +42,13 @@ export function Peek({ set }: { set: PeekSet }) {
   const place = useCallback(() => {
     const el = root.current;
     if (!el) return;
-    const k = window.innerWidth < 600 ? 0.66 : 1;
     const r = el.getBoundingClientRect();
     const cx = r.left + r.width / 2;
+    // smaller on a phone, and smaller still if even then the fan is wider than the screen
+    const span = Math.max(...FAN.map((f, i) => f.x + (set.cards[i] ?? set.cards[0]).w / 2 + 10)) - Math.min(...FAN.map((f, i) => f.x - (set.cards[i] ?? set.cards[0]).w / 2 - 10));
+    const k = Math.min(window.innerWidth < 600 ? 0.66 : 1, (window.innerWidth - 24) / span);
     const extents = FAN.map((f, i) => {
-      const c = set.cards[i];
+      const c = set.cards[i] ?? set.cards[0];
       return [cx + (f.x - c.w / 2 - 10) * k, cx + (f.x + c.w / 2 + 10) * k];
     });
     const lo = Math.min(...extents.map((e) => e[0]));
@@ -45,7 +57,7 @@ export function Peek({ set }: { set: PeekSet }) {
     if (hi > window.innerWidth - 12) shift = window.innerWidth - 12 - hi;
     if (lo + shift < 12) shift = 12 - lo;
     setLayout({ shift, k });
-  }, [set.cards]);
+  }, [set.cards, FAN]);
 
   const show = useCallback(() => {
     window.clearTimeout(closeTimer.current);
@@ -85,6 +97,14 @@ export function Peek({ set }: { set: PeekSet }) {
       onPointerEnter={(e) => e.pointerType === 'mouse' && show()}
       onPointerLeave={(e) => e.pointerType === 'mouse' && hide(140)}
     >
+      {/* the next picture in the set, tucked behind the chip: it reads as a
+          small stack of the real pictures, and says there is more in there */}
+      {set.cards.length > 1 && (
+        <span className="pk-back" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={set.cards[1].src} alt="" draggable={false} />
+        </span>
+      )}
       <button
         type="button"
         className="pk-chip"
@@ -97,7 +117,7 @@ export function Peek({ set }: { set: PeekSet }) {
       </button>
       <AnimatePresence>
         {open &&
-          set.cards.map((c, i) => {
+          set.cards.slice(0, 3).map((c, i) => {
             const f = FAN[i];
             return (
               <motion.span
