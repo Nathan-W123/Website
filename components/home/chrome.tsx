@@ -1,15 +1,15 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { SendOff } from '@/components/signs/sendoff';
 import './home.css';
 
 /**
  * What every page of the redesign shares, laid out like the reference Nathan
  * picked: a plain row of links on the paper, centred over a rule that runs
  * the width of the page, one of his GIFs as a picture in the column under
- * them (Home has its ribbon beside the words instead), the words under that,
- * and the paper plane from the deployed home at the foot of every page.
+ * them (Home has its ribbon beside the words instead), and the words under
+ * that. Going from page to page, the line under the tab glides to the next
+ * one and the new page drops in (View Transitions, home.css).
  */
 
 type Page = 'home' | 'work' | 'projects' | 'art' | 'chess';
@@ -140,11 +140,14 @@ export function Shell({ page, banner = false, children }: { page: Page; banner?:
           {NAV.map((n) => (
             <a key={n.label} href={n.href} aria-current={n.page === page ? 'page' : undefined}>
               {n.label}
+              {/* the line under the page you are on: its own element, so a
+                  page switch can glide it to the next tab (home.css) */}
+              {n.page === page && <span className="nw-tab-bar" aria-hidden="true" />}
             </a>
           ))}
         </nav>
         {banner && (
-          <div className="nw-col">
+          <div className="nw-col nw-banner-row">
             {banner === 'wave' ? (
               <Observed>
                 <Loop src={BANNERS.wave.src} className="nw-banner-media" />
@@ -159,7 +162,6 @@ export function Shell({ page, banner = false, children }: { page: Page; banner?:
       </header>
       <main>
         {children}
-        <SendOff />
       </main>
     </div>
   );

@@ -42,8 +42,6 @@ html:has(.nw) {
   --nav-rule: #ddd5c6;
   --col: 760px;
   --gut: 24px;
-  /* the paper plane is sized in the old site's design pixels; here one is one */
-  --uv: 1px;
   /* what Gambit's board reads from the page around it */
   --body: var(--serif);
   --ink-soft: #8d877d;
@@ -81,7 +79,7 @@ html:has(.nw) {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  padding-bottom: 120px;
+  padding-bottom: 96px;
 }
 
 /* ---- the row of links, on the paper, centred over a rule that runs the
@@ -95,15 +93,52 @@ html:has(.nw) {
   border-bottom: 1px solid var(--nav-rule);
 }
 .nw-nav a {
+  position: relative;
   font-size: 19px;
   text-decoration: none;
 }
-.nw-nav a[aria-current='page'],
-.nw-nav a:hover,
-.nw-nav a:focus-visible {
+/* the other tabs underline on hover; the page you are on has its own line,
+   an element, so a page switch can glide it from tab to tab */
+.nw-nav a:not([aria-current='page']):hover,
+.nw-nav a:not([aria-current='page']):focus-visible {
   text-decoration: underline;
   text-underline-offset: 5px;
   text-decoration-thickness: 1px;
+}
+.nw-tab-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* where the underline sat, about 5px under the letters */
+  bottom: 4px;
+  height: 1px;
+  background: var(--ink);
+  view-transition-name: nw-tab;
+}
+
+/* ---- going from page to page (a cross-document view transition: Chrome,
+   Edge and Safari 18.2 on; elsewhere the page just changes): the line
+   glides to the new tab, the page under the links drops in from a little
+   above as it fades in, the banner a beat before the words, and the old
+   page goes at once. The links themselves stay where they are. ---- */
+@view-transition { navigation: auto; }
+.nw-banner-row { view-transition-name: nw-banner; }
+.nw main { view-transition-name: nw-page; }
+::view-transition-group(nw-tab) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+::view-transition-group(nw-banner),
+::view-transition-group(nw-page) { animation: none; }
+::view-transition-old(nw-banner),
+::view-transition-old(nw-page) { display: none; }
+::view-transition-new(nw-banner) { animation: nw-drop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+::view-transition-new(nw-page) { animation: nw-drop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.07s both; }
+@keyframes nw-drop {
+  from { opacity: 0; transform: translateY(-16px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
 }
 
 /* ---- the banner: a picture in the column, whole, centred under the links ---- */
@@ -412,16 +447,6 @@ html:has(.nw) {
 }
 .pk-zoom-close:hover { background: rgb(249 246 239 / 0.24); }
 .pk-zoom-close:focus-visible { outline: 2px solid #f9f6ef; outline-offset: 3px; }
-
-/* ---- the paper plane from the deployed home, at the foot of the page:
-   pushed to the bottom of the screen when the words are shorter than it,
-   and never closer than 64px under them when they are not ---- */
-.nw .hm-sendoff {
-  position: static;
-  margin-top: auto;
-  padding-top: 64px;
-}
-.nw main:has(> .hm-sendoff) { padding-bottom: 28px; }
 
 /* ---- work and art, each a page of its own ---- */
 .nw-section { padding-top: 46px; }
