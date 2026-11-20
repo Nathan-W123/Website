@@ -199,43 +199,10 @@ html:has(.nw) {
 .nw:has(.nw-banner.is-drawing) .nw-section { padding-top: 12px; }
 /* the interference ribbon on Art, whole, across the banner's width */
 .nw-banner.is-interference { aspect-ratio: 664 / 298; }
-/* the wave packet, whole, across the banner's width; point at it to observe
-   it (Observed, chrome.tsx): its waves flatten into its straight line, the
-   full width of it, quickly; let go and they rise back out, slowly */
-.nw-banner.is-wave {
-  /* flatter than it was drawn: its peaks at two thirds of their height */
-  aspect-ratio: 640 / 155;
-  cursor: crosshair;
-}
-.nw-banner.is-wave .nw-banner-media {
-  object-fit: fill;
-  transform-origin: 50% 50%;
-  /* a layer of its own, so the collapse runs on the GPU, not the page */
-  will-change: transform;
-  transition: transform 1.1s cubic-bezier(0.3, 0.7, 0.2, 1);
-}
-.nw-banner.is-wave.is-seen .nw-banner-media {
-  transform: scaleY(0);
-  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-}
-/* the axis the wave lies along, left behind when it collapses */
-.nw-banner.is-wave::after {
-  content: '';
-  position: absolute;
-  left: 2.3%;
-  right: 2.3%;
-  top: 50%;
-  height: 1px;
-  background: rgb(102 105 96 / 0.5);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-.nw-banner.is-wave.is-seen::after { opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .nw-banner.is-wave .nw-banner-media,
-  .nw-banner.is-wave.is-seen .nw-banner-media { transition: none; }
-}
+/* the wave packet, whole, across the banner's width, flatter than it was
+   drawn: its peaks at two thirds of their height */
+.nw-banner.is-wave { aspect-ratio: 640 / 155; }
+.nw-banner.is-wave .nw-banner-media { object-fit: fill; }
 
 /* ---- home: the words on the left and the morphing ribbon on the right, as
    the About was laid out before the redesign, the two centred together in

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import './home.css';
 
 /**
@@ -27,7 +27,7 @@ const NAV: { page: Page; label: string; href: string }[] = [
  * with their off-white ground divided out (work/ref/wave-encode.mjs), so
  * they lie on the paper with no box, as Home's ribbon does. On Work,
  * Downloads/Infinity Ribbon.gif, whole; on Projects, Downloads/Braided Wave
- * Packet.gif, a wave function you collapse by looking at it (Observed); on
+ * Packet.gif, flattened to two thirds of its height; on
  * Art, Downloads/Interference Ribbon.gif.
  */
 const BANNERS = {
@@ -36,33 +36,6 @@ const BANNERS = {
   interference: { src: '/banner/interference', look: 'is-drawing is-interference' },
 };
 type Banner = keyof typeof BANNERS;
-
-/**
- * The wave packet on Projects, observed: point at it and its waves flatten,
- * top and bottom together, into the straight line they lie along, the full
- * width of it; look away and they rise back out of the line. A tap on a
- * phone observes it for a moment.
- */
-function Observed({ children }: { children: ReactNode }) {
-  const [seen, setSeen] = useState(false);
-  const release = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(release.current), []);
-  return (
-    <div
-      className={`nw-banner ${BANNERS.wave.look}${seen ? ' is-seen' : ''}`}
-      onPointerEnter={(e) => e.pointerType === 'mouse' && setSeen(true)}
-      onPointerLeave={(e) => e.pointerType === 'mouse' && setSeen(false)}
-      onPointerDown={(e) => {
-        if (e.pointerType === 'mouse') return;
-        setSeen(true);
-        window.clearTimeout(release.current);
-        release.current = window.setTimeout(() => setSeen(false), 1800);
-      }}
-    >
-      {children}
-    </div>
-  );
-}
 
 /**
  * One of Nathan's GIFs as a loop that plays on any screen. `src` names four
@@ -149,15 +122,9 @@ export function Shell({ page, banner = false, children }: { page: Page; banner?:
         </nav>
         {banner && (
           <div className="nw-col nw-banner-row">
-            {banner === 'wave' ? (
-              <Observed>
-                <Loop src={BANNERS.wave.src} className="nw-banner-media" />
-              </Observed>
-            ) : (
-              <div className={`nw-banner ${BANNERS[banner].look}`}>
-                <Loop src={BANNERS[banner].src} className="nw-banner-media" />
-              </div>
-            )}
+            <div className={`nw-banner ${BANNERS[banner].look}`}>
+              <Loop src={BANNERS[banner].src} className="nw-banner-media" />
+            </div>
           </div>
         )}
       </header>
