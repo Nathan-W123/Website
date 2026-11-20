@@ -3,14 +3,13 @@
 import type { ReactNode } from 'react';
 import { ABOUT, CONTACTS, EMAIL } from '@/components/signs/content';
 import { BrandIcon } from '@/components/signs/icons';
-import { SendOff } from '@/components/signs/sendoff';
 import { Shell } from './chrome';
 import { Peek, useWarmPeeks, type PeekSet } from './peek';
 
 /**
  * Home, after the reference Nathan picked: the study at the top, then who he
- * is in his own words, in Courier New, and the paper plane from the deployed
- * home to close the page. Three phrases in the About carry a picture chip
+ * is in his own words, in Courier New (the paper plane at the foot comes with
+ * the shell, chrome.tsx). Three phrases in the About carry a picture chip
  * that opens into a fan of three (peek.tsx).
  */
 
@@ -106,8 +105,6 @@ export default function Home() {
           ))}
         </p>
       </section>
-      {/* the paper plane from the deployed home, last on the page */}
-      <SendOff />
     </Shell>
   );
 }

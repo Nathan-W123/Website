@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import { SendOff } from '@/components/signs/sendoff';
 import './home.css';
 
 /**
  * What every page of the redesign shares, laid out like the reference Nathan
  * picked: a plain row of links on the paper, his sunset study as a picture in
- * the column under them, and the words under that. The study is
+ * the column under them, the words under that, and the paper plane from the
+ * deployed home at the foot of every page. The study is
  * Downloads/Sunset_Study_Three_Panes.gif with its black frame cropped off,
  * re-encoded as a loop (0.5 MB in place of 18.8 MB); the page shows its first
  * frame until the loop is ready, and only that frame with reduced motion.
@@ -67,7 +69,10 @@ export function Shell({ page, banner = true, children }: { page: Page; banner?: 
           </div>
         )}
       </header>
-      <main>{children}</main>
+      <main>
+        {children}
+        <SendOff />
+      </main>
     </div>
   );
 }
