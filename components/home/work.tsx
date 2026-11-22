@@ -47,7 +47,7 @@ export function Work() {
     <Shell page="work" banner="infinity">
       <section className="nw-col nw-section" aria-labelledby="nw-work">
         <h1 id="nw-work">Work</h1>
-        <p className="nw-lede">Read to see what I&apos;ve been up to.</p>
+        <p className="nw-lede">See what I&apos;ve been up to.</p>
         <ol className="nw-timeline">
           {WORK.map((w) => (
             <li key={w.at}>
