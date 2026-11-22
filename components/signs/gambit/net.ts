@@ -2,7 +2,7 @@
 
 /**
  * Gambit's network in the visitor's browser: onnxruntime-web on WebAssembly,
- * loaded only when someone actually opens the board. Both files come off this
+ * loaded only when someone starts to play on the board (board.tsx). Both files come off this
  * site — the runtime (~15 MB) and the weights (~8 MB) — fetched here so one
  * progress figure covers the whole wait, and handed to the runtime directly.
  */

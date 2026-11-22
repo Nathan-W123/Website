@@ -81,19 +81,30 @@ export function GambitBoard() {
     wasBig.current = big;
   }, [big]);
 
-  useEffect(() => {
-    let live = true;
-    net.current = loadGambit((f) => live && setProgress(f));
+  // The network (an 8 MB model and a 15 MB runtime) is fetched once someone
+  // starts to play, not when the page opens: it begins the moment a piece is
+  // picked up, so it downloads while the first move is chosen, and a visitor
+  // who only looks at the board downloads none of it.
+  const alive = useRef(true);
+  const [fetching, setFetching] = useState(false);
+  const startNet = useCallback(() => {
+    if (net.current) return net.current;
+    setFetching(true);
+    net.current = loadGambit((f) => alive.current && setProgress(f));
     net.current.then(
       (evaluate) => {
-        if (!live) return;
+        if (!alive.current) return;
         engine.current = new SearchEngine(evaluate);
         setReady(true);
       },
-      (e: unknown) => live && setFailed(e instanceof Error ? e.message : String(e)),
+      (e: unknown) => alive.current && setFailed(e instanceof Error ? e.message : String(e)),
     );
+    return net.current;
+  }, []);
+  useEffect(() => {
+    alive.current = true;
     return () => {
-      live = false;
+      alive.current = false;
       round.current += 1; // leaving the page abandons any search in flight
     };
   }, []);
@@ -120,7 +131,7 @@ export function GambitBoard() {
     setPhase('thinking');
     if (!engine.current) {
       try {
-        await net.current;
+        await startNet();
       } catch {
         return; // the failure is already on screen
       }
@@ -130,7 +141,7 @@ export function GambitBoard() {
     if (r0 !== round.current) return;
     play(result.move.slice(0, 2), result.move.slice(2, 4), result.move[4]);
     setPhase(game.current.isGameOver() ? 'over' : 'yours');
-  }, [play]);
+  }, [play, startNet]);
 
   const fresh = useCallback(
     (side: 'w' | 'b') => {
@@ -167,10 +178,13 @@ export function GambitBoard() {
       if (!yourTurn) return;
       if (selected && selected !== square && move(selected, square)) return;
       const pick = piece && piece.pieceType[0] === you && selected !== square ? square : null;
-      if (pick) setStarted(true); // the invitation goes the moment you touch a piece
+      if (pick) {
+        setStarted(true); // the invitation goes the moment you touch a piece
+        startNet();
+      }
       setSelected(pick);
     },
-    [yourTurn, selected, move, you],
+    [yourTurn, selected, move, you, startNet],
   );
 
   const squareStyles = useMemo(() => {
@@ -211,7 +225,10 @@ export function GambitBoard() {
             boardOrientation: you === 'w' ? 'white' : 'black',
             onPieceDrop: ({ sourceSquare, targetSquare }) => !!targetSquare && move(sourceSquare, targetSquare),
             onSquareClick,
-            onPieceDrag: () => setStarted(true),
+            onPieceDrag: () => {
+              setStarted(true);
+              startNet();
+            },
             canDragPiece: ({ piece }) => yourTurn && piece.pieceType[0] === you,
             squareStyles,
             lightSquareStyle: { backgroundColor: '#efebe2' },
@@ -256,7 +273,7 @@ export function GambitBoard() {
           )}
         </AnimatePresence>
 
-        {!ready && !failed && (
+        {fetching && !ready && !failed && (
           <span className="gbp-loading" aria-hidden="true">
             <span style={{ transform: `scaleX(${progress})` }} />
           </span>

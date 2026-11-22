@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     url: '/',
     siteName: 'Nathan W.',
     type: 'website',
-    images: [{ url: '/og.png?v=4', type: 'image/png', width: 1200, height: 630, alt: "The nateward.me home page: 'Hi, I'm Nathan.' and the About in EB Garamond, beside a morphing ribbon of fine grey lines" }],
+    images: [{ url: '/og.png?v=5', type: 'image/png', width: 1200, height: 630, alt: "The nateward.me home page: 'Hi, I'm Nathan.' and the About in EB Garamond, beside a morphing ribbon of fine grey lines" }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Nathan W.',
     description: 'Engineer and artist. Simulators, solvers and neural networks; hand-painted shoes and drawings.',
-    images: ['/og.png?v=4'],
+    images: ['/og.png?v=5'],
   },
 };
 

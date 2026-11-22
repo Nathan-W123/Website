@@ -157,6 +157,17 @@ const VIDEOS: Record<string, { src?: string; poster?: string; embed?: string; ca
     poster: '/projects/aether6/circuit.webp',
     caption: 'The autonomous circuit: the autopilot flying the waypoints lap after lap on its own estimate',
   },
+  // two clips from the old site's gallery (components/signs/gallery.ts), silent loops
+  aero: {
+    src: '/projects/aero/1',
+    poster: '/projects/aero/1.webp',
+    caption: 'An aircraft in the 3D tunnel: its wake replayed as a time-lapse while the camera orbits',
+  },
+  ignis: {
+    src: '/projects/ignis/1',
+    poster: '/projects/ignis/1.webp',
+    caption: 'The RS-25’s plume, marched from rest and drawn as a GPU volume inside NASA’s model of the bell',
+  },
   // Terra's video, as its landing page (terra-orchard-landing.vercel.app) embeds it
   terra: {
     embed: 'https://www.youtube-nocookie.com/embed/awrDA6VIbRQ?autoplay=1&rel=0',
