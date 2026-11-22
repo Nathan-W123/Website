@@ -2,13 +2,10 @@
 // give each card its shape before the picture has loaded. Regenerate if the
 // pictures change (work/ref in the main checkout has the one-liner).
 export const SHOT_SIZE: Record<string, [number, number]> = {
-  '/projects/ab-initio-md/1.webp': [960, 720],
-  '/projects/ab-initio-md/2.webp': [960, 720],
-  '/projects/ab-initio-md/3.webp': [960, 720],
-  '/projects/ab-initio-md/4.webp': [800, 800],
-  '/projects/ab-initio-md/5.webp': [960, 640],
-  '/projects/ab-initio-md/6.webp': [800, 800],
-  '/projects/ab-initio-md/7.webp': [960, 640],
+  '/projects/ab-initio-md/1.webp': [800, 800],
+  '/projects/ab-initio-md/2.webp': [960, 640],
+  '/projects/ab-initio-md/3.webp': [800, 800],
+  '/projects/ab-initio-md/4.webp': [960, 640],
   '/projects/aero/1.webp': [1600, 1000],
   '/projects/aero/2.webp': [1600, 1000],
   '/projects/aero/3.webp': [1600, 1000],

@@ -88,10 +88,9 @@ export const PLACES: Record<string, Place[]> = {
   ],
   // its write-up and pictures are in components/home/projects.tsx
   'ab-initio-md': [
-    { after: 'mixing two volatile chemicals', shots: [0, 1, 2] },
-    { after: 'takes the forces from that energy', shots: [3] },
-    { after: 'hold the molecules at a set temperature', shots: [4] },
-    { after: "water's computed shape matches published values", shots: [5] },
-    { after: 'its energy does not drift', shots: [6] },
+    { after: 'takes the forces from that energy', shots: [0] },
+    { after: 'hold the molecules at a set temperature', shots: [1] },
+    { after: "water's computed shape matches published values", shots: [2] },
+    { after: 'its energy does not drift', shots: [3] },
   ],
 };
