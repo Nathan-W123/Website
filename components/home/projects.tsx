@@ -33,7 +33,8 @@ const SECTIONS: { label: string; ids: string[] }[] = [
  * (docs/terra in github.com/EthanVTruong/terra) and its mascot.
  */
 const EXTRA: Card[] = [
-  // github.com/Nathan-W123/Ab-Initio-MD (its README has the numbers below)
+  // github.com/Nathan-W123/Ab-Initio-MD (its README has the numbers below);
+  // its pictures are runs of the engine itself (work/ref/aimd-pictures.mjs)
   {
     id: 'ab-initio-md',
     title: 'Ab Initio MD',
@@ -42,7 +43,15 @@ const EXTRA: Card[] = [
     stack: ['Python', 'NumPy', 'SciPy', 'Numba', 'PySCF'],
     href: 'https://github.com/Nathan-W123/Ab-Initio-MD',
     notes: [],
-    images: [],
+    images: [
+      { src: '/projects/ab-initio-md/1.webp', caption: 'H + H₂, run by the engine: a hydrogen atom (blue) flies at H₂, each atom’s path dotted every half femtosecond' },
+      { src: '/projects/ab-initio-md/2.webp', caption: 'The swap: the three atoms in a line, the old bond stretching as the new one forms' },
+      { src: '/projects/ab-initio-md/3.webp', caption: 'After: the blue atom has taken one atom of H₂, and the other flies away' },
+      { src: '/projects/ab-initio-md/4.webp', caption: 'Methanol at one step of a 300 K run, with the force the engine computes on each atom (RHF/6-31G*)' },
+      { src: '/projects/ab-initio-md/5.webp', caption: 'That run’s temperature: started at 30 K, brought to 300 K by the thermostat and held there' },
+      { src: '/projects/ab-initio-md/6.webp', caption: 'Water’s shape as the engine computes it (HF/STO-3G): 0.9894 Å and 100.03°, against the published 0.989 Å and 100.0°' },
+      { src: '/projects/ab-initio-md/7.webp', caption: 'Water left to move freely for a picosecond (HF/6-31G*): kinetic and potential energy trade back and forth, and the total stays within 0.07 kcal/mol' },
+    ],
   },
   {
     id: 'terra',
