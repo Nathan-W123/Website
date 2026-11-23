@@ -2,7 +2,7 @@
 
 import 'katex/dist/katex.min.css';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useEffect, useId, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { Fragment, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { PROJECT_GROUPS, type Card } from '@/components/signs/content';
 import { Shell } from './chrome';
@@ -81,10 +81,16 @@ const BODIES: Record<string, string[]> = {
     "It runs on its own Hartree–Fock engine, which computes the forces exactly rather than estimating them, and it can hold the molecules at a set temperature or let them move freely.",
     "Its energies and forces match PySCF, the standard quantum chemistry package, to 13 decimal places, water's computed shape matches published values, and left to move freely for a picosecond, its energy does not drift.",
   ],
+  // the orchard estimate is backend/chillwatch/estimate.py (k = 6; lapse shrink
+  // 0.75 and dz scale 600 ft from config/thresholds.yaml, fitted on 2018-19 to
+  // 2022-23, 2.333 F MAE leaving stations out on 2023-24 and 2024-25)
   terra: [
-    "Terra is a local-first assistant for orchard growers: their weather, their winter chill and the data behind them. It tracks each orchard's chill through the winter and messages the grower, through the OpenAI and Twilio APIs, when chill is close to met, when something looks wrong, or when the season won't reach it.",
-    "The backend pulls CIMIS station observations and checks 17.3 million readings for nine kinds of fault, comparing each station's temperatures with its neighbours' and flagging suspect humidity, wind and solar readings, before estimating the temperature at the orchard itself.",
-    'Tested by planting 50 faults in a held-out season, it caught 9 of 9 outages, 8 of 9 stuck sensors and 7 of 8 spikes at about half a false alarm per station-month.',
+    'Going to one of the biggest ag schools in the nation, you realize there’s a lot more to farming than planting and harvesting, like data analysis. Fruit and nut trees, for one, need enough winter cold to bloom, and growers count it hour by hour.',
+    'So we built Terra, a local-first assistant for orchard growers: their weather, their winter chill and the data behind them. It tracks each orchard’s chill through the winter and messages the grower, through the OpenAI and Twilio APIs, when chill is close to met, when something looks wrong, or when the season won’t reach it.',
+    'The backend pulls CIMIS station observations and checks 17.3 million readings for nine kinds of fault, comparing each station’s temperatures with its neighbours’ and flagging suspect humidity, wind and solar readings. Then it estimates the temperature at the orchard itself from the six nearest stations:',
+    '$$orchard-estimate$$',
+    'Each station’s reading is carried to the orchard’s elevation by that hour’s lapse rate γ, the median slope of temperature against elevation between stations, and weighted by its distance d and its height difference Δz, with the 0.75 and the 600 ft fitted on five earlier seasons. Every hour between 32 and 45 °F from November through March counts toward the orchard’s chill.',
+    'Tested by planting 50 faults in a held-out season, it caught 9 of 9 outages, 8 of 9 stuck sensors and 7 of 8 spikes at about half a false alarm per station-month. Predicting each station from the others over the two seasons that followed, the orchard estimate is off by 2.3 °F on average.',
   ],
 };
 const BY_ID = new Map([...PROJECT_GROUPS.flatMap((g) => g.cards), ...EXTRA].map((c) => [c.id, c]));
@@ -108,14 +114,29 @@ const setFor = (c: Card, shots: number[]): PeekSet | null => {
 };
 
 /**
- * The write-up as paragraphs of text and chips: each place's chip goes right
- * after its phrase, in the first paragraph that has it (project-pictures.ts).
+ * Words in a write-up that open another project on this page: the words as
+ * the write-up has them, and the project they open.
+ */
+const LINKS: Record<string, { text: string; to: string }[]> = {
+  // Olson's structural analysis was run with SparLab's FEA engine
+  olson: [{ text: 'SparLab’s FEA engine', to: 'sparlab' }],
+};
+/** what such a link sends: the project by that id opens and comes into view */
+const OPEN_PROJECT = 'nw-open-project';
+
+/**
+ * The write-up as paragraphs of text, chips and links: each place's chip goes
+ * right after its phrase, in the first paragraph that has it
+ * (project-pictures.ts), and each link over its words (LINKS).
  */
 const writeUp = (c: Card, body: string[]): ReactNode[][] => {
   const places = PLACES[c.id] ?? [];
+  const links = LINKS[c.id] ?? [];
   const home = places.map((p) => body.findIndex((t) => t.includes(p.after)));
-  if (process.env.NODE_ENV !== 'production')
+  if (process.env.NODE_ENV !== 'production') {
     places.forEach((p, i) => home[i] < 0 && console.warn(`${c.id}: no "${p.after}" in the write-up`));
+    links.forEach((l) => body.some((t) => t.includes(l.text)) || console.warn(`${c.id}: no "${l.text}" in the write-up`));
+  }
   return body.map((text, pi) => {
     // a paragraph that is only "$$name$$" is that equation, typeset ahead of time (equations.ts)
     const eq = /^\$\$([a-z-]+)\$\$$/.exec(text)?.[1];
@@ -129,18 +150,52 @@ const writeUp = (c: Card, body: string[]): ReactNode[][] => {
           dangerouslySetInnerHTML={{ __html: EQUATIONS[eq].html }}
         />,
       ];
-    const hits = places
-      .map((p, i) => ({ p, i, at: home[i] === pi ? text.indexOf(p.after) : -1 }))
-      .filter((h) => h.at >= 0)
-      .sort((a, b) => a.at - b.at);
+    // what is set into the text, in order: from..to is the stretch of text it takes
+    const cuts: { from: number; to: number; node: ReactNode }[] = [];
+    places.forEach((p, i) => {
+      const set = home[i] === pi ? setFor(c, p.shots) : null;
+      if (!set) return;
+      const end = text.indexOf(p.after) + p.after.length;
+      // punctuation right after a chip keeps to its line (a '?' once wrapped onto a line of its own)
+      const tail = /^[.,;:?!)]*/.exec(text.slice(end))?.[0] ?? '';
+      cuts.push({
+        from: end,
+        to: end + tail.length,
+        node: (
+          <span key={`pk${i}`} className="nw-glue">
+            <Peek set={set} zoomable />
+            {tail}
+          </span>
+        ),
+      });
+    });
+    links.forEach((l, i) => {
+      const at = text.indexOf(l.text);
+      if (at < 0) return;
+      cuts.push({
+        from: at,
+        to: at + l.text.length,
+        node: (
+          <a
+            key={`ln${i}`}
+            className="nw-xref"
+            href={`#${l.to}`}
+            onClick={(e) => {
+              e.preventDefault();
+              window.dispatchEvent(new CustomEvent(OPEN_PROJECT, { detail: l.to }));
+            }}
+          >
+            {l.text}
+          </a>
+        ),
+      });
+    });
+    cuts.sort((a, b) => a.from - b.from);
     const out: ReactNode[] = [];
     let pos = 0;
-    for (const { p, i, at } of hits) {
-      const end = at + p.after.length;
-      out.push(text.slice(pos, end));
-      const set = setFor(c, p.shots);
-      if (set) out.push(<Peek key={`pk${i}`} set={set} zoomable />);
-      pos = end;
+    for (const k of cuts) {
+      out.push(text.slice(pos, k.from), k.node);
+      pos = k.to;
     }
     out.push(text.slice(pos));
     return out;
@@ -212,7 +267,7 @@ const STACKS: Record<string, string[]> = {
   quantize: ['Python', 'NumPy', 'SciPy', 'PySCF'],
   formulate: ['Python', 'RDKit', 'scikit-learn', 'thermo'],
   'high-risk-roads': ['R', 'tidyverse', 'sf', 'Leaflet', 'ggplot2'],
-  olson: ['Autodesk Fusion', 'ASCE 7-22', 'AISC 360-22', 'ACI 318-19', '2025 CBC'],
+  olson: ['Autodesk Fusion', 'SparLab', 'ASCE 7-22', 'AISC 360-22', 'ACI 318-19', '2025 CBC'],
 };
 
 /** who a project was built with, on a line of its own at the end of its write-up */
@@ -244,8 +299,33 @@ function Project({ c }: { c: Card }) {
   useEffect(() => {
     if (open) c.images.forEach((s) => { const i = new Image(); i.src = s.src; });
   }, [open, c]);
+  const row = useRef<HTMLLIElement>(null);
+  // asked to come into view: it does once it has finished opening, since a
+  // scroll made while it grows is undone by the browser keeping the words
+  // being read in place
+  const [view, setView] = useState(0);
+  const viewed = useRef(0);
+  useEffect(() => {
+    if (!settled || view === viewed.current) return;
+    viewed.current = view;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    row.current?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+  }, [view, settled]);
+  // opened by a link in another write-up (LINKS), or by its id after # in the address
+  useEffect(() => {
+    const show = () => {
+      setOpen(true);
+      setView((v) => v + 1);
+    };
+    if (window.location.hash === `#${c.id}`) show();
+    const onOpen = (e: Event) => {
+      if ((e as CustomEvent<string>).detail === c.id) show();
+    };
+    window.addEventListener(OPEN_PROJECT, onOpen);
+    return () => window.removeEventListener(OPEN_PROJECT, onOpen);
+  }, [c.id]);
   return (
-    <li className={`nw-proj${open ? ' is-open' : ''}`}>
+    <li id={c.id} ref={row} className={`nw-proj${open ? ' is-open' : ''}`}>
       <button type="button" className="nw-proj-row" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
         <span className="nw-proj-name">{c.title}</span>
         <span className="nw-proj-tag">{c.tag}</span>
@@ -278,7 +358,17 @@ function Project({ c }: { c: Card }) {
                   </a>
                 </p>
               )}
-              {stack.length > 0 && <p className="nw-proj-stack">{stack.join(' · ')}</p>}
+              {stack.length > 0 && (
+                // each name whole on its line ('AISC 360-22' was splitting at its hyphen)
+                <p className="nw-proj-stack">
+                  {stack.map((s, i) => (
+                    <Fragment key={s}>
+                      {i > 0 && ' · '}
+                      <span>{s}</span>
+                    </Fragment>
+                  ))}
+                </p>
+              )}
               {(c.href || video || more.length > 0) && (
                 <p className="nw-proj-link">
                   {c.href && (

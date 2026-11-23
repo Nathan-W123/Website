@@ -41,8 +41,8 @@ export const metadata: Metadata = {
     icon: [{ url: '/favicon.svg?v=3', type: 'image/svg+xml' }, { url: '/favicon.ico?v=3', sizes: '16x16 32x32 48x48' }],
     apple: '/apple-touch-icon.png?v=3',
   },
-  // The picture a sent link shows is the home page itself, taken by
-  // scripts/og-image.mjs (npm run og). Run it after a redesign, and bump ?v=
+  // The picture a sent link shows is Home's ribbon with the name over it,
+  // drawn by scripts/og-image.mjs (npm run og). When it changes, bump ?v=
   // here (both places) so apps that keep old previews fetch the new one.
   openGraph: {
     title: 'Nathan W.',
@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     url: '/',
     siteName: 'Nathan W.',
     type: 'website',
-    images: [{ url: '/og.png?v=5', type: 'image/png', width: 1200, height: 630, alt: "The nateward.me home page: 'Hi, I'm Nathan.' and the About in EB Garamond, beside a morphing ribbon of fine grey lines" }],
+    images: [{ url: '/og.png?v=6', type: 'image/png', width: 1200, height: 630, alt: 'Nathan Ward, in EB Garamond, over a morphing ribbon of fine grey lines' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Nathan W.',
     description: 'Engineer and artist. Simulators, solvers and neural networks; hand-painted shoes and drawings.',
-    images: ['/og.png?v=5'],
+    images: ['/og.png?v=6'],
   },
 };
 

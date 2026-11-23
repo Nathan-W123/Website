@@ -623,8 +623,15 @@ html:has(.nw) {
 .nw-equation .katex { font-size: min(1.12em, calc(97cqi / var(--eq-em, 22))); color: var(--ink); }
 /* who it was built with, the name a link */
 .nw-proj-credit a { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+/* words in a write-up that open another project here (LINKS in projects.tsx),
+   which then comes into view with a little room above it */
+.nw-xref { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.nw-proj { scroll-margin-top: 24px; }
+/* a chip and the punctuation right after it, kept on one line */
+.nw-glue { white-space: nowrap; }
 /* under a write-up: what it is built with, quietly */
 .nw .nw-proj-stack { margin: 4px 0 8px; font-size: 0.86em; letter-spacing: 0.01em; color: var(--muted); }
+.nw-proj-stack span { white-space: nowrap; }
 /* under a write-up: its code, and a video to play where there is one */
 .nw-proj-link { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 26px; }
 .nw-proj-link a { text-decoration: underline; text-underline-offset: 4px; }

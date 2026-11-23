@@ -1,20 +1,18 @@
 #!/usr/bin/env node
 // scripts/og-image.mjs: the picture a link to the site shows when it is sent
-// (iMessage, Slack, Discord, LinkedIn, X...), taken from the home page itself
-// so it can't fall behind the site again: run it after a redesign.
+// (iMessage, Slack, Discord, LinkedIn, X...): Home's morphing ribbon on its
+// first frame (public/about/ribbon.webp), multiplied onto the page's paper as
+// Home shows it, with the name set over it in the site's EB Garamond. A soft
+// halo of paper behind the letters keeps the ribbon's lines off them.
 //
-// Opens the home page in headless Chrome at a laptop's width and the link
-// preview's shape (1440 x 756, 1.905 : 1), waits for the opening motion to
-// settle, and writes public/og.png at 1200 x 630. The scrollbar's gutter is
-// left out, as a Mac or a phone shows the page. Then bump ?v= on the image in
+// Writes public/og.png at 1200 x 630. Then bump ?v= on the image in
 // app/layout.tsx so apps that keep old previews fetch the new one.
 //
 // Usage:
-//   npm run og                                   # from the live site
-//   node scripts/og-image.mjs --base=http://127.0.0.1:4173/   # a local build
+//   npm run og
 //   node scripts/og-image.mjs --chrome="C:\path\to\chrome.exe" --out=work/og.png
 
-import { mkdir, stat } from 'node:fs/promises';
+import { mkdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
@@ -24,57 +22,45 @@ const arg = (name, fallback) => {
   const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
   return hit ? hit.slice(name.length + 3) : fallback;
 };
-const BASE = arg('base', 'https://nateward.me/');
 const OUT = path.resolve(ROOT, arg('out', 'public/og.png'));
 const CHROME = arg('chrome', process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe');
 
-const VIEW = { width: 1440, height: 756 };
 const SIZE = { width: 1200, height: 630 };
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const PAPER = '#f9f6ef'; // --bg in components/home/home.css
+const INK = '#1f1c18'; // --ink
+const RIBBON = 560; // the ribbon's square on the card, in px
+const NAME = { text: 'Nathan Ward', size: 76, weight: 600 };
+
+const b64 = async (f) => (await readFile(path.join(ROOT, f))).toString('base64');
+const font = await b64('app/fonts/eb-garamond-var.woff2');
+const ribbon = await b64('public/about/ribbon.webp');
+const halo = [6, 12, 18, 26].map((r) => `0 0 ${r}px ${PAPER}`).join(', ');
+
+const html = `<!doctype html><meta charset="utf-8">
+<style>
+@font-face { font-family: 'EB Garamond'; src: url(data:font/woff2;base64,${font}) format('woff2'); font-weight: 400 800; }
+html, body { margin: 0; width: ${SIZE.width}px; height: ${SIZE.height}px; overflow: hidden; background: ${PAPER}; }
+/* the paper on the card itself, so the ribbon's white ground multiplies away */
+.card { position: relative; width: 100%; height: 100%; display: grid; place-items: center; isolation: isolate; background: ${PAPER}; }
+.card img { width: ${RIBBON}px; height: ${RIBBON}px; mix-blend-mode: multiply; }
+.card h1 {
+  position: absolute; inset: 0; margin: 0; display: grid; place-items: center;
+  font: ${NAME.weight} ${NAME.size}px/1 'EB Garamond', serif; letter-spacing: -0.005em; color: ${INK};
+  text-shadow: ${halo};
+}
+</style>
+<div class="card"><img src="data:image/webp;base64,${ribbon}" alt=""><h1>${NAME.text}</h1></div>`;
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new' });
-const problems = [];
 try {
   const page = await browser.newPage();
-  page.on('pageerror', (e) => problems.push(String(e)));
-  page.on('console', (m) => { if (m.type() === 'error') problems.push(m.text()); });
-  page.on('requestfailed', (r) => problems.push(`failed: ${r.url()}`));
-  // drawn straight at the size it is sent at: 1440 css px across 1200 pixels
-  await page.setViewport({ ...VIEW, deviceScaleFactor: SIZE.width / VIEW.width });
-  await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
-  const url = new URL(BASE);
-  url.searchParams.set('og', String(Date.now()));
-  url.hash = '#/';
-  await page.goto(url.href, { waitUntil: 'networkidle0', timeout: 60000 });
+  await page.setViewport({ ...SIZE, deviceScaleFactor: 1 });
+  await page.setContent(html, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
-  // no gutter: the nav's rule runs edge to edge and the page sits centred
-  await page.addStyleTag({ content: 'html, .sg-page { scrollbar-width: none !important; scrollbar-gutter: auto !important; }' });
-  await page.evaluate(() => window.dispatchEvent(new Event('resize')));
-  // the opening motion has settled once the name, the cards, the two words
-  // and the switch have held still for three looks in a row
-  const pose = () => page.evaluate(() =>
-    ['.nw-banner', '.nw-about h1', '.nw-about p', '.hm-name', '.hm-role', '.hm-switch', '.hm-fan *', '.hm-nav-bar']
-      .flatMap((s) => [...document.querySelectorAll(s)])
-      .map((e) => { const r = e.getBoundingClientRect(); return `${r.x.toFixed(1)},${r.y.toFixed(1)},${r.width.toFixed(1)},${r.height.toFixed(1)}`; })
-      .join('|'));
-  await wait(1500);
-  let last = await pose();
-  let still = 0;
-  for (let i = 0; i < 40 && still < 3; i++) {
-    await wait(250);
-    const now = await pose();
-    still = now === last ? still + 1 : 0;
-    last = now;
-  }
-  if (still < 3) problems.push('the home page was still moving after 11.5 s');
   await mkdir(path.dirname(OUT), { recursive: true });
   await page.screenshot({ path: OUT, type: 'png' });
   const { size } = await stat(OUT);
   console.log(`wrote ${path.relative(ROOT, OUT)}: ${SIZE.width} x ${SIZE.height}, ${Math.round(size / 1024)} KB`);
 } finally {
   await browser.close();
-}
-if (problems.length) {
-  console.error(`problems:\n  ${problems.join('\n  ')}`);
-  process.exitCode = 1;
 }

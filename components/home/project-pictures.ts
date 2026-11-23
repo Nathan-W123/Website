@@ -36,7 +36,7 @@ export const PLACES: Record<string, Place[]> = {
     { after: 'complete the mission', shots: [3] },
   ],
   ignis: [
-    { after: 'from the propellants up', shots: [0] },
+    { after: 'rocket propulsion simulator', shots: [0] },
     { after: 'regenerative cooling', shots: [3, 4, 6] },
     { after: 'through a bell nozzle', shots: [1, 2] },
     { after: 'to within 4.5%', shots: [5] },
@@ -76,9 +76,11 @@ export const PLACES: Record<string, Place[]> = {
   terra: [
     { after: 'a local-first assistant for orchard growers', shots: [3, 0, 1] },
     // the raw and filtered maps were near twins of the flagged one: the
-    // flagged station and the chat about it, then the neighbours' map
+    // flagged station and the chat about it, then the neighbours' map, then
+    // which stations the orchard's estimate used
     { after: 'nine kinds of fault', shots: [5, 7] },
-    { after: "with its neighbours'", shots: [6, 9] },
+    { after: 'with its neighbours’', shots: [6] },
+    { after: 'from the six nearest stations', shots: [9] },
     { after: 'per station-month', shots: [8] },
   ],
   'high-risk-roads': [
