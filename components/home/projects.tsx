@@ -85,12 +85,12 @@ const BODIES: Record<string, string[]> = {
   // 0.75 and dz scale 600 ft from config/thresholds.yaml, fitted on 2018-19 to
   // 2022-23, 2.333 F MAE leaving stations out on 2023-24 and 2024-25)
   terra: [
-    'Going to one of the biggest ag schools in the nation, you realize there’s a lot more to farming than planting and harvesting, like data analysis. Fruit and nut trees, for one, need enough winter cold to bloom, and growers count it hour by hour.',
-    'So we built Terra, a local-first assistant for orchard growers: their weather, their winter chill and the data behind them. It tracks each orchard’s chill through the winter and messages the grower, through the OpenAI and Twilio APIs, when chill is close to met, when something looks wrong, or when the season won’t reach it.',
-    'The backend pulls CIMIS station observations and checks 17.3 million readings for nine kinds of fault, comparing each station’s temperatures with its neighbours’ and flagging suspect humidity, wind and solar readings. Then it estimates the temperature at the orchard itself from the six nearest stations:',
+    'Going to one of the biggest ag schools in the nation, you realize there’s a lot more to farming than planting and harvesting, like data analysis.',
+    'So we built Terra, a local-first assistant for orchard growers that tracks their winter chill and texts them when it’s nearly met or something looks wrong.',
+    'It checks 17.3 million CIMIS readings for nine kinds of fault, comparing each station with its neighbours, then estimates the orchard’s temperature from the six nearest stations:',
     '$$orchard-estimate$$',
-    'Each station’s reading is carried to the orchard’s elevation by that hour’s lapse rate γ, the median slope of temperature against elevation between stations, and weighted by its distance d and its height difference Δz, with the 0.75 and the 600 ft fitted on five earlier seasons. Every hour between 32 and 45 °F from November through March counts toward the orchard’s chill.',
-    'Tested by planting 50 faults in a held-out season, it caught 9 of 9 outages, 8 of 9 stuck sensors and 7 of 8 spikes at about half a false alarm per station-month. Predicting each station from the others over the two seasons that followed, the orchard estimate is off by 2.3 °F on average.',
+    'Each reading is shifted to the orchard’s elevation by the hour’s lapse rate γ and weighted by distance d and height difference Δz; every hour from 32 to 45 °F counts as chill.',
+    'In a held-out season with 50 planted faults, it caught 9 of 9 outages, 8 of 9 stuck sensors and 7 of 8 spikes at about half a false alarm per station-month. At stations it never saw, the estimate is off by 2.3 °F on average.',
   ],
 };
 const BY_ID = new Map([...PROJECT_GROUPS.flatMap((g) => g.cards), ...EXTRA].map((c) => [c.id, c]));

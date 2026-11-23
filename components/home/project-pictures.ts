@@ -79,7 +79,7 @@ export const PLACES: Record<string, Place[]> = {
     // flagged station and the chat about it, then the neighbours' map, then
     // which stations the orchard's estimate used
     { after: 'nine kinds of fault', shots: [5, 7] },
-    { after: 'with its neighbours’', shots: [6] },
+    { after: 'with its neighbours', shots: [6] },
     { after: 'from the six nearest stations', shots: [9] },
     { after: 'per station-month', shots: [8] },
   ],
