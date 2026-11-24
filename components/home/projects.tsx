@@ -276,7 +276,7 @@ const BUILT_WITH: Record<string, { name: string; href: string }> = {
 };
 
 /** what a write-up's own link is called, where it is not code */
-const LINK_LABELS: Record<string, string> = { olson: 'CAD' };
+const LINK_LABELS: Record<string, string> = { olson: 'CAD', 'high-risk-roads': 'Report' };
 /** more links under a write-up, beside its own (a report, say) */
 const MORE_LINKS: Record<string, { label: string; href: string }[]> = {
   // the preliminary calculations from the UWP 102E team report (5 Nov 2026),
