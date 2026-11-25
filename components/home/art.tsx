@@ -6,12 +6,14 @@ import { createPortal } from 'react-dom';
 import { ART, WORKED_WITH, type ArtItem } from '@/components/signs/content';
 import { Shell } from './chrome';
 import { Zoom } from './peek';
+import { tug } from './tug';
 
 /**
  * Art, laid out like Work and Projects: a line down the left with a dot at
  * each section, a sentence on what the section is, and the pieces in rows of
  * square pictures under it; a picture opens large with its name and what it
- * was made with. The last dot is who the work was for.
+ * was made with, and with a mouse can be tugged a little way (tug.ts). The
+ * last dot is who the work was for.
  */
 const SECTIONS: { id: string; label: string; line: string }[] = [
   { id: 'shoes', label: 'Shoes', line: "Some of my favorite shoes I've painted." },
@@ -36,7 +38,7 @@ export function Art() {
                 <ul className="nw-art">
                   {items.map((it) => (
                     <li key={it.image}>
-                      <button type="button" className="nw-art-open" onClick={() => setZoom(it)} aria-label={`Open ${it.caption || s.label}`}>
+                      <button type="button" className="nw-art-open" {...tug} onClick={() => setZoom(it)} aria-label={`Open ${it.caption || s.label}`}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={it.image} alt="" loading="lazy" draggable={false} />
                       </button>

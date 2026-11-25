@@ -3,19 +3,23 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { tug } from './tug';
 
 /**
  * A picture chip in a line of text that opens into a small fan of three
  * pictures, after the reference Nathan showed (a thumbnail after a phrase;
  * hover it, or tap it on a phone, and three photos fly out of it and settle
  * at angles over the words below). The fan is shifted sideways if it would
- * run off the screen, and comes down a size on a phone. With `zoomable`, the
- * fan stays open while the pointer crosses to it, and a picture opens large
- * over the page when clicked. The chip itself is one picture, upright, about
- * the height of the words around it, like the reference's.
+ * run off the screen, and comes down a size on a phone. The fan stays open
+ * while the pointer crosses to it, and a picture in it opens large over the
+ * page when clicked (its `full` copy, where it has one). The chip itself is
+ * one picture, upright, about the height of the words around it, like the
+ * reference's. With a mouse, the chip and the pictures can be tugged a little
+ * way, and spring back (tug.ts).
  */
 
-export type PeekCard = { src: string; alt: string; w: number; h: number };
+/** `full`: a larger copy, for when it opens large (`src` is sized for the fan) */
+export type PeekCard = { src: string; alt: string; w: number; h: number; full?: string };
 /** one to three cards: a project with fewer pictures opens into fewer */
 export type PeekSet = { label: string; icon: string; cards: PeekCard[] };
 
@@ -38,7 +42,7 @@ const FANS = {
  *  was still hard to make out), and a little closer under the chip */
 const GROW = 1.25;
 
-export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boolean }) {
+export function Peek({ set }: { set: PeekSet }) {
   const n = Math.min(3, Math.max(1, set.cards.length)) as 1 | 2 | 3;
   const FAN = useMemo(() => FANS[n].map((f) => ({ ...f, x: f.x * GROW, y: f.y * GROW - 12 })), [n]);
   const cards = useMemo(() => set.cards.map((c) => ({ ...c, w: c.w * GROW, h: c.h * GROW })), [set.cards]);
@@ -106,12 +110,13 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
       ref={root}
       className={`pk${open ? ' is-open' : ''}`}
       onPointerEnter={(e) => e.pointerType === 'mouse' && show()}
-      // a fan you can click into gets long enough to cross the gap to it
-      onPointerLeave={(e) => e.pointerType === 'mouse' && hide(zoomable ? 380 : 140)}
+      // long enough to cross the gap to the fan, which can be clicked into
+      onPointerLeave={(e) => e.pointerType === 'mouse' && hide(380)}
     >
       <button
         type="button"
         className="pk-chip"
+        {...tug}
         aria-label={`${set.label}: ${open ? 'hide' : 'show'} pictures`}
         aria-expanded={open}
         onClick={() => (open ? hide() : show())}
@@ -126,29 +131,25 @@ export function Peek({ set, zoomable = false }: { set: PeekSet; zoomable?: boole
             return (
               <motion.span
                 key={c.src}
-                className={zoomable ? 'pk-card is-zoomable' : 'pk-card'}
+                className="pk-card"
+                {...tug}
                 style={{ width: c.w * layout.k, height: c.h * layout.k, marginLeft: (-c.w * layout.k) / 2, marginTop: (-c.h * layout.k) / 2, zIndex: 40 + f.z }}
                 initial={{ opacity: 0, x: 0, y: 0, scale: 0.18, rotate: 0 }}
                 animate={{ opacity: 1, x: f.x * layout.k + layout.shift, y: f.y * layout.k, scale: 1, rotate: f.r }}
                 exit={{ opacity: 0, x: 0, y: 0, scale: 0.18, rotate: 0, transition: { duration: reduce ? 0.01 : 0.18, ease: 'easeIn' } }}
                 transition={{ ...spring, delay: reduce ? 0 : i * 0.035 }}
-                whileHover={zoomable && !reduce ? { scale: 1.06, zIndex: 60 } : undefined}
+                whileHover={reduce ? undefined : { scale: 1.06, zIndex: 60 }}
               >
-                {zoomable ? (
-                  <button type="button" className="pk-card-open" aria-label={'Open: ' + c.alt} onClick={() => setZoom(c)}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={c.src} alt="" draggable={false} />
-                  </button>
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={c.src} alt={c.alt} draggable={false} />
-                )}
+                <button type="button" className="pk-card-open" aria-label={'Open: ' + c.alt} onClick={() => setZoom(c)}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={c.src} alt="" draggable={false} />
+                </button>
               </motion.span>
             );
           })}
       </AnimatePresence>
       {typeof document !== 'undefined' &&
-        createPortal(<AnimatePresence>{zoom && <Zoom key={zoom.src} src={zoom.src} caption={zoom.alt} onClose={() => setZoom(null)} />}</AnimatePresence>, document.body)}
+        createPortal(<AnimatePresence>{zoom && <Zoom key={zoom.src} src={zoom.full ?? zoom.src} caption={zoom.alt} onClose={() => setZoom(null)} />}</AnimatePresence>, document.body)}
     </span>
   );
 }

@@ -350,7 +350,7 @@ html:has(.nw) {
   overflow: hidden;
   border-radius: 14px;
   background: #fff;
-  pointer-events: none;
+  cursor: zoom-in;
   box-shadow: 0 24px 44px -20px rgb(40 25 10 / 0.55), 0 3px 10px rgb(40 25 10 / 0.16);
 }
 .pk-card img {
@@ -359,9 +359,8 @@ html:has(.nw) {
   height: 100%;
   object-fit: cover;
 }
-/* on Projects a picture in the fan opens large: it takes the pointer, lifts
-   a little under it (whileHover, in peek.tsx), and is the button */
-.pk-card.is-zoomable { pointer-events: auto; cursor: zoom-in; }
+/* a picture in the fan opens large: it takes the pointer, lifts a little
+   under it (whileHover, in peek.tsx), and is the button */
 .pk-card-open {
   display: block;
   width: 100%;
@@ -373,6 +372,13 @@ html:has(.nw) {
 }
 .pk-card-open img { pointer-events: none; }
 .pk-card-open:focus-visible { outline: 2px solid #1f1c18; outline-offset: -2px; border-radius: 14px; }
+/* the pictures that can be tugged (tug.ts): pressing one starts no selection
+   in the words around it, and while it is held it is grabbed */
+.pk-chip,
+.pk-card,
+.nw-art-open { -webkit-user-select: none; user-select: none; }
+.is-tugged,
+.is-tugged * { cursor: grabbing; }
 @media (prefers-reduced-motion: reduce) {
   .pk-chip { transition: none; }
 }

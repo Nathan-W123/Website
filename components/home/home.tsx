@@ -13,7 +13,7 @@ import { Peek, useWarmPeeks, type PeekSet } from './peek';
  * its lines to grey, work/ref/ribbon-recolour.mjs, multiplied onto the
  * paper), the way that About was laid out. The paper plane at the foot comes
  * with the shell, chrome.tsx. Three phrases in the About carry a picture chip
- * that opens into a fan of three (peek.tsx).
+ * that opens into a fan of three (peek.tsx), each of which opens large.
  */
 
 /** The About, word for word from content.ts: its opening line is the heading. */
@@ -24,8 +24,10 @@ const PARAGRAPHS = [REST_OF_FIRST.join(' '), ...ABOUT.paragraphs.slice(1)];
  * The pictures behind the chips, at their size on screen (the files are at
  * least twice that). Quantum: orbitals Nathan's own Hartree–Fock engine
  * computed, the HF-SCF project's pictures (work/ref/orbital-render.mjs);
- * organic chemistry: Ben Mills' ball-and-stick renders, public domain, from
- * Wikimedia Commons (work/ref/peek-images.mjs). Art: Nathan's own.
+ * organic chemistry: ball-and-stick renders, public domain, from Wikimedia
+ * Commons (work/ref/peek-images.mjs). Art: Nathan's own. A picture opens
+ * large from its fan, as on Projects: the art from the Art page's copies, the
+ * molecules from larger ones (work/ref/peek-full.mjs), the orbitals as they are.
  */
 const PEEKS: Record<'quantum' | 'art' | 'ochem', PeekSet> = {
   quantum: {
@@ -41,18 +43,18 @@ const PEEKS: Record<'quantum' | 'art' | 'ochem', PeekSet> = {
     label: 'Art',
     icon: '/about/peek/art-icon.webp',
     cards: [
-      { src: '/about/peek/art-1.webp', alt: 'Carnage, a marker drawing', w: 150, h: 176 },
-      { src: '/about/peek/art-2.webp', alt: 'Hand-painted Gengar shoes', w: 168, h: 174 },
-      { src: '/about/peek/art-3.webp', alt: 'Hand-painted graffiti shoes', w: 210, h: 157 },
+      { src: '/about/peek/art-1.webp', full: '/art/drawing/carnage.webp', alt: 'Carnage, a marker drawing', w: 150, h: 176 },
+      { src: '/about/peek/art-2.webp', full: '/art/shoes/purple-monster.webp', alt: 'Hand-painted Gengar shoes', w: 168, h: 174 },
+      { src: '/about/peek/art-3.webp', full: '/art/shoes/graffiti.webp', alt: 'Hand-painted graffiti shoes', w: 210, h: 157 },
     ],
   },
   ochem: {
     label: 'Organic chemistry',
     icon: '/about/peek/ochem-icon.webp',
     cards: [
-      { src: '/about/peek/ochem-1.webp', alt: 'Caffeine, a ball-and-stick model', w: 164, h: 141 },
-      { src: '/about/peek/ochem-2.webp', alt: 'Aspirin, a ball-and-stick model', w: 176, h: 169 },
-      { src: '/about/peek/ochem-3.webp', alt: 'Paracetamol, a ball-and-stick model', w: 214, h: 134 },
+      { src: '/about/peek/ochem-1.webp', full: '/about/peek/ochem-1-full.webp', alt: 'Caffeine, a ball-and-stick model', w: 164, h: 141 },
+      { src: '/about/peek/ochem-2.webp', full: '/about/peek/ochem-2-full.webp', alt: 'Aspirin, a ball-and-stick model', w: 176, h: 169 },
+      { src: '/about/peek/ochem-3.webp', full: '/about/peek/ochem-3-full.webp', alt: 'Paracetamol, a ball-and-stick model', w: 214, h: 134 },
     ],
   },
 };

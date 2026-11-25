@@ -164,7 +164,7 @@ const writeUp = (c: Card, body: string[]): ReactNode[][] => {
         to: end + tail.length,
         node: (
           <span key={`pk${i}`} className="nw-glue">
-            <Peek set={set} zoomable />
+            <Peek set={set} />
             {tail}
           </span>
         ),
@@ -362,7 +362,7 @@ export function Projects() {
     <Shell page="projects" banner="wave" sendoff>
       <section className="nw-col nw-section" aria-labelledby="nw-projects">
         <h1 id="nw-projects">Projects</h1>
-        <p className="nw-lede">Things I&apos;ve built and am passionate about.</p>
+        <p className="nw-lede">Cool stuff I&apos;ve built.</p>
         <ul className="nw-groups">
           {SECTIONS.map((s) => (
             <li key={s.label} className="nw-group">
