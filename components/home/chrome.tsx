@@ -6,9 +6,8 @@ import './home.css';
 
 /**
  * What every page of the redesign shares, laid out like the reference Nathan
- * picked: his name on the left, the way home, and a plain row of links
- * centred on the paper, over a rule that runs the width of the page (on a
- * phone, the name over the links), one of his GIFs as a picture in the column under
+ * picked: a plain row of links on the paper, centred over a rule that runs
+ * the width of the page, one of his GIFs as a picture in the column under
  * them (Home has its ribbon beside the words instead), and the words under
  * that, and at the foot of Art and Projects, the paper plane from the old
  * home over a line of its own. Going from page to page, the line under the tab glides to the next
@@ -17,6 +16,7 @@ import './home.css';
 
 type Page = 'home' | 'work' | 'projects' | 'art' | 'chess' | 'contact';
 const NAV: { page: Page; label: string; href: string }[] = [
+  { page: 'home', label: 'Home', href: '/' },
   { page: 'work', label: 'Work', href: '/work/' },
   { page: 'projects', label: 'Projects', href: '/projects/' },
   { page: 'art', label: 'Art', href: '/art/' },
@@ -113,19 +113,14 @@ export function Shell({ page, banner = false, sendoff = false, children }: { pag
     <div className="nw" id="top">
       <header className="nw-head">
         <nav className="nw-nav" aria-label="Site">
-          <a className="nw-name" href="/" aria-current={page === 'home' ? 'page' : undefined}>
-            Nathan Ward
-          </a>
-          <div className="nw-tabs">
-            {NAV.map((n) => (
-              <a key={n.label} href={n.href} aria-current={n.page === page ? 'page' : undefined}>
-                {n.label}
-                {/* the line under the page you are on: its own element, so a
-                    page switch can glide it to the next tab (home.css) */}
-                {n.page === page && <span className="nw-tab-bar" aria-hidden="true" />}
-              </a>
-            ))}
-          </div>
+          {NAV.map((n) => (
+            <a key={n.label} href={n.href} aria-current={n.page === page ? 'page' : undefined}>
+              {n.label}
+              {/* the line under the page you are on: its own element, so a
+                  page switch can glide it to the next tab (home.css) */}
+              {n.page === page && <span className="nw-tab-bar" aria-hidden="true" />}
+            </a>
+          ))}
         </nav>
         {banner && (
           <div className="nw-col nw-banner-row">

@@ -84,46 +84,25 @@ html:has(.nw) {
   padding-bottom: 96px;
 }
 
-/* ---- the bar at the top: Nathan's name on the left, the way home, and the
-   row of links centred on the page (the third column, empty, balances the
-   name's), over a rule that runs the width of the page. On a wide screen it
-   keeps to the middle 1180px; below 760px the name sits over the links ---- */
+/* ---- the row of links, on the paper, centred over a rule that runs the
+   width of the page ---- */
 .nw-nav {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: baseline;
-  column-gap: 24px;
-  padding: 30px max(var(--gut), calc((100% - 1180px) / 2)) 18px;
-  border-bottom: 1px solid var(--nav-rule);
-}
-.nw-nav .nw-name {
-  justify-self: start;
-  font-size: 21px;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  white-space: nowrap;
-  text-decoration: none;
-}
-.nw-nav .nw-name:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
-.nw-tabs {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px 30px;
+  padding: 30px var(--gut) 18px;
+  border-bottom: 1px solid var(--nav-rule);
 }
-.nw-tabs a {
+.nw-nav a {
   position: relative;
   font-size: 19px;
   text-decoration: none;
 }
-@media (max-width: 760px) {
-  .nw-nav { grid-template-columns: 1fr; justify-items: center; row-gap: 8px; }
-  .nw-nav .nw-name { justify-self: center; }
-}
 /* the other tabs underline on hover; the page you are on has its own line,
    an element, so a page switch can glide it from tab to tab */
-.nw-tabs a:not([aria-current='page']):hover,
-.nw-tabs a:not([aria-current='page']):focus-visible {
+.nw-nav a:not([aria-current='page']):hover,
+.nw-nav a:not([aria-current='page']):focus-visible {
   text-decoration: underline;
   text-underline-offset: 5px;
   text-decoration-thickness: 1px;
@@ -757,11 +736,9 @@ html:has(.nw) {
 @media (max-width: 600px) {
   .nw { --gut: 18px; font-size: 18px; }
   .nw-about { font-size: 21px; }
-  /* the name, then the five tabs on one line under it */
-  .nw-nav { padding: 22px var(--gut) 14px; row-gap: 6px; }
-  .nw-nav .nw-name { font-size: 19px; }
-  .nw-tabs { gap: 6px 16px; }
-  .nw-tabs a { font-size: 17px; }
+  /* six tabs on one line on a phone */
+  .nw-nav { padding: 22px var(--gut) 14px; gap: 6px 16px; }
+  .nw-nav a { font-size: 17px; }
   .nw-banner { margin-top: 26px; aspect-ratio: 2 / 1; }
   .nw-home,
   .nw-section { padding-top: 34px; }
