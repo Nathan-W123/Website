@@ -648,6 +648,59 @@ html:has(.nw) {
 }
 .nw-proj-video:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
 
+/* ---- a project's video on a page of its own (app/video/[id]), the link
+   that is sent: the video first and wider than the column, then its title,
+   a line about it and the links, in the column ---- */
+.nw-watch {
+  width: 100%;
+  max-width: calc(1040px + 2 * var(--gut));
+  margin: 40px auto 0;
+  padding: 0 var(--gut);
+}
+.nw-watch-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 22px 44px -30px rgb(40 25 10 / 0.7);
+}
+.nw-watch-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+/* the same paper disc and ink triangle as the picture the link shows */
+.nw-watch-play {
+  --d: clamp(56px, 9vw, 84px);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--d);
+  height: var(--d);
+  margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(249 246 239 / 0.94);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 12px 30px -12px rgb(0 0 0 / 0.7);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.3, 1);
+}
+.nw-watch-play svg { width: 44%; height: 44%; margin-left: 6%; fill: currentColor; }
+.nw-watch-play:hover { transform: scale(1.06); }
+.nw-watch-play:focus-visible { outline: 2px solid var(--bg); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .nw-watch-play { transition: none; }
+}
+.nw-watch-text.nw-section { padding-top: 26px; }
+.nw-watch-links { margin: 16px 0 0; }
+
 /* ---- chess: Gambit's board on a page of its own, after the reference's game page ---- */
 .nw-chess p { margin: 0 0 12px; }
 .nw-chess-board {
